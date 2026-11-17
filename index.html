@@ -64,6 +64,19 @@ h1, h2, h3 { font-family: var(--display); letter-spacing: -0.03em; margin: 0; }
 .btn-ghost { border: 1px solid var(--line); color: var(--fg); background: rgba(255,255,255,.03); }
 .btn svg { width: 18px; height: 18px; }
 
+.hero-cta { display: grid; justify-items: center; gap: 10px; margin-top: 30px; position: relative; }
+.hero-cta .btn { font-size: 18px; padding: 16px 30px; }
+.hero-cta small { font-size: 13px; color: var(--dim); }
+.launcher { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 34px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 30px; padding: 40px; margin-bottom: 110px; position: relative; overflow: hidden; }
+.launcher::before { content: ""; position: absolute; inset: 0; background: radial-gradient(70% 120% at 0% 0%, rgba(48,209,88,.16), transparent 70%); pointer-events: none; }
+.launcher > * { position: relative; }
+.launcher h2 { font-size: clamp(30px, 4vw, 42px); font-weight: 700; margin-top: 12px; }
+.launcher p.lead2 { color: var(--muted); margin: 14px 0 22px; }
+.launcher ol { list-style: none; counter-reset: s; padding: 0; margin: 0; display: grid; gap: 14px; }
+.launcher li { counter-increment: s; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 14px; align-items: start; background: var(--surface-2); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
+.launcher li::before { content: counter(s); display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: rgba(48,209,88,.14); color: var(--green); font: 700 18px var(--display); }
+.launcher li b { display: block; font-family: var(--display); font-size: 17px; }
+.launcher li p { margin: 2px 0 0; color: var(--muted); font-size: 14.5px; }
 .facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding-bottom: 110px; }
 .fact { border-top: 1px solid var(--line); padding-top: 20px; }
 .fact b { display: block; font-family: var(--display); font-size: 20px; letter-spacing: -0.02em; }
@@ -79,6 +92,7 @@ footer nav a:hover { color: var(--fg); }
   .app { grid-template-columns: minmax(0, 1fr); padding: 26px; }
   .app .side { min-width: 0; }
   .facts { grid-template-columns: minmax(0, 1fr); }
+  .launcher { grid-template-columns: minmax(0, 1fr); padding: 26px; }
   .nav-links { gap: 16px; }
 }
 @media (max-width: 520px) { .nav-links a.opt { display: none; } }
@@ -96,6 +110,7 @@ footer nav a:hover { color: var(--fg); }
       <a href="kehrwerk/">Kehrwerk</a>
       <a href="pebble/">Pebble</a>
       <a href="idock-app/">iDock</a>
+      <a class="opt" href="#launcher">Launcher</a>
     </div>
   </div>
 </nav>
@@ -108,6 +123,10 @@ footer nav a:hover { color: var(--fg); }
       <h1 style="margin-top:16px">Windows,<br><span class="grad">nur besser.</span></h1>
       <p class="lead">Drei kleine Programme, die deinen PC aufgeräumter, schöner und bequemer machen. Alle gratis zum Laden und Nutzen – und Updates kommen von selbst.</p>
       <span class="free-badge">Gratis · ohne Konto · ohne Werbung</span>
+      <div class="hero-cta">
+        <a class="btn btn-free" href="https://github.com/Newxcall/launcher/releases/latest/download/NewcallLauncher.exe"><svg><use href="#i-down"/></svg>Newcall Launcher gratis laden</a>
+        <small>Ein Programm für alle drei: installieren und aktualisieren mit einem Klick</small>
+      </div>
       <div class="icons" aria-hidden="true">
         <img src="kehrwerk/icon.png" alt=""><img src="pebble/icon.png" alt=""><img src="idock-app/icon.png" alt="">
       </div>
@@ -123,7 +142,7 @@ footer nav a:hover { color: var(--fg); }
       </div>
       <div class="side">
         <div class="price">Gratis<small>PC scannen, ansehen und KI fragen</small></div>
-        <a class="btn btn-free" href="https://github.com/Newxcall/kehrwerk/releases/latest/download/Kehrwerk.exe"><svg><use href="#i-down"/></svg>Gratis laden</a>
+        <a class="btn btn-free" href="https://github.com/Newxcall/launcher/releases/latest/download/NewcallLauncher.exe"><svg><use href="#i-down"/></svg>Gratis laden</a>
         <a class="btn btn-ghost" href="kehrwerk/">Mehr erfahren</a>
         <p class="upsell">Aufräumen 7 Tage testen · alle Funktionen 3,99&nbsp;€/Monat</p>
       </div>
@@ -137,7 +156,7 @@ footer nav a:hover { color: var(--fg); }
       </div>
       <div class="side">
         <div class="price">Gratis<small>Pille mit Musik, Akku, Timer und Uhr</small></div>
-        <a class="btn btn-free" href="https://github.com/Newxcall/pebble/releases/latest/download/PebbleSetup.exe"><svg><use href="#i-down"/></svg>Gratis laden</a>
+        <a class="btn btn-free" href="https://github.com/Newxcall/launcher/releases/latest/download/NewcallLauncher.exe"><svg><use href="#i-down"/></svg>Gratis laden</a>
         <a class="btn btn-ghost" href="pebble/">Mehr erfahren</a>
         <p class="upsell">Alle Funktionen 7 Tage testen, danach 3,99&nbsp;€/Monat</p>
       </div>
@@ -151,16 +170,32 @@ footer nav a:hover { color: var(--fg); }
       </div>
       <div class="side">
         <div class="price">Gratis<small>Dock und Touchpad im WLAN</small></div>
-        <a class="btn btn-free" href="https://github.com/Newxcall/idock-app/releases/latest/download/iDock-Setup.exe"><svg><use href="#i-down"/></svg>Gratis laden</a>
+        <a class="btn btn-free" href="https://github.com/Newxcall/launcher/releases/latest/download/NewcallLauncher.exe"><svg><use href="#i-down"/></svg>Gratis laden</a>
         <a class="btn btn-ghost" href="idock-app/">Mehr erfahren</a>
         <p class="upsell">Alle Funktionen 7 Tage testen, danach 3,99&nbsp;€/Monat</p>
       </div>
     </article>
   </section>
 
+  <section class="wrap" id="launcher" aria-label="Newcall Launcher">
+    <div class="launcher">
+      <div>
+        <p class="eyebrow">Newcall Launcher</p>
+        <h2>Einmal laden.<br>Alles mit einem Klick.</h2>
+        <p class="lead2">Der Launcher ist dein Startpunkt: Er installiert Kehrwerk, Pebble und iDock und zeigt dir, wenn es eine neue Version gibt. Nie wieder etwas neu von der Website laden.</p>
+        <a class="btn btn-free" href="https://github.com/Newxcall/launcher/releases/latest/download/NewcallLauncher.exe"><svg><use href="#i-down"/></svg>Launcher gratis laden</a>
+      </div>
+      <ol>
+        <li><div><b>Laden und öffnen</b><p>NewcallLauncher.exe doppelt anklicken. Zeigt Windows „Der Computer wurde geschützt“, auf „Weitere Informationen“ und „Trotzdem ausführen“ klicken.</p></div></li>
+        <li><div><b>Programm installieren</b><p>Beim gewünschten Programm auf „Installieren“ klicken. Der Launcher legt sich selbst auf dem Desktop und im Startmenü ab.</p></div></li>
+        <li><div><b>Aktualisieren</b><p>Gibt es eine neue Version, steht dort „Aktualisieren“. Ein Klick, fertig – deine Einstellungen bleiben.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
   <section class="wrap facts" aria-label="Für alle Programme">
     <div class="fact"><b>Gratis nutzen</b><p>Laden, installieren, loslegen – ohne Konto und ohne Zahlungsdaten. Die Grundfunktionen bleiben für immer gratis.</p></div>
-    <div class="fact"><b>Updates von selbst</b><p>Jedes Programm meldet neue Versionen und installiert sie mit einem Klick. Nichts neu herunterladen.</p></div>
+    <div class="fact"><b>Updates von selbst</b><p>Der Newcall Launcher installiert alle Programme und holt neue Versionen mit einem Klick. Nichts neu herunterladen.</p></div>
     <div class="fact"><b>Mehr nur, wenn du willst</b><p>In den ersten 7 Tagen kannst du mehr kostenlos ausprobieren. Wer danach alles will, nimmt das Abo – sicher über Stripe, monatlich kündbar.</p></div>
   </section>
 </main>

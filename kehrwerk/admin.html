@@ -94,6 +94,15 @@ label.small { font-size: 13px; color: var(--muted); }
       </div>
     </div>
 
+    <h2>Installationen</h2>
+    <p class="small" style="margin-top:-6px">Alle PCs, auf denen der Newcall Launcher läuft – mit freiwilligem Namen und Geräte-Code. „Gratis freischalten“ gilt beim nächsten Start des Launchers.</p>
+    <div class="tools">
+      <input type="search" id="iq" placeholder="Suchen: Name oder Geräte-Code …">
+      <button class="btn btn-ghost btn-s" id="ireload">Neu laden</button>
+    </div>
+    <p class="err" id="instErr" role="alert"></p>
+    <div class="list" id="installs"></div>
+
     <h2>Kunden</h2>
     <div class="tools">
       <input type="search" id="q" placeholder="Suchen: Name, E-Mail, Schlüssel …">
@@ -108,7 +117,7 @@ label.small { font-size: 13px; color: var(--muted); }
     </div>
     <p class="err" id="listErr" role="alert"></p>
     <div class="list" id="list"></div>
-    <p class="stand">Zahlungen, Rückerstattungen und Rechnungen verwaltest du im Stripe-Dashboard. Hier geht es nur um die Freischaltung in Kehrwerk.</p>
+    <p class="stand">Zahlungen, Rückerstattungen und Rechnungen verwaltest du im Stripe-Dashboard. Hier geht es nur um die Freischaltung in Kehrwerk, Pebble und iDock.</p>
   </div>
 </main>
 
@@ -133,6 +142,7 @@ label.small { font-size: 13px; color: var(--muted); }
     $('login').classList.add('hidden'); $('panel').classList.remove('hidden'); $('logout').hidden = false;
     var m = $('mode'); m.hidden = false; m.className = 'mode ' + (test ? 'test' : 'live'); m.textContent = test ? 'TESTMODUS' : 'LIVE';
     load();
+    loadInstalls();
   }
   function login() {
     token = $('token').value.trim();
@@ -158,6 +168,48 @@ label.small { font-size: 13px; color: var(--muted); }
     }).catch(function (e) { $('listErr').textContent = e.message; }).then(function () { $('reload').disabled = false; });
   }
   $('reload').addEventListener('click', load);
+
+  // ---------- Installationen (Newcall Launcher)
+  var installs = [];
+  function loadInstalls() {
+    $('instErr').textContent = ''; $('ireload').disabled = true;
+    call({ action: 'admin_installs' }).then(function (j) { installs = j.rows || []; renderInstalls(); })
+      .catch(function (e) { $('instErr').textContent = e.message; }).then(function () { $('ireload').disabled = false; });
+  }
+  function ago(ts) {
+    if (!ts) return '';
+    var d = Math.floor((Date.now() / 1000 - ts) / 86400);
+    return d <= 0 ? 'heute' : d === 1 ? 'gestern' : 'vor ' + d + ' Tagen';
+  }
+  function renderInstalls() {
+    var q = $('iq').value.trim().toLowerCase();
+    var shown = installs.filter(function (r) { return !q || (r.name + ' ' + r.code).toLowerCase().indexOf(q) >= 0; });
+    $('installs').innerHTML = shown.length ? shown.map(function (r, i) {
+      var apps = Object.keys(NAMES).filter(function (p) { return r.apps && r.apps[p]; }).map(function (p) { return NAMES[p] + ' ' + esc(r.apps[p]); });
+      var keys = r.keys || {};
+      var tags = Object.keys(NAMES).filter(function (p) { return keys[p]; }).map(function (p) { return '<span class="tag free">' + NAMES[p] + ' gratis</span>'; }).join(' ');
+      var missing = Object.keys(NAMES).filter(function (p) { return !keys[p]; });
+      var meta = [apps.length ? apps.join(', ') : 'noch nichts installiert', 'zuerst ' + date(r.first_seen), 'zuletzt ' + ago(r.last_seen),
+        r.launcher ? 'Launcher ' + esc(r.launcher) : ''].filter(Boolean).join(' · ');
+      var acts = missing.length ? '<button class="btn btn-go btn-s" data-iact="all" data-i="' + i + '">' + (missing.length === 3 ? 'Alles gratis freischalten' : 'Rest gratis freischalten') + '</button>' : '';
+      missing.forEach(function (p) { acts += '<button class="btn btn-ghost btn-s" data-iact="' + p + '" data-i="' + i + '">' + NAMES[p] + ' gratis</button>'; });
+      return '<div class="cust"><div class="who"><b>' + esc(r.name || '(ohne Namen)') + ' <span class="tag off">' + esc(r.code) + '</span> ' + tags + '</b>' +
+        '<div class="meta">' + meta + '</div></div><div class="acts">' + acts + '</div></div>';
+    }).join('') : '<p>' + (installs.length ? 'Keine Treffer.' : 'Noch keine Installationen.') + '</p>';
+    $('installs').querySelectorAll('button[data-iact]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var r = shown[+b.dataset.i], a = b.dataset.iact;
+        var what = a === 'all' ? 'alle Programme' : NAMES[a];
+        if (!confirm((r.name || 'Gerät ' + r.code) + ': ' + what + ' kostenlos freischalten?')) return;
+        b.disabled = true;
+        call({ action: 'admin_install_grant', device: r.device, products: a === 'all' ? [] : [a] })
+          .then(function () { loadInstalls(); load(); })
+          .catch(function (e) { $('instErr').textContent = e.message; b.disabled = false; });
+      });
+    });
+  }
+  $('ireload').addEventListener('click', loadInstalls);
+  $('iq').addEventListener('input', renderInstalls);
   $('q').addEventListener('input', render);
   $('filter').addEventListener('change', render);
   $('prod').addEventListener('change', render);
