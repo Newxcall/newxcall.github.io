@@ -113,6 +113,16 @@ footer nav a:hover { color: var(--fg); }
   .sec { padding: 80px 0; }
 }
 @media (prefers-reduced-motion: reduce) { .phone .pad::after { animation: none; } html { scroll-behavior: auto; } }
+
+/* Gratis zuerst: kostenloser Plan hervorgehoben, Abo zurückhaltend */
+.plan.free { background: radial-gradient(80% 90% at 15% 0%, rgba(48,209,88,.20), transparent 70%), var(--surface); border-color: rgba(48,209,88,.5); }
+.plan.free .amount { color: #30d158; font-size: 64px; }
+.plan .badge { align-self: flex-start; font: 600 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: #30d158; border: 1px solid rgba(48,209,88,.4); background: rgba(48,209,88,.08); border-radius: 999px; padding: 4px 12px; }
+.plan.pro { background: var(--surface); border-color: var(--line); }
+.plan.pro h3 { color: var(--muted); font-size: 20px; }
+.plan.pro .amount { font-size: 34px; }
+.btn.btn-gratis { background: #30d158; color: #04210e; }
+.plan.pro .btn-go { background: transparent; color: var(--fg); border: 1px solid rgba(255,255,255,.18); }
 </style>
 <style>.all-apps{font-size:13px;color:var(--muted);text-decoration:none;padding:4px 11px;border:1px solid var(--line);border-radius:999px;white-space:nowrap}.all-apps:hover{color:var(--fg)}</style>
 </head>
@@ -139,7 +149,7 @@ footer nav a:hover { color: var(--fg); }
       <a href="#so">So geht's</a>
       <a href="#preis">Preis</a>
     </div>
-    <a class="btn btn-small" href="#preis">Laden</a>
+    <a class="btn btn-small" href="#preis">Gratis laden</a>
   </div>
 </nav>
 
@@ -151,7 +161,7 @@ footer nav a:hover { color: var(--fg); }
       <h1 style="margin-top:16px">Dein iPhone.<br><span class="grad">Dein PC-Dock.</span></h1>
       <p class="lead">iDock macht dein iPhone zum Dock, Touchpad, zur Tastatur und Fernbedienung für deinen Windows-PC. Im WLAN sofort – und auf Wunsch auch unterwegs.</p>
       <div class="ctas">
-        <a class="btn btn-big" href="#preis"><svg><use href="#i-down"/></svg>Für Windows laden</a>
+        <a class="btn btn-big btn-gratis" href="#preis"><svg><use href="#i-down"/></svg>Gratis für Windows laden</a>
         <a class="btn-link" href="#funktionen">Funktionen ansehen ›</a>
       </div>
       <div class="phone" aria-hidden="true">
@@ -172,8 +182,8 @@ footer nav a:hover { color: var(--fg); }
       <p class="eyebrow">Funktionen</p>
       <h2 style="margin-top:14px">Alles, was dein PC<br><span class="grad">aus der Hand braucht.</span></h2>
       <div class="grid">
-        <div class="card"><svg><use href="#i-dock"/></svg><h3>Dock</h3><p>Deine Lieblings-Apps als Symbole auf dem iPhone. Ein Tippen, und sie starten am PC.</p><span class="tag">Auch ohne Abo</span></div>
-        <div class="card"><svg><use href="#i-pad"/></svg><h3>Touchpad</h3><p>Maus bewegen, klicken, scrollen und ziehen – mit Gesten wie auf einem Laptop.</p><span class="tag">Auch ohne Abo</span></div>
+        <div class="card"><svg><use href="#i-dock"/></svg><h3>Dock</h3><p>Deine Lieblings-Apps als Symbole auf dem iPhone. Ein Tippen, und sie starten am PC.</p><span class="tag">Gratis</span></div>
+        <div class="card"><svg><use href="#i-pad"/></svg><h3>Touchpad</h3><p>Maus bewegen, klicken, scrollen und ziehen – mit Gesten wie auf einem Laptop.</p><span class="tag">Gratis</span></div>
         <div class="card"><svg><use href="#i-key"/></svg><h3>Tastatur</h3><p>Tippen mit der iPhone-Tastatur, dazu Sondertasten und Tastenkürzel.</p><span class="tag pro">Abo</span></div>
         <div class="card"><svg><use href="#i-music"/></svg><h3>Medien</h3><p>Musik steuern, Cover sehen, Lautstärke und Bildschirmhelligkeit regeln.</p><span class="tag pro">Abo</span></div>
         <div class="card"><svg><use href="#i-screen"/></svg><h3>Live-Bild</h3><p>Den PC-Bildschirm auf dem iPhone sehen und direkt darauf steuern – flüssig als Video.</p><span class="tag pro">Abo</span></div>
@@ -198,24 +208,25 @@ footer nav a:hover { color: var(--fg); }
   <section class="sec" id="preis">
     <div class="wrap center">
       <p class="eyebrow">Preis</p>
-      <h2 style="margin-top:14px">Erst testen. <span class="grad-go">Dann entscheiden.</span></h2>
-      <p class="lead">7 Tage ist alles frei. Danach bleiben Dock und Touchpad im WLAN – alles andere gibt es mit dem Abo.</p>
+      <h2 style="margin-top:14px">Gratis laden. <span class="grad-go">Mehr, wenn du willst.</span></h2>
+      <p class="lead">iDock ist gratis: Dock und Touchpad im WLAN bleiben für immer. Alles andere kannst du 7 Tage testen und dann mit dem Abo behalten.</p>
       <div class="price-grid">
-        <article class="plan">
+        <article class="plan free">
+          <span class="badge">Für immer gratis</span>
           <h3>iDock</h3>
-          <div class="amount">0 €</div>
+          <div class="amount">Gratis</div>
           <ul>
-            <li><svg><use href="#i-tick"/></svg>7 Tage alle Funktionen</li>
-            <li><svg><use href="#i-tick"/></svg>Danach weiter: Dock und Touchpad im WLAN</li>
+            <li><svg><use href="#i-tick"/></svg>Für immer: Dock und Touchpad im WLAN</li>
+            <li><svg><use href="#i-tick"/></svg>7 Tage: alle Funktionen testen</li>
             <li class="no"><svg><use href="#i-lock"/></svg>Fernzugriff, Live-Bild, Zwischenablage, Tastatur und Medien nur mit Abo</li>
           </ul>
           <div class="cta">
-            <a class="btn btn-big" href="https://github.com/Newxcall/idock-app/releases/latest/download/iDock-Setup.exe"><svg><use href="#i-down"/></svg>iDock-Setup.exe laden</a>
+            <a class="btn btn-big btn-gratis" href="https://github.com/Newxcall/idock-app/releases/latest/download/iDock-Setup.exe"><svg><use href="#i-down"/></svg>Gratis laden</a>
             <p class="fine">Windows 10 oder 11 · 64 Bit · iPhone oder iPad mit Safari · Updates kommen automatisch.</p>
           </div>
         </article>
         <article class="plan pro">
-          <h3>iDock Abo</h3>
+          <h3>Alle Funktionen: iDock Abo</h3>
           <div class="amount">3,99 € <small>im Monat</small></div>
           <ul>
             <li><svg><use href="#i-tick"/></svg>Alle Funktionen, auch unterwegs</li>

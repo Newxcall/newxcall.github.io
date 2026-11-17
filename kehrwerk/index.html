@@ -286,6 +286,16 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
   html { scroll-behavior: auto; }
 }
+
+/* Gratis zuerst: kostenloser Plan hervorgehoben, Abo zurückhaltend */
+.plan.free { background: radial-gradient(80% 90% at 15% 0%, rgba(48,209,88,.20), transparent 70%), var(--surface); border-color: rgba(48,209,88,.5); }
+.plan.free .amount { color: #30d158; font-size: 64px; }
+.plan .badge { align-self: flex-start; font: 600 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: #30d158; border: 1px solid rgba(48,209,88,.4); background: rgba(48,209,88,.08); border-radius: 999px; padding: 4px 12px; }
+.plan.pro { background: var(--surface); border-color: var(--line); }
+.plan.pro h3 { color: var(--muted); font-size: 20px; }
+.plan.pro .amount { font-size: 34px; }
+.btn.btn-gratis { background: #30d158; color: #04210e; }
+.plan.pro .btn-go { background: transparent; color: var(--fg); border: 1px solid rgba(255,255,255,.18); }
 </style>
 <style>.all-apps{font-size:13px;color:var(--muted);text-decoration:none;padding:4px 11px;border:1px solid var(--line);border-radius:999px;white-space:nowrap}.all-apps:hover{color:var(--fg)}</style>
 </head>
@@ -324,7 +334,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       <a href="#so">So geht's</a>
       <a href="#preis">Preis</a>
     </nav>
-    <a class="btn btn-small" href="#preis">Testen</a>
+    <a class="btn btn-small" href="#preis">Gratis laden</a>
   </div>
 </header>
 
@@ -336,10 +346,10 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       <h1 style="margin-top:14px">Dein PC.<br><span class="grad-fresh">Endlich aufgeräumt.</span></h1>
       <p class="lead">Kehrwerk findet Müll, riesige Dateien und doppelte Fotos, sortiert volle Ordner und schiebt Programme auf eine andere Platte. Du entscheidest, was passiert, und alles lässt sich rückgängig machen.</p>
       <div class="ctas">
-        <a class="btn btn-big" href="#preis"><svg><use href="#i-down"/></svg>7 Tage testen</a>
+        <a class="btn btn-big btn-gratis" href="#preis"><svg><use href="#i-down"/></svg>Gratis laden</a>
         <a class="btn-link" href="#bereiche">Bereiche ansehen ›</a>
       </div>
-      <p class="meta">7 Tage testen · danach 3,99 € im Monat · monatlich kündbar</p>
+      <p class="meta">Gratis · ohne Konto · alle Funktionen für 3,99 € im Monat</p>
 
       <div class="screen-wrap">
         <div class="bezel">
@@ -566,25 +576,26 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     <div class="glow"></div>
     <div class="wrap">
       <p class="eyebrow">Preis</p>
-      <h2 style="margin-top:14px">Erst testen.<br><span class="grad-fresh">Dann entscheiden.</span></h2>
-      <p class="lead">Ein Programm, eine Datei, keine Installation. Lade Kehrwerk, probier es 7 Tage aus und schalte dann alles frei.</p>
+      <h2 style="margin-top:14px">Gratis laden.<br><span class="grad-fresh">Mehr, wenn du willst.</span></h2>
+      <p class="lead">Ein Programm, eine Datei, keine Installation. Kehrwerk ist gratis – nur wer auch löschen, ordnen und verschieben will, nimmt das Abo.</p>
       <div class="price-grid">
-        <article class="plan">
-          <h3>7 Tage testen</h3>
-          <div class="amount">0 €</div>
+        <article class="plan free">
+          <span class="badge">Für immer gratis</span>
+          <h3>Kehrwerk</h3>
+          <div class="amount">Gratis</div>
           <ul>
-            <li><svg><use href="#i-tick"/></svg>Alles scannen und ansehen</li>
-            <li><svg><use href="#i-tick"/></svg>Müll und Cache aufräumen</li>
-            <li><svg><use href="#i-tick"/></svg>KI-Berater fragen</li>
+            <li><svg><use href="#i-tick"/></svg>Für immer: PC scannen und alles ansehen</li>
+            <li><svg><use href="#i-tick"/></svg>Für immer: KI-Berater fragen</li>
+            <li><svg><use href="#i-tick"/></svg>7 Tage: Müll und Cache aufräumen</li>
             <li class="no"><svg><use href="#i-lock"/></svg>Löschen, Ordnen, Verschieben und Übertragen erst mit Abo</li>
           </ul>
           <div class="cta">
-            <a class="btn btn-big" id="dl" href="https://github.com/Newxcall/kehrwerk/releases/latest/download/Kehrwerk.exe"><svg><use href="#i-down"/></svg>Kehrwerk.exe laden</a>
+            <a class="btn btn-big btn-gratis" id="dl" href="https://github.com/Newxcall/kehrwerk/releases/latest/download/Kehrwerk.exe"><svg><use href="#i-down"/></svg>Gratis laden</a>
             <p class="fine">Windows 10 oder 11 · 64 Bit. Zeigt Windows beim ersten Start „Der Computer wurde durch Windows geschützt“, klicke auf „Weitere Informationen“ und dann „Trotzdem ausführen“.</p>
           </div>
         </article>
         <article class="plan pro">
-          <h3>Kehrwerk Abo</h3>
+          <h3>Alle Funktionen: Kehrwerk Abo</h3>
           <div class="amount">3,99 € <small>im Monat</small></div>
           <ul>
             <li><svg><use href="#i-tick"/></svg>Alle sieben Bereiche ohne Grenzen</li>

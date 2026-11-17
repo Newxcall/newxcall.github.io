@@ -343,6 +343,16 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
   html { scroll-behavior: auto; }
 }
+
+/* Gratis zuerst: kostenloser Plan hervorgehoben, Abo zurückhaltend */
+.plan.free { background: radial-gradient(80% 90% at 15% 0%, rgba(48,209,88,.20), transparent 70%), var(--surface); border-color: rgba(48,209,88,.5); }
+.plan.free .amount { color: #30d158; font-size: 64px; }
+.plan .badge { align-self: flex-start; font: 600 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: #30d158; border: 1px solid rgba(48,209,88,.4); background: rgba(48,209,88,.08); border-radius: 999px; padding: 4px 12px; }
+.plan.pro { background: var(--surface); border-color: var(--line); }
+.plan.pro h3 { color: var(--muted); font-size: 20px; }
+.plan.pro .amount { font-size: 34px; }
+.btn.btn-gratis { background: #30d158; color: #04210e; }
+.plan.pro .btn-go { background: transparent; color: var(--fg); border: 1px solid rgba(255,255,255,.18); }
 </style>
 <style>.all-apps{font-size:13px;color:var(--muted);text-decoration:none;padding:4px 11px;border:1px solid var(--line);border-radius:999px;white-space:nowrap}.all-apps:hover{color:var(--fg)}</style>
 </head>
@@ -387,7 +397,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       <a href="#details">Details</a>
       <a href="#preis">Preis</a>
     </div>
-    <a class="btn btn-small" href="#laden">Laden</a>
+    <a class="btn btn-small" href="#laden">Gratis laden</a>
   </div>
 </nav>
 
@@ -400,10 +410,10 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       <h1 style="margin-top:14px">Alles Wichtige.<br>In einer <span class="grad-warm">Pille.</span></h1>
       <p class="lead">Pebble sitzt oben auf deinem Bildschirm und zeigt, was gerade passiert: Musik, Lautstärke, Nachrichten, Timer und deinen Stream. Ein Blick genügt, ein Klick öffnet mehr.</p>
       <div class="ctas">
-        <a class="btn btn-big" href="#laden" data-download><svg><use href="#i-down"/></svg>Für Windows laden</a>
+        <a class="btn btn-big btn-gratis" href="#laden" data-download><svg><use href="#i-down"/></svg>Gratis für Windows laden</a>
         <a class="btn-link" href="#funktionen">Funktionen ansehen ›</a>
       </div>
-      <p class="meta">Windows 10 und 11 · Version 1.3</p>
+      <p class="meta">Gratis · Windows 10 und 11 · alle Funktionen für 3,99 € im Monat</p>
 
       <div class="screen-wrap">
         <div class="bezel">
@@ -642,24 +652,25 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   <section class="sec download" id="preis">
     <div class="wrap">
       <p class="eyebrow" style="position:relative">Preis</p>
-      <h2 style="margin-top:14px">Erst testen. <span class="grad-warm">Dann entscheiden.</span></h2>
-      <p class="lead">7 Tage ist alles frei. Danach bleibt die Pille mit Musik, Akku, Timer und Uhr – alles andere gibt es mit dem Abo.</p>
+      <h2 style="margin-top:14px">Gratis laden. <span class="grad-warm">Mehr, wenn du willst.</span></h2>
+      <p class="lead">Pebble ist gratis: Die Pille mit Musik, Akku, Timer und Uhr bleibt für immer. Alles andere kannst du 7 Tage testen und dann mit dem Abo behalten.</p>
       <div class="price-grid">
-        <article class="plan">
+        <article class="plan free">
+          <span class="badge">Für immer gratis</span>
           <h3>Pebble</h3>
-          <div class="amount">0 €</div>
+          <div class="amount">Gratis</div>
           <ul>
-            <li><svg><use href="#i-tick"/></svg>7 Tage alle Funktionen</li>
-            <li><svg><use href="#i-tick"/></svg>Danach weiter: Pille mit Musik, Akku, Timer und Uhr</li>
+            <li><svg><use href="#i-tick"/></svg>Für immer: Pille mit Musik, Akku, Timer und Uhr</li>
+            <li><svg><use href="#i-tick"/></svg>7 Tage: alle Funktionen testen</li>
             <li class="no"><svg><use href="#i-lockp"/></svg>Mac-Dock, Lautstärke und Mixer, Spotify, OBS, Wetter, Termine und Mitteilungen nur mit Abo</li>
           </ul>
           <div class="cta">
-            <a class="btn btn-big" href="https://github.com/Newxcall/pebble/releases/latest/download/PebbleSetup.exe" data-download><svg><use href="#i-down"/></svg>PebbleSetup.exe laden</a>
+            <a class="btn btn-big btn-gratis" href="https://github.com/Newxcall/pebble/releases/latest/download/PebbleSetup.exe" data-download><svg><use href="#i-down"/></svg>Gratis laden</a>
             <p class="fine">Windows 10 oder 11 · 64 Bit · Updates kommen automatisch.</p>
           </div>
         </article>
         <article class="plan pro">
-          <h3>Pebble Abo</h3>
+          <h3>Alle Funktionen: Pebble Abo</h3>
           <div class="amount">3,99 € <small>im Monat</small></div>
           <ul>
             <li><svg><use href="#i-tick"/></svg>Alle Funktionen ohne Grenzen</li>
@@ -682,10 +693,10 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     <div class="glow" aria-hidden="true"></div>
     <div class="wrap">
       <p class="eyebrow" style="position:relative">Download</p>
-      <h2 style="margin-top:14px">Hol dir <span class="grad-warm">Pebble.</span></h2>
+      <h2 style="margin-top:14px">Hol dir Pebble. <span class="grad-warm">Gratis.</span></h2>
       <p class="lead">Ein Installer, ein Doppelklick, und die Pille sitzt oben auf deinem Bildschirm.</p>
       <div class="ctas">
-        <a class="btn btn-big" href="https://github.com/Newxcall/pebble/releases/latest/download/PebbleSetup.exe" data-download id="dlButton"><svg><use href="#i-down"/></svg>PebbleSetup.exe laden</a>
+        <a class="btn btn-big btn-gratis" href="https://github.com/Newxcall/pebble/releases/latest/download/PebbleSetup.exe" data-download id="dlButton"><svg><use href="#i-down"/></svg>Gratis laden</a>
         <p class="dl-note" id="dlNote" hidden>In dieser Vorschau ist kein Download möglich. Öffne die Seite direkt im Browser.</p>
       </div>
       <ol class="install">
