@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pebble für Windows</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Pebble: die Pille oben auf deinem Windows-Bildschirm. Musik, Lautstärke, Mitteilungen, Timer und dein OBS-Stream auf einen Blick.">
+<style>
+/* Layout: schwarze Buehne wie eine Produktseite – jede Sektion zeigt die Pille in einem Zustand, die Pille ist der Held. */
+@font-face { font-family: "Geist"; src: url("fonts/Geist-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Geist Mono"; src: url("fonts/GeistMono-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+:root {
+  color-scheme: dark;
+  --bg: #050507;
+  --surface: #0e0e12;
+  --surface-2: #17171c;
+  --tile: #212226;
+  --line: rgba(255, 255, 255, 0.08);
+  --fg: #f5f5f7;
+  --muted: #a1a1a6;
+  --dim: #6e6e76;
+  --red: #ff453a;
+  --blue: #0a84ff;
+  --green: #30d158;
+  --orange: #ff9f0a;
+  --pink: #ff5e8a;
+  --peach: #ffb36b;
+  --violet: #bf5af2;
+  --sky: #64d2ff;
+  --pill: #000;
+  --display: "Geist", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+  --body: "Geist", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --mono: "Geist Mono", "Cascadia Mono", Consolas, monospace;
+  --spring: cubic-bezier(.34, 1.36, .64, 1);
+  --ease: cubic-bezier(.22, 1, .36, 1);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 17px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased; overflow-x: hidden;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 60; background: rgba(5, 5, 7, 0.82); }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 8px; }
+.wrap {
+  max-width: 1120px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; letter-spacing: -0.035em; }
+p { margin: 0; }
+.eyebrow { font-family: var(--mono); font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.grad-warm { background: linear-gradient(90deg, var(--pink), var(--peach)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.grad-cool { background: linear-gradient(90deg, var(--sky), var(--blue)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.grad-live { background: linear-gradient(90deg, var(--red), var(--orange)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* ---------- Navigation */
+.nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50; background: rgba(5, 5, 7, 0.72); backdrop-filter: saturate(1.6) blur(20px); -webkit-backdrop-filter: saturate(1.6) blur(20px); border-bottom: 1px solid var(--line); }
+.nav .wrap { display: flex; align-items: center; gap: 28px; height: 52px; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; font-size: 18px; letter-spacing: -0.02em; text-decoration: none; }
+.brand-mark { width: 30px; height: 14px; border-radius: 7px; background: var(--pill); box-shadow: inset 0 0 0 1px rgba(255,255,255,.22); position: relative; }
+.brand-mark::before, .brand-mark::after { content: ""; position: absolute; top: 4px; width: 3px; height: 5px; border-radius: 2px; background: var(--fg); }
+.brand-mark::before { left: 10px; } .brand-mark::after { right: 10px; }
+.nav-links { display: flex; gap: 24px; margin-left: auto; font-size: 14px; color: var(--muted); }
+.nav-links a { text-decoration: none; transition: color .2s; }
+.nav-links a:hover { color: var(--fg); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 999px; font-weight: 600; text-decoration: none; border: 0; cursor: pointer; font-family: var(--body); transition: transform .2s var(--ease), background .2s, opacity .2s; }
+.btn:active { transform: scale(.97); }
+.btn-small { padding: 6px 14px; font-size: 13px; background: var(--fg); color: #000; }
+.btn-big { padding: 15px 28px; font-size: 17px; background: var(--fg); color: #000; }
+.btn-big:hover, .btn-small:hover { background: #fff; }
+.btn-link { color: var(--blue); font-size: 17px; text-decoration: none; font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn svg { width: 18px; height: 18px; }
+
+/* ---------- Hero */
+.hero { padding-block: 72px 40px; text-align: center; position: relative; overflow: hidden; }
+.hero .glow { position: absolute; left: 50%; top: 260px; width: 1200px; height: 700px; transform: translateX(-50%); background: radial-gradient(closest-side, rgba(10,132,255,.20), rgba(191,90,242,.10) 55%, transparent); pointer-events: none; }
+.hero h1 { font-size: clamp(44px, 8vw, 92px); font-weight: 700; line-height: 1.02; position: relative; }
+.hero .lead { max-width: 640px; margin: 22px auto 0; font-size: clamp(18px, 2.2vw, 22px); color: var(--muted); line-height: 1.45; position: relative; }
+.hero .ctas { display: flex; gap: 24px; justify-content: center; align-items: center; flex-wrap: wrap; margin-top: 32px; position: relative; }
+.hero .meta { margin-top: 16px; font-size: 13px; color: var(--dim); font-family: var(--mono); position: relative; }
+
+/* Bildschirm mit Pille */
+.screen-wrap { position: relative; margin: 56px auto 0; max-width: 980px; }
+.bezel { position: relative; border-radius: 26px; padding: 10px; background: linear-gradient(180deg, #2a2a30, #141418); box-shadow: 0 40px 120px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.06); }
+.screen { position: relative; width: 100%; overflow: hidden; border-radius: 17px; background: #0b1020; }
+.stage { position: absolute; left: 0; top: 0; width: 960px; height: 540px; transform-origin: 0 0; }
+.wall { position: absolute; inset: 0; background:
+  radial-gradient(60% 70% at 18% 80%, rgba(32, 80, 170, .55), transparent 70%),
+  radial-gradient(55% 60% at 85% 25%, rgba(120, 60, 200, .55), transparent 70%),
+  radial-gradient(40% 50% at 60% 90%, rgba(20, 140, 160, .40), transparent 70%),
+  linear-gradient(160deg, #0d1330, #160f2c 55%, #08121e); }
+.win { position: absolute; border-radius: 12px; background: rgba(28, 30, 42, .78); box-shadow: 0 20px 60px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.07); overflow: hidden; }
+.win .bar { height: 30px; border-bottom: 1px solid rgba(255,255,255,.06); display: flex; align-items: center; gap: 6px; padding: 0 12px; }
+.win .bar i { width: 34px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.12); }
+.win .bar i:first-child { width: 90px; }
+.win .ln { height: 9px; border-radius: 5px; background: rgba(255,255,255,.08); margin: 14px 16px 0; }
+.taskbar { position: absolute; left: 0; right: 0; bottom: 0; height: 46px; background: rgba(18, 18, 26, .78); backdrop-filter: blur(12px); border-top: 1px solid rgba(255,255,255,.06); display: flex; justify-content: center; align-items: center; gap: 8px; }
+.taskbar i { width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,.10); }
+.taskbar i:nth-child(1) { background: linear-gradient(135deg, #4aa3ff, #2563eb); }
+.taskbar i:nth-child(3) { background: linear-gradient(135deg, #ffb36b, #ff5e8a); }
+.taskbar i:nth-child(5) { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
+.taskbar .clock { position: absolute; right: 16px; font-size: 11px; color: rgba(255,255,255,.75); text-align: right; line-height: 1.25; font-family: var(--body); }
+
+/* ---------- Die Pille */
+.pill {
+  --w: 150px; --h: 42px; --r: 21px;
+  position: absolute; left: 50%; top: 12px; transform: translateX(-50%);
+  width: var(--w); height: var(--h); border-radius: var(--r); background: var(--pill); color: var(--fg);
+  box-shadow: 0 12px 40px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.07);
+  transition: width .62s var(--spring), height .62s var(--spring), border-radius .62s var(--spring), box-shadow .6s;
+  overflow: hidden; font-family: var(--body);
+}
+.pill[data-state="music"] { --w: 440px; --h: 196px; --r: 46px; box-shadow: 0 12px 50px rgba(0,0,0,.55), 0 0 60px rgba(255, 94, 138, .28), inset 0 0 0 1px rgba(255,255,255,.07); }
+.pill[data-state="volume"] { --w: 320px; --h: 46px; --r: 23px; }
+.pill[data-state="notify"] { --w: 420px; --h: 72px; --r: 36px; }
+.pill[data-state="timer"] { --w: 300px; --h: 46px; --r: 23px; }
+.pill[data-state="live"] { --w: 300px; --h: 46px; --r: 23px; }
+.layer { position: absolute; left: 50%; top: 0; transform: translateX(-50%) scale(.94); opacity: 0; filter: blur(8px); transition: opacity .28s, filter .28s, transform .5s var(--ease); pointer-events: none; }
+.pill[data-state="idle"] .l-idle, .pill[data-state="music"] .l-music, .pill[data-state="volume"] .l-volume,
+.pill[data-state="notify"] .l-notify, .pill[data-state="timer"] .l-timer, .pill[data-state="live"] .l-live {
+  opacity: 1; filter: none; transform: translateX(-50%) scale(1); transition-delay: .14s, .14s, 0s;
+}
+.l-idle { width: 150px; height: 42px; display: flex; align-items: center; justify-content: center; gap: 13px; }
+.eye { width: 7px; height: 11px; border-radius: 4px; background: var(--fg); animation: blink 4.6s infinite, look 9s infinite; }
+@keyframes blink { 0%, 46%, 50%, 100% { transform: scaleY(1); } 48% { transform: scaleY(.12); } }
+@keyframes look { 0%, 30%, 100% { translate: 0 0; } 36%, 52% { translate: 4px 0; } 58%, 72% { translate: -4px 0; } }
+.l-compact { width: 100%; height: 46px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; }
+.l-volume, .l-timer, .l-live { width: 300px; }
+.l-volume { width: 320px; gap: 12px; }
+.l-volume .track { flex: 1; height: 6px; border-radius: 3px; background: rgba(255,255,255,.18); overflow: hidden; }
+.l-volume .fill { height: 100%; width: 64%; background: var(--fg); border-radius: 3px; transition: width .5s var(--ease); }
+.num { font-family: var(--mono); font-weight: 600; font-size: 15px; font-variant-numeric: tabular-nums; }
+.l-timer .num { color: var(--orange); }
+.l-live .num { color: var(--red); }
+.rec { width: 12px; height: 12px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 0 rgba(255,69,58,.6); animation: pulse 1.6s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,69,58,.55); } 70% { box-shadow: 0 0 0 9px rgba(255,69,58,0); } 100% { box-shadow: 0 0 0 0 rgba(255,69,58,0); } }
+.l-notify { width: 420px; height: 72px; display: flex; align-items: center; gap: 14px; padding: 0 22px 0 16px; }
+.app-icon { width: 42px; height: 42px; border-radius: 12px; flex: none; display: grid; place-items: center; background: linear-gradient(160deg, #3ce07a, #1faa50); }
+.app-icon svg { width: 22px; height: 22px; }
+.l-notify .t { flex: 1; min-width: 0; text-align: left; }
+.l-notify .t b { font-size: 15px; font-weight: 600; display: flex; justify-content: space-between; }
+.l-notify .t b span { font-weight: 400; color: var(--dim); font-size: 13px; }
+.l-notify .t p { font-size: 14px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.l-music { width: 440px; height: 196px; padding: 24px 28px; text-align: left; }
+.m-top { display: flex; align-items: center; gap: 14px; }
+.cover { width: 62px; height: 62px; border-radius: 14px; flex: none; background:
+  radial-gradient(circle at 70% 30%, rgba(255,255,255,.55) 0 7px, transparent 8px),
+  radial-gradient(circle at 30% 120%, #ffb36b, transparent 60%),
+  linear-gradient(140deg, #ff5e8a, #7a2bd6); }
+.m-title { flex: 1; min-width: 0; }
+.m-title b { display: block; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+.m-title span { font-size: 15px; color: var(--muted); }
+.wave { display: flex; gap: 3px; align-items: center; height: 26px; }
+.wave i { width: 4px; height: 100%; border-radius: 2px; background: linear-gradient(var(--peach), var(--pink)); animation: wave 1.1s ease-in-out infinite; transform-origin: center; }
+.wave i:nth-child(2) { animation-delay: -.3s; } .wave i:nth-child(3) { animation-delay: -.6s; } .wave i:nth-child(4) { animation-delay: -.15s; } .wave i:nth-child(5) { animation-delay: -.8s; }
+@keyframes wave { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+.m-prog { display: flex; align-items: center; gap: 12px; margin-top: 18px; font-family: var(--mono); font-size: 12px; color: var(--dim); font-variant-numeric: tabular-nums; }
+.m-prog .bar { flex: 1; height: 5px; border-radius: 3px; background: rgba(255,255,255,.16); overflow: hidden; }
+.m-prog .bar i { display: block; height: 100%; width: 38%; border-radius: 3px; background: linear-gradient(90deg, var(--pink), var(--peach)); }
+.m-ctrl { display: flex; justify-content: center; align-items: center; gap: 46px; margin-top: 14px; }
+.m-ctrl svg { width: 26px; height: 26px; fill: var(--fg); }
+.m-ctrl svg.big { width: 34px; height: 34px; }
+
+/* Zustandsknoepfe unter dem Bildschirm */
+.chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 28px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px; background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); font: 500 14px var(--body); cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
+.chip svg { width: 16px; height: 16px; }
+.chip:hover { color: var(--fg); }
+.chip[aria-pressed="true"] { background: var(--fg); color: #000; border-color: var(--fg); }
+
+/* ---------- Sektionen */
+section { position: relative; }
+.sec { padding-block: 120px; }
+.sec-head { text-align: center; max-width: 760px; margin: 0 auto 64px; display: grid; gap: 18px; }
+.sec-head h2 { font-size: clamp(36px, 5.6vw, 64px); font-weight: 700; line-height: 1.05; }
+.sec-head p { font-size: clamp(17px, 2vw, 21px); color: var(--muted); }
+
+/* So funktioniert's: drei Groessen */
+.sizes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.size { background: var(--surface); border-radius: 28px; padding: 28px; display: grid; gap: 18px; align-content: start; border: 1px solid var(--line); }
+.size .demo { height: 150px; border-radius: 18px; background: radial-gradient(80% 90% at 50% 0%, rgba(10,132,255,.16), transparent 70%), var(--surface-2); position: relative; overflow: hidden; }
+.size .mini { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); background: var(--pill); box-shadow: inset 0 0 0 1px rgba(255,255,255,.09); display: flex; align-items: center; }
+.size h3 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+.size p { color: var(--muted); font-size: 16px; }
+.size .tag { font-family: var(--mono); font-size: 12px; color: var(--dim); }
+
+/* Bento */
+.bento { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 20px; }
+.tile { background: var(--surface); border-radius: 30px; padding: 32px; border: 1px solid var(--line); display: flex; flex-direction: column; gap: 14px; overflow: hidden; position: relative; min-width: 0; }
+.tile h3 { font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.15; }
+.tile p { color: var(--muted); font-size: 16px; max-width: 46ch; }
+.tile .vis { margin-top: auto; padding-top: 18px; }
+.t-music { grid-column: span 4; background: radial-gradient(70% 90% at 80% 100%, rgba(255,94,138,.22), transparent 70%), var(--surface); }
+.t-vol { grid-column: span 2; }
+.t-note { grid-column: span 3; }
+.t-timer { grid-column: span 3; }
+.t-cal { grid-column: span 2; }
+.t-live { grid-column: span 2; }
+.t-split { grid-column: span 2; }
+
+.card-pill { background: var(--pill); border-radius: 34px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 18px 40px rgba(0,0,0,.4); }
+.t-music .card-pill { max-width: 440px; padding: 22px 26px; }
+.mix { display: grid; gap: 12px; }
+.mix-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) 34px; gap: 10px; align-items: center; font-size: 13px; color: var(--muted); }
+.mix-row .ic { width: 28px; height: 28px; border-radius: 8px; }
+.mix-row .tr { height: 6px; border-radius: 3px; background: rgba(255,255,255,.14); overflow: hidden; }
+.mix-row .tr i { display: block; height: 100%; border-radius: 3px; background: var(--fg); }
+.mix-row .num { font-size: 12px; color: var(--dim); text-align: right; }
+.notes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.note { min-width: 0; display: flex; gap: 12px; align-items: center; background: var(--surface-2); border-radius: 18px; padding: 12px 14px; border: 1px solid var(--line); }
+.note .app-icon { width: 36px; height: 36px; border-radius: 10px; }
+.note .t { min-width: 0; flex: 1; }
+.note small { display: block; font: 600 10.5px var(--mono); letter-spacing: .06em; color: var(--dim); }
+.note b { font-size: 14px; font-weight: 600; }
+.note p { font-size: 13.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.timer-vis { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
+.ring { width: 120px; height: 120px; flex: none; }
+.ring circle { fill: none; stroke-width: 9; }
+.ring .bg { stroke: rgba(255,159,10,.2); }
+.ring .fg { stroke: var(--orange); stroke-linecap: round; transform: rotate(-90deg); transform-origin: center; stroke-dasharray: 314; stroke-dashoffset: 94; }
+.ring text { fill: var(--orange); font: 600 22px var(--mono); }
+.seg { display: inline-flex; background: var(--surface-2); border-radius: 12px; padding: 3px; border: 1px solid var(--line); }
+.seg span { padding: 6px 12px; border-radius: 9px; font-size: 13px; color: var(--muted); }
+.seg span.on { background: var(--tile); color: var(--fg); }
+.cal { background: var(--surface-2); border-radius: 18px; padding: 14px 16px; border: 1px solid var(--line); display: grid; gap: 10px; }
+.cal-row { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.cal-row svg { width: 18px; height: 18px; flex: none; }
+.cal-row .when { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--dim); }
+.live-vis { display: grid; gap: 10px; }
+.mini-pill { display: flex; align-items: center; justify-content: space-between; height: 40px; border-radius: 20px; padding: 0 16px; background: var(--pill); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); font-size: 14px; }
+.mini-pill .num { font-size: 13px; }
+.dotrow { display: flex; gap: 8px; align-items: center; }
+.dot { width: 9px; height: 9px; border-radius: 50%; }
+.split-vis { display: flex; align-items: center; gap: 8px; }
+.split-vis .mini-pill { flex: 1; min-width: 0; }
+.bubble { width: 40px; height: 40px; border-radius: 50%; background: var(--pill); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); display: grid; place-items: center; flex: none; }
+
+/* ---------- Stream */
+.stream { overflow: hidden; }
+.stream .glow { position: absolute; right: -200px; top: 120px; width: 900px; height: 700px; background: radial-gradient(closest-side, rgba(255,69,58,.18), transparent); pointer-events: none; }
+.stream-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: 64px; align-items: center; position: relative; }
+.stream-copy { display: grid; gap: 22px; }
+.stream-copy h2 { font-size: clamp(36px, 5.4vw, 62px); font-weight: 700; line-height: 1.05; }
+.stream-copy > p { font-size: clamp(17px, 2vw, 20px); color: var(--muted); max-width: 52ch; }
+.steps { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 14px; counter-reset: s; }
+.steps li { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 14px; align-items: start; font-size: 16px; color: var(--muted); counter-increment: s; }
+.steps li::before { content: counter(s); width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-2); border: 1px solid var(--line); font: 600 14px var(--mono); color: var(--fg); }
+.steps b { color: var(--fg); font-weight: 600; }
+.deck-col { display: grid; gap: 18px; justify-items: center; }
+.deck { width: 100%; max-width: 400px; background: #111214; border-radius: 36px; padding: 22px; box-shadow: 0 30px 90px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.07); user-select: none; }
+.deck-head { display: flex; align-items: center; justify-content: space-between; height: 32px; }
+.deck-head b { font-size: 16px; font-weight: 600; }
+.status { display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 999px; font: 600 13px var(--body); font-variant-numeric: tabular-nums; transition: background .3s, color .3s; }
+.status .dot { width: 8px; height: 8px; background: currentColor; }
+.status.ready { color: var(--green); background: rgba(48,209,88,.15); }
+.status.live { color: var(--red); background: rgba(255,69,58,.15); }
+.actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+.act { background: var(--tile); border-radius: 18px; padding: 13px 4px 11px; text-align: center; display: grid; justify-items: center; gap: 2px; cursor: pointer; border: 0; color: var(--fg); font-family: var(--body); transition: background .25s, transform .15s; }
+.act:active { transform: scale(.96); }
+.act svg { width: 24px; height: 24px; margin-bottom: 4px; }
+.act b { font-size: 14px; font-weight: 600; }
+.act span { font-size: 12px; opacity: .7; font-variant-numeric: tabular-nums; }
+.act.on { background: #e5443a; }
+.deck-label { font: 600 11px var(--mono); letter-spacing: .08em; color: var(--dim); margin: 18px 0 8px 2px; }
+.scenes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.scene { height: 42px; border-radius: 14px; background: var(--tile); color: var(--fg); border: 0; text-align: left; padding: 0 14px; font: 400 14.5px var(--body); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background .25s, transform .15s; }
+.scene:active { transform: scale(.97); }
+.scene.on { background: var(--blue); font-weight: 600; }
+.deck.is-live .scene.on { background: var(--red); }
+.deck-pill { transition: opacity .3s; }
+.deck-hint { font-size: 13px; color: var(--dim); text-align: center; }
+
+/* ---------- Details */
+.details { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border-radius: 28px; overflow: hidden; border: 1px solid var(--line); }
+.detail { background: var(--surface); padding: 28px 26px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.detail svg { width: 26px; height: 26px; color: var(--fg); margin-bottom: 6px; }
+.detail h3 { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+.detail p { font-size: 15px; color: var(--muted); }
+.kbd { font: 600 12px var(--mono); padding: 1px 6px; border-radius: 6px; background: var(--surface-2); border: 1px solid var(--line); color: var(--fg); white-space: nowrap; }
+
+/* ---------- Download */
+.download { text-align: center; overflow: hidden; }
+.price-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; margin-top: 56px; text-align: left; position: relative; }
+.plan { background: var(--surface); border: 1px solid var(--line); border-radius: 30px; padding: 32px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.plan.pro { background: radial-gradient(80% 90% at 85% 0%, rgba(48,209,88,.16), transparent 70%), var(--surface); border-color: rgba(48,209,88,.35); }
+.plan h3 { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin: 0; }
+.plan .amount { font: 700 52px var(--display); letter-spacing: -0.04em; line-height: 1; }
+.plan .amount small { font: 500 17px var(--body); color: var(--muted); letter-spacing: 0; }
+.plan ul { list-style: none; padding: 0; margin: 4px 0 0; display: grid; gap: 9px; }
+.plan li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px; font-size: 15px; color: var(--muted); }
+.plan li svg { width: 20px; height: 20px; color: var(--green); }
+.plan li.no svg { color: var(--dim); }
+.plan .cta { margin-top: auto; padding-top: 10px; display: grid; gap: 12px; }
+.plan .btn-big { width: 100%; justify-content: center; }
+.btn-go { background: var(--green); color: #04210e; border: 0; cursor: pointer; font: inherit; font-weight: 600; }
+.btn-go[disabled] { opacity: .45; cursor: not-allowed; }
+.consent { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; font-size: 13px; color: var(--muted); cursor: pointer; }
+.consent input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--green); }
+.consent a { color: var(--fg); }
+.fine { font-size: 12.5px; color: var(--dim); margin: 0; }
+.err { font-size: 14px; color: var(--red); min-height: 1em; margin: 0; }
+footer nav { display: flex; gap: 18px; flex-wrap: wrap; }
+footer nav a { color: inherit; text-decoration: none; }
+footer nav a:hover { color: var(--fg); }
+@media (max-width: 900px) { .price-grid { grid-template-columns: minmax(0, 1fr); } }
+.download .glow { position: absolute; left: 50%; top: 40px; width: 1000px; height: 600px; transform: translateX(-50%); background: radial-gradient(closest-side, rgba(191,90,242,.18), rgba(10,132,255,.10) 60%, transparent); pointer-events: none; }
+.download h2 { font-size: clamp(44px, 7.4vw, 88px); font-weight: 700; line-height: 1.02; position: relative; }
+.download .lead { color: var(--muted); font-size: clamp(17px, 2vw, 21px); margin: 20px auto 0; max-width: 560px; position: relative; }
+.download .ctas { margin-top: 34px; position: relative; display: grid; justify-items: center; gap: 14px; }
+.dl-note { max-width: 520px; margin: 0 auto; font-size: 14px; color: var(--muted); background: var(--surface-2); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; }
+.install { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 64px; text-align: left; counter-reset: i; position: relative; }
+.install li { list-style: none; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 26px; display: grid; gap: 8px; counter-increment: i; }
+.install li::before { content: "Schritt " counter(i); font: 600 12px var(--mono); letter-spacing: .06em; color: var(--dim); text-transform: uppercase; }
+.install b { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+.install p { font-size: 15px; color: var(--muted); }
+.req { margin-top: 28px; font-size: 13px; color: var(--dim); position: relative; }
+
+footer { border-top: 1px solid var(--line); padding-block: 28px 40px; font-size: 13px; color: var(--dim); }
+footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+/* ---------- Schmal */
+@media (max-width: 900px) {
+  .sizes { grid-template-columns: minmax(0, 1fr); }
+  .bento { grid-template-columns: minmax(0, 1fr); }
+  .bento .tile { grid-column: auto; }
+  .stream-grid { grid-template-columns: minmax(0, 1fr); gap: 48px; }
+  .details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .install { grid-template-columns: minmax(0, 1fr); }
+  .sec { padding-block: 88px; }
+}
+@media (max-width: 560px) {
+  .nav-links { display: none; }
+  .nav .btn-small { margin-left: auto; }
+  .details { grid-template-columns: minmax(0, 1fr); }
+  .tile { padding: 24px; border-radius: 24px; }
+  .hero { padding-block: 48px 24px; }
+  .chip { padding: 8px 12px; font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
+  html { scroll-behavior: auto; }
+}
+</style>
+<style>.all-apps{font-size:13px;color:var(--muted);text-decoration:none;padding:4px 11px;border:1px solid var(--line);border-radius:999px;white-space:nowrap}.all-apps:hover{color:var(--fg)}</style>
+</head>
+<body>
+
+<!-- Symbole (einmal definiert, ueberall benutzt) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-music" viewBox="0 0 24 24"><path fill="currentColor" d="M9 18.5a3 3 0 1 1-2-2.83V5.2l12-2.2v12.5a3 3 0 1 1-2-2.83V7.4L9 8.9z"/></symbol>
+  <symbol id="i-tick" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-lockp" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></symbol>
+  <symbol id="i-vol" viewBox="0 0 24 24"><path fill="currentColor" d="M4 9h3.5L12 5v14l-4.5-4H4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 13.5V9.5M9.5 2.5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-live" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M8.2 8.2a5.4 5.4 0 0 0 0 7.6M15.8 8.2a5.4 5.4 0 0 1 0 7.6M5.3 5.3a9.5 9.5 0 0 0 0 13.4M18.7 5.3a9.5 9.5 0 0 1 0 13.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-rec" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="5" fill="currentColor"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-idle" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="10" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="8.5" y="10" width="2" height="4" rx="1" fill="currentColor"/><rect x="13.5" y="10" width="2" height="4" rx="1" fill="currentColor"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="currentColor"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 19.5h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-game" viewBox="0 0 24 24"><path d="M7 8h10a4.5 4.5 0 0 1 4.4 5.5l-.8 3.4a2.2 2.2 0 0 1-3.8 1L14.5 16h-5l-2.3 1.9a2.2 2.2 0 0 1-3.8-1l-.8-3.4A4.5 4.5 0 0 1 7 8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 11v3M6.5 12.5h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="16" cy="12.5" r="1.2" fill="currentColor"/></symbol>
+  <symbol id="i-cursor" viewBox="0 0 24 24"><path d="M5 3.5l13 7-5.6 1.6L10 18z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M13 13l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 15V9m0 0l-2.5 2.5M12 9l2.5 2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-plug" viewBox="0 0 24 24"><path d="M9 3v5M15 3v5M6.5 8h11v3a5.5 5.5 0 0 1-11 0zM12 16.5V21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.8-.9 1.4-2l-.3-.8c-.4-1.1.4-2.2 1.6-2.2H17a4 4 0 0 0 4-4c0-5-4-9-9-9z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="7.5" cy="11" r="1.3" fill="currentColor"/><circle cx="10.5" cy="7" r="1.3" fill="currentColor"/><circle cx="15.5" cy="7.5" r="1.3" fill="currentColor"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8 5-14 15-14 0 10-6 15-14 15M5 19l7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M4 6.5h11M4 11.5h11M4 16.5h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M19 13.5v-7l3-1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="17.3" cy="16" r="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path fill="#fff" d="M12 3.5c-4.97 0-9 3.36-9 7.5 0 2.3 1.25 4.36 3.2 5.73L5.5 20.5l4.1-2.2c.77.15 1.57.2 2.4.2 4.97 0 9-3.36 9-7.5s-4.03-7.5-9-7.5z"/></symbol>
+</svg>
+
+<nav class="nav" aria-label="Hauptmenü">
+  <div class="wrap">
+    <a class="all-apps" href="../" title="Alle Programme">‹ Alle</a>
+    <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>Pebble</a>
+    <div class="nav-links">
+      <a href="#so">So geht's</a>
+      <a href="#funktionen">Funktionen</a>
+      <a href="#stream">Stream</a>
+      <a href="#details">Details</a>
+      <a href="#preis">Preis</a>
+    </div>
+    <a class="btn btn-small" href="#laden">Laden</a>
+  </div>
+</nav>
+
+<main id="top">
+  <!-- ================= HERO ================= -->
+  <header class="hero">
+    <div class="glow" aria-hidden="true"></div>
+    <div class="wrap">
+      <p class="eyebrow">Pebble für Windows</p>
+      <h1 style="margin-top:14px">Alles Wichtige.<br>In einer <span class="grad-warm">Pille.</span></h1>
+      <p class="lead">Pebble sitzt oben auf deinem Bildschirm und zeigt, was gerade passiert: Musik, Lautstärke, Nachrichten, Timer und deinen Stream. Ein Blick genügt, ein Klick öffnet mehr.</p>
+      <div class="ctas">
+        <a class="btn btn-big" href="#laden" data-download><svg><use href="#i-down"/></svg>Für Windows laden</a>
+        <a class="btn-link" href="#funktionen">Funktionen ansehen ›</a>
+      </div>
+      <p class="meta">Windows 10 und 11 · Version 1.3</p>
+
+      <div class="screen-wrap">
+        <div class="bezel">
+          <div class="screen" id="screen">
+            <div class="stage" id="stage" aria-hidden="true">
+              <div class="wall"></div>
+              <div class="win" style="left:70px;top:96px;width:470px;height:300px">
+                <div class="bar"><i></i><i></i><i></i></div>
+                <div class="ln" style="width:60%"></div><div class="ln" style="width:85%"></div><div class="ln" style="width:72%"></div>
+                <div class="ln" style="width:40%;margin-top:26px"></div><div class="ln" style="width:78%"></div><div class="ln" style="width:66%"></div>
+              </div>
+              <div class="win" style="left:500px;top:150px;width:380px;height:250px;background:rgba(36,30,52,.82)">
+                <div class="bar"><i></i><i></i></div>
+                <div style="display:flex;gap:14px;padding:18px 16px">
+                  <div style="width:90px;height:90px;border-radius:12px;background:linear-gradient(140deg,#ff5e8a,#7a2bd6)"></div>
+                  <div style="flex:1"><div class="ln" style="margin:6px 0 0;width:80%"></div><div class="ln" style="margin:12px 0 0;width:55%"></div></div>
+                </div>
+                <div class="ln" style="width:88%"></div><div class="ln" style="width:70%"></div>
+              </div>
+              <div class="pill" id="pill" data-state="idle">
+                <div class="layer l-idle"><span class="eye"></span><span class="eye"></span></div>
+                <div class="layer l-music">
+                  <div class="m-top">
+                    <div class="cover"></div>
+                    <div class="m-title"><b>Nachtfahrt</b><span>Lumen Bay</span></div>
+                    <div class="wave"><i></i><i></i><i></i><i></i><i></i></div>
+                  </div>
+                  <div class="m-prog"><span>1:12</span><div class="bar"><i></i></div><span>-2:03</span></div>
+                  <div class="m-ctrl">
+                    <svg viewBox="0 0 24 24"><path d="M11 6v12L3 12zM20 6v12l-8-6z"/></svg>
+                    <svg class="big" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M13 6v12l8-6zM4 6v12l8-6z"/></svg>
+                  </div>
+                </div>
+                <div class="layer l-compact l-volume"><svg width="20" height="20"><use href="#i-vol"/></svg><div class="track"><div class="fill" id="volFill"></div></div><span class="num" id="volNum">64</span></div>
+                <div class="layer l-notify">
+                  <div class="app-icon"><svg><use href="#i-chat"/></svg></div>
+                  <div class="t"><b>Lena <span>jetzt</span></b><p>Kommst du heute noch vorbei? Ich hab Pizza.</p></div>
+                </div>
+                <div class="layer l-compact l-timer">
+                  <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="rgba(255,159,10,.25)" stroke-width="2.6"/><circle id="timerArc" cx="12" cy="12" r="9.5" fill="none" stroke="#ff9f0a" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="59.7" stroke-dashoffset="0" transform="rotate(-90 12 12)"/></svg>
+                  <span class="num" id="timerNum">4:59</span>
+                </div>
+                <div class="layer l-compact l-live"><span class="rec"></span><span class="num" id="liveNum">LIVE 1:24:07</span></div>
+              </div>
+              <div class="taskbar"><i></i><i></i><i></i><i></i><i></i><i></i><span class="clock">21:42<br>07.11.2026</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chips" role="group" aria-label="Zustand der Pille zeigen">
+        <button class="chip" data-state="idle" aria-pressed="true"><svg><use href="#i-idle"/></svg>Ruhe</button>
+        <button class="chip" data-state="music" aria-pressed="false"><svg><use href="#i-music"/></svg>Musik</button>
+        <button class="chip" data-state="volume" aria-pressed="false"><svg><use href="#i-vol"/></svg>Lautstärke</button>
+        <button class="chip" data-state="notify" aria-pressed="false"><svg><use href="#i-bell"/></svg>Mitteilung</button>
+        <button class="chip" data-state="timer" aria-pressed="false"><svg><use href="#i-timer"/></svg>Timer</button>
+        <button class="chip" data-state="live" aria-pressed="false"><svg><use href="#i-live"/></svg>Live</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= SO GEHT'S ================= -->
+  <section class="sec" id="so">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">So funktioniert's</p>
+        <h2>Klein, wenn nichts los ist. <span class="grad-cool">Groß, wenn du sie brauchst.</span></h2>
+        <p>Die Pille passt ihre Form an das an, was gerade passiert. Fließend, wie aus einem Guss.</p>
+      </div>
+      <div class="sizes">
+        <article class="size">
+          <div class="demo"><div class="mini" style="width:108px;height:32px;border-radius:16px;justify-content:center;gap:10px"><span class="eye" style="width:5px;height:8px"></span><span class="eye" style="width:5px;height:8px"></span></div></div>
+          <span class="tag">Ruhe</span>
+          <h3>Unauffällig</h3>
+          <p>Ein kleines schwarzes Oval mit Gesicht. Es blinzelt, schaut sich um und stört nie.</p>
+        </article>
+        <article class="size">
+          <div class="demo"><div class="mini" style="width:220px;height:36px;border-radius:18px;justify-content:space-between;padding:0 14px"><span class="rec" style="width:10px;height:10px"></span><span class="num" style="color:var(--red);font-size:13px">LIVE 0:42</span></div></div>
+          <span class="tag">Aktivität</span>
+          <h3>Wächst mit</h3>
+          <p>Läuft Musik, ein Timer, ein Download oder dein Stream, wird sie breiter und zeigt das Wichtigste.</p>
+        </article>
+        <article class="size">
+          <div class="demo"><div class="mini" style="width:250px;height:118px;border-radius:30px;flex-direction:column;align-items:stretch;padding:16px 18px;gap:12px">
+            <div style="display:flex;gap:10px;align-items:center"><div class="cover" style="width:38px;height:38px;border-radius:10px"></div><div style="text-align:left;line-height:1.2"><b style="font-size:13px">Nachtfahrt</b><br><span style="font-size:12px;color:var(--muted)">Lumen Bay</span></div></div>
+            <div class="m-prog" style="margin:0"><div class="bar"><i></i></div></div>
+            <div class="m-ctrl" style="margin:0;gap:26px"><svg viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M11 6v12L3 12zM20 6v12l-8-6z"/></svg><svg viewBox="0 0 24 24" style="width:20px;height:20px"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg><svg viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M13 6v12l8-6zM4 6v12l8-6z"/></svg></div>
+          </div></div>
+          <span class="tag">Klick</span>
+          <h3>Öffnet sich</h3>
+          <p>Ein Klick oder die Maus darüber, und du steuerst alles direkt in der Pille. Ohne Fensterwechsel.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FUNKTIONEN ================= -->
+  <section class="sec" id="funktionen" style="padding-top:40px">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Funktionen</p>
+        <h2>Eine Pille. <span class="grad-warm">Viele Talente.</span></h2>
+        <p>Alles, was du sonst in Ecken, Fenstern und Einstellungen suchst, an einer Stelle.</p>
+      </div>
+      <div class="bento">
+        <article class="tile t-music">
+          <h3>Musik, immer im Blick.</h3>
+          <p>Cover, Titel, Fortschritt und Steuerung für Spotify, YouTube im Browser und jede App, die Windows ihre Musik meldet. Die Pille leuchtet sanft in der Farbe des Covers.</p>
+          <div class="vis">
+            <div class="card-pill" style="box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 0 60px rgba(255,94,138,.25)">
+              <div class="m-top">
+                <div class="cover"></div>
+                <div class="m-title"><b>Nachtfahrt</b><span>Lumen Bay</span></div>
+                <div class="wave"><i></i><i></i><i></i><i></i><i></i></div>
+              </div>
+              <div class="m-prog"><span>1:12</span><div class="bar"><i></i></div><span>-2:03</span></div>
+            </div>
+          </div>
+        </article>
+        <article class="tile t-vol">
+          <h3>Lautstärke. Elegant.</h3>
+          <p>Ersetzt die Windows-Anzeige. Mausrad über der Pille regelt laut und leise, der Mixer jede App einzeln.</p>
+          <div class="vis mix">
+            <div class="mix-row"><span class="ic" style="background:linear-gradient(135deg,#1ed760,#119c45)"></span><span class="tr"><i style="width:72%"></i></span><span class="num">72</span></div>
+            <div class="mix-row"><span class="ic" style="background:linear-gradient(135deg,#8b9bff,#5865f2)"></span><span class="tr"><i style="width:48%"></i></span><span class="num">48</span></div>
+            <div class="mix-row"><span class="ic" style="background:linear-gradient(135deg,#ffb36b,#ff6b3d)"></span><span class="tr"><i style="width:90%"></i></span><span class="num">90</span></div>
+          </div>
+        </article>
+        <article class="tile t-note">
+          <h3>Keine Nachricht verpassen.</h3>
+          <p>Neue Mitteilungen erscheinen genau da, wo du hinschaust. Die Glocke hält die letzten 50 bereit, falls du mal nicht hingesehen hast.</p>
+          <div class="vis notes">
+            <div class="note"><div class="app-icon"><svg><use href="#i-chat"/></svg></div><div class="t"><small>CHAT · JETZT</small><b>Lena</b><p>Kommst du heute noch vorbei? Ich hab Pizza.</p></div></div>
+            <div class="note"><div class="app-icon" style="background:linear-gradient(160deg,#8b9bff,#5865f2)"><svg><use href="#i-chat"/></svg></div><div class="t"><small>SERVER · VOR 5 MIN</small><b>Jonas</b><p>Heute Abend wieder zocken?</p></div></div>
+          </div>
+        </article>
+        <article class="tile t-timer">
+          <h3>Timer. Stoppuhr. Fokus.</h3>
+          <p>Ein Rechtsklick auf die Pille genügt. Der Ring zeigt die Restzeit, der Fokus-Modus wechselt Arbeit und Pause, ein Klingelton holt dich zurück.</p>
+          <div class="vis timer-vis">
+            <svg class="ring" viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="50"/><circle class="fg" cx="60" cy="60" r="50"/><text x="60" y="68" text-anchor="middle">17:30</text></svg>
+            <div class="seg" aria-hidden="true"><span>Timer</span><span>Stoppuhr</span><span class="on">Fokus</span></div>
+          </div>
+        </article>
+        <article class="tile t-cal">
+          <h3>Dein Tag auf einen Blick.</h3>
+          <p>Nächster Termin und Wetter in der Uhr-Ansicht, eigene Erinnerungen direkt in der Pille.</p>
+          <div class="vis cal">
+            <div class="cal-row"><svg style="color:var(--orange)"><use href="#i-cal"/></svg>Training<span class="when">18:30</span></div>
+            <div class="cal-row"><svg style="color:var(--orange)"><use href="#i-sun"/></svg>Leicht bewölkt<span class="when">12 °C</span></div>
+          </div>
+        </article>
+        <article class="tile t-live">
+          <h3>Live dabei.</h3>
+          <p>Downloads mit geladener Menge, ein roter Punkt bei Bildschirmaufnahmen, ein farbiger Punkt, wenn Mikrofon oder Kamera an sind.</p>
+          <div class="vis live-vis">
+            <div class="mini-pill"><svg width="18" height="18" style="color:var(--blue)"><use href="#i-down"/></svg><span class="num" style="color:var(--blue)">418 MB</span></div>
+            <div class="mini-pill"><span class="dotrow"><span class="dot" style="background:var(--orange)"></span><span class="dot" style="background:var(--green)"></span></span><span style="font-size:13px;color:var(--muted)">Mikro · Kamera</span></div>
+          </div>
+        </article>
+        <article class="tile t-split">
+          <h3>Zwei Dinge. Eine Pille.</h3>
+          <p>Musik und Timer gleichzeitig? Eine kleine Blase daneben zeigt das Zweite.</p>
+          <div class="vis split-vis">
+            <div class="mini-pill"><div class="cover" style="width:26px;height:26px;border-radius:7px"></div><div class="wave" style="height:18px"><i></i><i></i><i></i><i></i></div></div>
+            <div class="bubble"><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="rgba(255,159,10,.25)" stroke-width="2.6"/><circle cx="12" cy="12" r="9" fill="none" stroke="#ff9f0a" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="56.5" stroke-dashoffset="20" transform="rotate(-90 12 12)"/></svg></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= STREAM ================= -->
+  <section class="sec stream" id="stream">
+    <div class="glow" aria-hidden="true"></div>
+    <div class="wrap stream-grid">
+      <div class="stream-copy">
+        <p class="eyebrow" style="color:var(--red)">Neu · Für OBS Studio</p>
+        <h2>Dein Stream Deck.<br><span class="grad-live">Schon eingebaut.</span></h2>
+        <p>Szenen per Klick wechseln, live gehen, aufnehmen und das Mikro stumm schalten. Solange du streamst, zeigt die Pille deine Sendezeit. Live geht es erst beim zweiten Tippen, damit nichts aus Versehen passiert.</p>
+        <ol class="steps">
+          <li><span>In OBS <b>Werkzeuge → WebSocket-Servereinstellungen</b> öffnen.</span></li>
+          <li><span><b>„WebSocket-Server aktivieren“</b> anhaken.</span></li>
+          <li><span><b>Fertig.</b> Pebble findet OBS von selbst, ganz ohne Passwort-Eintippen.</span></li>
+        </ol>
+      </div>
+      <div class="deck-col">
+        <div class="deck" id="deck">
+          <div class="deck-head"><b>Stream</b><span class="status ready" id="deckStatus"><span class="dot"></span><span id="deckStatusText">Bereit</span></span></div>
+          <div class="actions">
+            <button class="act" id="actLive"><svg><use href="#i-live"/></svg><b>Live gehen</b><span>Stream</span></button>
+            <button class="act" id="actRec"><svg><use href="#i-rec"/></svg><b>Aufnehmen</b><span>Aufnahme</span></button>
+            <button class="act" id="actMic"><svg><use href="#i-mic"/></svg><b>Mikro</b><span>An</span></button>
+          </div>
+          <div class="deck-label">SZENEN</div>
+          <div class="scenes" id="scenes">
+            <button class="scene on">Startet gleich</button>
+            <button class="scene">Spiel + Kamera</button>
+            <button class="scene">Just Chatting</button>
+            <button class="scene">Nur Kamera</button>
+            <button class="scene">Pause</button>
+          </div>
+        </div>
+        <div class="mini-pill deck-pill" id="deckPill" style="width:240px;opacity:.35"><span class="rec" id="deckPillDot" style="width:10px;height:10px;animation:none;background:var(--dim)"></span><span class="num" id="deckPillText" style="font-size:13px;color:var(--dim)">nicht live</span></div>
+        <p class="deck-hint">Probier es aus: Szenen antippen, zweimal auf „Live gehen“.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DETAILS ================= -->
+  <section class="sec" id="details" style="padding-top:40px">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Details</p>
+        <h2>Durchdacht bis ins Kleinste.</h2>
+      </div>
+      <div class="details">
+        <div class="detail"><svg><use href="#i-game"/></svg><h3>Über Spielen</h3><p>Bleibt auch über Spielen und Videos im Vollbild sichtbar.</p></div>
+        <div class="detail"><svg><use href="#i-cursor"/></svg><h3>Durchklicken</h3><p>Mit <span class="kbd">Strg+Alt+P</span> gehen Klicks durch die Pille ans Fenster dahinter.</p></div>
+        <div class="detail"><svg><use href="#i-list"/></svg><h3>Spotify-Bibliothek</h3><p>Playlists und Lieblingssongs durchblättern und direkt abspielen.</p></div>
+        <div class="detail"><svg><use href="#i-moon"/></svg><h3>Nachtmodus</h3><p>Färbt den Bildschirm abends wärmer, Stärke per Regler.</p></div>
+        <div class="detail"><svg><use href="#i-key"/></svg><h3>Feststelltaste</h3><p>Kurze Anzeige beim Umschalten von Feststell- und Num-Taste.</p></div>
+        <div class="detail"><svg><use href="#i-copy"/></svg><h3>Kopiert und Screenshots</h3><p>„Kopiert“-Hinweis und Vorschau bei Screenshots. Der Text selbst wird nie gezeigt.</p></div>
+        <div class="detail"><svg><use href="#i-plug"/></svg><h3>Geräte und Akku</h3><p>Headset, Bluetooth und USB verbunden oder getrennt, Akku beim Einstecken.</p></div>
+        <div class="detail"><svg><use href="#i-palette"/></svg><h3>Vier Designs</h3><p>Schwarz, Graphit, Glas und Nacht. Größe, Schrift und Abstand einstellbar.</p></div>
+        <div class="detail"><svg><use href="#i-leaf"/></svg><h3>Sparsam</h3><p>Reagiert auf Ereignisse statt ständig nachzufragen. Im Ruhezustand braucht Pebble praktisch keine Rechenzeit.</p></div>
+        <div class="detail"><svg><use href="#i-lock"/></svg><h3>Bleibt bei dir</h3><p>Der Mitteilungsverlauf liegt nur im Arbeitsspeicher. Nachrichteninhalte werden nie gespeichert.</p></div>
+        <div class="detail"><svg><use href="#i-idle"/></svg><h3>Ein Gesicht</h3><p>In Ruhe blinzelt Pebble, schaut sich um und freut sich mit dir.</p></div>
+        <div class="detail"><svg><use href="#i-bell"/></svg><h3>Ein Klingelton</h3><p>Timer und Fokus klingeln, bis du auf die Pille klickst.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DOWNLOAD ================= -->
+  <section class="sec download" id="preis">
+    <div class="wrap">
+      <p class="eyebrow" style="position:relative">Preis</p>
+      <h2 style="margin-top:14px">Erst testen. <span class="grad-warm">Dann entscheiden.</span></h2>
+      <p class="lead">7 Tage ist alles frei. Danach bleibt die Pille mit Musik, Akku, Timer und Uhr – alles andere gibt es mit dem Abo.</p>
+      <div class="price-grid">
+        <article class="plan">
+          <h3>Pebble</h3>
+          <div class="amount">0 €</div>
+          <ul>
+            <li><svg><use href="#i-tick"/></svg>7 Tage alle Funktionen</li>
+            <li><svg><use href="#i-tick"/></svg>Danach weiter: Pille mit Musik, Akku, Timer und Uhr</li>
+            <li class="no"><svg><use href="#i-lockp"/></svg>Mac-Dock, Lautstärke und Mixer, Spotify, OBS, Wetter, Termine und Mitteilungen nur mit Abo</li>
+          </ul>
+          <div class="cta">
+            <a class="btn btn-big" href="https://github.com/Newxcall/pebble/releases/latest/download/PebbleSetup.exe" data-download><svg><use href="#i-down"/></svg>PebbleSetup.exe laden</a>
+            <p class="fine">Windows 10 oder 11 · 64 Bit · Updates kommen automatisch.</p>
+          </div>
+        </article>
+        <article class="plan pro">
+          <h3>Pebble Abo</h3>
+          <div class="amount">3,99 € <small>im Monat</small></div>
+          <ul>
+            <li><svg><use href="#i-tick"/></svg>Alle Funktionen ohne Grenzen</li>
+            <li><svg><use href="#i-tick"/></svg>Bis zu 3 PCs mit einem Schlüssel</li>
+            <li><svg><use href="#i-tick"/></svg>Alle Updates inklusive</li>
+            <li><svg><use href="#i-tick"/></svg>Monatlich kündbar, mit einem Klick</li>
+          </ul>
+          <div class="cta">
+            <label class="consent"><input type="checkbox" id="agree"><span>Ich akzeptiere die <a href="agb.html">AGB</a> und habe die <a href="widerruf.html">Widerrufsbelehrung</a> gelesen. Ich stimme zu, dass Pebble sofort freigeschaltet wird, und weiß, dass ich damit mein Widerrufsrecht verliere.</span></label>
+            <button class="btn btn-big btn-go" id="buy" disabled>Abo abschließen</button>
+            <p class="err" id="buyErr" role="alert"></p>
+            <p class="fine">Sichere Bezahlung über Stripe. Nach dem Bezahlen bekommst du deinen Schlüssel und trägst ihn in Pebble ein (Rechtsklick auf das Symbol → Abo).</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec download" id="laden">
+    <div class="glow" aria-hidden="true"></div>
+    <div class="wrap">
+      <p class="eyebrow" style="position:relative">Download</p>
+      <h2 style="margin-top:14px">Hol dir <span class="grad-warm">Pebble.</span></h2>
+      <p class="lead">Ein Installer, ein Doppelklick, und die Pille sitzt oben auf deinem Bildschirm.</p>
+      <div class="ctas">
+        <a class="btn btn-big" href="https://github.com/Newxcall/pebble/releases/latest/download/PebbleSetup.exe" data-download id="dlButton"><svg><use href="#i-down"/></svg>PebbleSetup.exe laden</a>
+        <p class="dl-note" id="dlNote" hidden>In dieser Vorschau ist kein Download möglich. Öffne die Seite direkt im Browser.</p>
+      </div>
+      <ol class="install">
+        <li><b>Laden</b><p>PebbleSetup.exe herunterladen und doppelt anklicken.</p></li>
+        <li><b>Zulassen</b><p>Zeigt Windows „Der Computer wurde geschützt“, auf „Weitere Informationen“ und dann „Trotzdem ausführen“ klicken.</p></li>
+        <li><b>Loslegen</b><p>Die Pille erscheint oben. Einstellungen und das Abo findest du über das Pebble-Symbol im Infobereich unten rechts.</p></li>
+      </ol>
+      <p class="req">Windows 10 oder 11, 64 Bit. Keine weiteren Programme nötig. Neue Versionen installiert Pebble auf Wunsch selbst.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Pebble · Gemacht von Deniz Gül · Für Windows 10 und 11</span>
+    <nav aria-label="Rechtliches"><a href="../">Alle Programme</a><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="agb.html">AGB</a><a href="widerruf.html">Widerruf</a><a href="kuendigen.html">Verträge hier kündigen</a></nav>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- Bildschirm-Buehne an die Breite anpassen (960 x 540 Punkte)
+  const screen = document.getElementById('screen');
+  const stage = document.getElementById('stage');
+  const fit = () => {
+    const k = screen.clientWidth / 960;
+    stage.style.transform = `scale(${k})`;
+    screen.style.height = (540 * k) + 'px';
+  };
+  fit();
+  if ('ResizeObserver' in window) new ResizeObserver(fit).observe(screen); else addEventListener('resize', fit);
+
+  // ---------- Pille: Zustaende nacheinander zeigen
+  const pill = document.getElementById('pill');
+  const chips = [...document.querySelectorAll('.chip')];
+  const order = ['idle', 'music', 'volume', 'notify', 'timer', 'live'];
+  let current = 0, pausedUntil = 0;
+  const show = (state) => {
+    pill.dataset.state = state;
+    chips.forEach(c => c.setAttribute('aria-pressed', String(c.dataset.state === state)));
+    if (state === 'volume') {
+      const v = [64, 72, 81][Math.floor(Math.random() * 3)];
+      setTimeout(() => { volFill.style.width = v + '%'; volNum.textContent = v; }, 350);
+    }
+  };
+  const volFill = document.getElementById('volFill'), volNum = document.getElementById('volNum');
+  chips.forEach(c => c.addEventListener('click', () => {
+    current = order.indexOf(c.dataset.state);
+    pausedUntil = Date.now() + 9000;
+    show(c.dataset.state);
+  }));
+  if (!reduce) {
+    setInterval(() => {
+      if (Date.now() < pausedUntil || document.hidden) return;
+      current = (current + 1) % order.length;
+      show(order[current]);
+    }, 3200);
+  }
+
+  // Timer zaehlt herunter, Live zaehlt hoch
+  let timerLeft = 299, liveSec = 1 * 3600 + 24 * 60 + 7;
+  const timerNum = document.getElementById('timerNum'), timerArc = document.getElementById('timerArc'), liveNum = document.getElementById('liveNum');
+  const mmss = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  const hms = s => `${Math.floor(s / 3600)}:${String(Math.floor(s / 60) % 60).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+  setInterval(() => {
+    timerLeft = timerLeft > 0 ? timerLeft - 1 : 299;
+    liveSec++;
+    timerNum.textContent = mmss(timerLeft);
+    timerArc.setAttribute('stroke-dashoffset', String(59.7 * (1 - timerLeft / 300)));
+    liveNum.textContent = 'LIVE ' + hms(liveSec);
+  }, 1000);
+
+  // ---------- Stream Deck zum Ausprobieren
+  const deck = document.getElementById('deck');
+  const status = document.getElementById('deckStatus'), statusText = document.getElementById('deckStatusText');
+  const actLive = document.getElementById('actLive'), actRec = document.getElementById('actRec'), actMic = document.getElementById('actMic');
+  const dPill = document.getElementById('deckPill'), dDot = document.getElementById('deckPillDot'), dText = document.getElementById('deckPillText');
+  let live = false, rec = false, muted = false, confirmUntil = 0, liveStart = 0, recStart = 0, confirmTimer = 0;
+  const set = (btn, title, sub, on) => { btn.querySelector('b').textContent = title; btn.querySelector('span').textContent = sub; btn.classList.toggle('on', on); };
+  const render = () => {
+    const now = Date.now();
+    const confirming = now < confirmUntil;
+    const lt = mmss(Math.floor((now - liveStart) / 1000)), rt = mmss(Math.floor((now - recStart) / 1000));
+    set(actLive, live ? 'Beenden' : 'Live gehen', confirming ? 'Nochmal tippen' : live ? lt : 'Stream', live || confirming);
+    set(actRec, rec ? 'Stoppen' : 'Aufnehmen', rec ? rt : 'Aufnahme', rec);
+    set(actMic, muted ? 'Stumm' : 'Mikro', muted ? 'Antippen: an' : 'An', muted);
+    deck.classList.toggle('is-live', live);
+    const red = live || rec;
+    status.className = 'status ' + (red ? 'live' : 'ready');
+    statusText.textContent = live ? 'LIVE ' + lt : rec ? 'REC ' + rt : 'Bereit';
+    dPill.style.opacity = red ? '1' : '.35';
+    dDot.style.background = red ? 'var(--red)' : 'var(--dim)';
+    dDot.style.animation = red && !reduce ? '' : 'none';
+    dText.style.color = red ? 'var(--red)' : 'var(--dim)';
+    dText.textContent = live ? 'LIVE ' + lt : rec ? 'REC ' + rt : 'nicht live';
+  };
+  actLive.addEventListener('click', () => {
+    if (Date.now() < confirmUntil) {
+      confirmUntil = 0;
+      live = !live;
+      if (live) liveStart = Date.now();
+    } else {
+      confirmUntil = Date.now() + 3000;
+      clearTimeout(confirmTimer);
+      confirmTimer = setTimeout(render, 3050);
+    }
+    render();
+  });
+  actRec.addEventListener('click', () => { rec = !rec; if (rec) recStart = Date.now(); render(); });
+  actMic.addEventListener('click', () => { muted = !muted; render(); });
+  document.querySelectorAll('.scene').forEach(s => s.addEventListener('click', () => {
+    document.querySelectorAll('.scene').forEach(o => o.classList.toggle('on', o === s));
+  }));
+  setInterval(() => { if (live || rec) render(); }, 1000);
+  render();
+
+  // ---------- Download: in der Vorschau (eingebettet) gibt es keine Datei
+  const framed = window.top !== window;
+  const note = document.getElementById('dlNote');
+  document.querySelectorAll('[data-download]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      if (!framed) return;
+      e.preventDefault();
+      note.hidden = false;
+      document.getElementById('laden').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+    });
+  });
+
+  // ---------- Abo abschließen: der Lizenz-Dienst erstellt die Stripe-Bezahlseite
+  const API = location.hostname === '127.0.0.1' ? 'http://127.0.0.1:8787/' : 'https://snafgyzhegwkxmunmxje.supabase.co/functions/v1/kehrwerk-license';
+  const agree = document.getElementById('agree'), buy = document.getElementById('buy'), err = document.getElementById('buyErr');
+  agree.addEventListener('change', () => { buy.disabled = !agree.checked; err.textContent = ''; });
+  buy.addEventListener('click', () => {
+    if (!agree.checked) return;
+    buy.disabled = true; buy.textContent = 'Einen Moment …'; err.textContent = '';
+    fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'checkout', product: 'pebble' }) })
+      .then(r => r.json())
+      .then(j => {
+        if (j.url && j.url.indexOf('https://checkout.stripe.com/') === 0) { location.href = j.url; return; }
+        throw new Error(j.error || 'Die Bezahlseite ließ sich nicht öffnen.');
+      })
+      .catch(e => {
+        const m = e && e.message;
+        err.textContent = (m && m !== 'Failed to fetch' && m.indexOf('JSON') < 0) ? m : 'Keine Verbindung zum Lizenz-Dienst. Bitte später noch einmal versuchen.';
+        buy.disabled = false; buy.textContent = 'Abo abschließen';
+      });
+  });
+})();
+</script>
+</body>
+</html>

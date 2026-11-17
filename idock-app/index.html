@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>iDock – iPhone als Dock</title>
+<meta name="description" content="iDock macht dein iPhone zum Dock, Touchpad, zur Tastatur und Fernbedienung für deinen Windows-PC – im WLAN und unterwegs.">
+<link rel="icon" href="icon.png">
+<style>
+@font-face { font-family: "Geist"; src: url("fonts/Geist-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Geist Mono"; src: url("fonts/GeistMono-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+:root {
+  color-scheme: dark;
+  --bg: #050507; --surface: #0e0e12; --surface-2: #17171c; --line: rgba(255,255,255,.08);
+  --fg: #f5f5f7; --muted: #a1a1a6; --dim: #6e6e76;
+  --blue: #0a84ff; --green: #30d158; --violet: #bf5af2; --sky: #64d2ff; --red: #ff453a; --orange: #ff9f0a;
+  --display: "Geist", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+  --body: "Geist", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --mono: "Geist Mono", "Cascadia Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 17px; line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+a { color: inherit; }
+h1, h2, h3 { font-family: var(--display); letter-spacing: -0.03em; margin: 0; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-left, 0px)); }
+.eyebrow { font-family: var(--mono); font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.grad { background: linear-gradient(90deg, var(--sky), var(--blue) 45%, var(--violet)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.grad-go { background: linear-gradient(90deg, var(--green), var(--sky)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; border-radius: 999px; font-weight: 600; text-decoration: none; transition: transform .2s, background .2s; }
+.btn:hover { transform: translateY(-1px); }
+.btn svg { width: 20px; height: 20px; }
+.btn-small { padding: 6px 14px; font-size: 13px; background: var(--fg); color: #000; }
+.btn-big { padding: 15px 28px; font-size: 17px; background: var(--fg); color: #000; }
+.btn-go { background: var(--green); color: #04210e; border: 0; cursor: pointer; font: inherit; font-weight: 600; }
+.btn-go[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
+
+.nav { position: sticky; top: 0; z-index: 10; background: rgba(5,5,7,.72); backdrop-filter: saturate(180%) blur(18px); -webkit-backdrop-filter: saturate(180%) blur(18px); border-bottom: 1px solid var(--line); }
+.nav .wrap { display: flex; align-items: center; gap: 20px; height: 56px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; text-decoration: none; }
+.brand img { width: 26px; height: 26px; border-radius: 7px; }
+.nav-links { display: flex; gap: 24px; margin-left: auto; font-size: 14px; color: var(--muted); }
+.nav-links a { text-decoration: none; }
+.nav-links a:hover { color: var(--fg); }
+
+.hero { text-align: center; padding: 96px 0 40px; position: relative; overflow: hidden; }
+.hero .glow { position: absolute; left: 50%; top: -120px; width: 1100px; height: 700px; transform: translateX(-50%); background: radial-gradient(closest-side, rgba(10,132,255,.22), rgba(191,90,242,.10) 60%, transparent); pointer-events: none; }
+.hero h1 { font-size: clamp(46px, 8vw, 96px); font-weight: 700; line-height: 1.02; position: relative; }
+.hero .lead { max-width: 660px; margin: 22px auto 0; font-size: clamp(18px, 2.2vw, 22px); color: var(--muted); position: relative; }
+.hero .ctas { margin-top: 34px; display: flex; gap: 18px; justify-content: center; align-items: center; flex-wrap: wrap; position: relative; }
+.btn-link { color: var(--sky); text-decoration: none; font-weight: 500; }
+
+/* iPhone-Skizze mit Dock */
+.phone { width: min(300px, 78vw); aspect-ratio: 9 / 19.5; margin: 64px auto 0; border-radius: 48px; background: #000; border: 10px solid #1c1c1f; box-shadow: 0 40px 120px rgba(10,132,255,.25), inset 0 0 0 1px rgba(255,255,255,.06); position: relative; padding: 46px 18px 22px; display: flex; flex-direction: column; gap: 16px; }
+.phone::before { content: ""; position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 92px; height: 26px; border-radius: 999px; background: #000; box-shadow: 0 0 0 1px rgba(255,255,255,.04); }
+.phone .pad { flex: 1; border-radius: 22px; background: linear-gradient(160deg, #15151b, #0c0c10); border: 1px solid var(--line); position: relative; overflow: hidden; }
+.phone .pad::after { content: ""; position: absolute; width: 46px; height: 46px; border-radius: 50%; background: radial-gradient(circle, rgba(100,210,255,.55), transparent 70%); left: 58%; top: 42%; animation: drift 6s ease-in-out infinite; }
+@keyframes drift { 0%,100% { left: 58%; top: 42%; } 35% { left: 26%; top: 28%; } 70% { left: 44%; top: 64%; } }
+.phone .dock { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 12px; border-radius: 26px; background: rgba(255,255,255,.07); }
+.phone .dock span { aspect-ratio: 1; border-radius: 14px; }
+.phone .tabs { display: flex; justify-content: space-around; font: 600 11px var(--mono); color: var(--dim); }
+.phone .tabs b { color: var(--sky); }
+
+.sec { padding: 110px 0; position: relative; }
+.sec h2 { font-size: clamp(36px, 5.6vw, 64px); font-weight: 700; line-height: 1.05; }
+.sec .lead { color: var(--muted); font-size: clamp(17px, 2vw, 21px); margin: 18px 0 0; max-width: 640px; }
+.center { text-align: center; }
+.center .lead { margin-left: auto; margin-right: auto; }
+
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 56px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 26px; padding: 28px; min-width: 0; }
+.card svg { width: 30px; height: 30px; color: var(--sky); }
+.card h3 { font-size: 21px; font-weight: 600; margin: 14px 0 6px; letter-spacing: -0.02em; }
+.card p { color: var(--muted); font-size: 15px; margin: 0; }
+.card .tag { display: inline-block; font: 600 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--green); margin-top: 12px; }
+.card .tag.pro { color: var(--violet); }
+
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 56px; padding: 0; counter-reset: i; }
+.steps li { list-style: none; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 26px; display: grid; gap: 8px; counter-increment: i; }
+.steps li::before { content: "Schritt " counter(i); font: 600 12px var(--mono); letter-spacing: .06em; color: var(--dim); text-transform: uppercase; }
+.steps b { font-size: 18px; font-weight: 600; }
+.steps p { margin: 0; color: var(--muted); font-size: 15px; }
+
+.price-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; margin-top: 56px; text-align: left; }
+.plan { background: var(--surface); border: 1px solid var(--line); border-radius: 30px; padding: 32px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.plan.pro { background: radial-gradient(80% 90% at 85% 0%, rgba(48,209,88,.16), transparent 70%), var(--surface); border-color: rgba(48,209,88,.35); }
+.plan h3 { font-size: 24px; font-weight: 600; }
+.plan .amount { font: 700 52px var(--display); letter-spacing: -0.04em; line-height: 1; }
+.plan .amount small { font: 500 17px var(--body); color: var(--muted); letter-spacing: 0; }
+.plan ul { list-style: none; padding: 0; margin: 4px 0 0; display: grid; gap: 9px; }
+.plan li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px; font-size: 15px; color: var(--muted); }
+.plan li svg { width: 20px; height: 20px; color: var(--green); }
+.plan li.no svg { color: var(--dim); }
+.plan .cta { margin-top: auto; padding-top: 10px; display: grid; gap: 12px; }
+.plan .btn-big { width: 100%; }
+.consent { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; font-size: 13px; color: var(--muted); cursor: pointer; }
+.consent input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--green); }
+.consent a { color: var(--fg); }
+.fine { font-size: 12.5px; color: var(--dim); margin: 0; }
+.err { font-size: 14px; color: var(--red); min-height: 1em; margin: 0; }
+.req { color: var(--dim); font-size: 14px; margin-top: 28px; }
+
+footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--dim); font-size: 13px; }
+footer .wrap { display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+footer nav { display: flex; gap: 18px; flex-wrap: wrap; }
+footer nav a { text-decoration: none; }
+footer nav a:hover { color: var(--fg); }
+
+@media (max-width: 900px) {
+  .grid, .steps, .price-grid { grid-template-columns: minmax(0, 1fr); }
+  .nav-links { display: none; }
+  .nav .btn-small { margin-left: auto; }
+  .sec { padding: 80px 0; }
+}
+@media (prefers-reduced-motion: reduce) { .phone .pad::after { animation: none; } html { scroll-behavior: auto; } }
+</style>
+<style>.all-apps{font-size:13px;color:var(--muted);text-decoration:none;padding:4px 11px;border:1px solid var(--line);border-radius:999px;white-space:nowrap}.all-apps:hover{color:var(--fg)}</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-down" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14"/></symbol>
+  <symbol id="i-tick" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></symbol>
+  <symbol id="i-dock" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M3 15.5h18v4H3zM6 12V7h4v5M14 12V5h4v7"/></symbol>
+  <symbol id="i-pad" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M9 20h6"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></symbol>
+  <symbol id="i-music" viewBox="0 0 24 24"><path fill="currentColor" d="M9 18.5a3 3 0 1 1-2-2.83V5.2l12-2.2v12.5a3 3 0 1 1-2-2.83V7.4L9 8.9z"/></symbol>
+  <symbol id="i-screen" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M8 20h8M12 16v4"/></symbol>
+  <symbol id="i-clip" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M8 5H6.5A1.5 1.5 0 0 0 5 6.5v13A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-13A1.5 1.5 0 0 0 17.5 5H16M9 3.5h6V7H9z"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path fill="none" stroke="currentColor" stroke-width="1.8" d="M3.5 12h17M12 3.5c2.5 2.6 3.7 5.4 3.7 8.5s-1.2 5.9-3.7 8.5c-2.5-2.6-3.7-5.4-3.7-8.5s1.2-5.9 3.7-8.5z"/></symbol>
+</svg>
+
+<nav class="nav" aria-label="Hauptmenü">
+  <div class="wrap">
+    <a class="all-apps" href="../" title="Alle Programme">‹ Alle</a>
+    <a class="brand" href="#top"><img src="icon.png" alt="">iDock</a>
+    <div class="nav-links">
+      <a href="#funktionen">Funktionen</a>
+      <a href="#so">So geht's</a>
+      <a href="#preis">Preis</a>
+    </div>
+    <a class="btn btn-small" href="#preis">Laden</a>
+  </div>
+</nav>
+
+<main id="top">
+  <section class="hero">
+    <div class="glow" aria-hidden="true"></div>
+    <div class="wrap">
+      <p class="eyebrow">Für iPhone, iPad und Windows</p>
+      <h1 style="margin-top:16px">Dein iPhone.<br><span class="grad">Dein PC-Dock.</span></h1>
+      <p class="lead">iDock macht dein iPhone zum Dock, Touchpad, zur Tastatur und Fernbedienung für deinen Windows-PC. Im WLAN sofort – und auf Wunsch auch unterwegs.</p>
+      <div class="ctas">
+        <a class="btn btn-big" href="#preis"><svg><use href="#i-down"/></svg>Für Windows laden</a>
+        <a class="btn-link" href="#funktionen">Funktionen ansehen ›</a>
+      </div>
+      <div class="phone" aria-hidden="true">
+        <div class="pad"></div>
+        <div class="dock">
+          <span style="background:linear-gradient(135deg,#0a84ff,#64d2ff)"></span>
+          <span style="background:linear-gradient(135deg,#30d158,#a5f3b5)"></span>
+          <span style="background:linear-gradient(135deg,#ff9f0a,#ffd60a)"></span>
+          <span style="background:linear-gradient(135deg,#bf5af2,#ff5e8a)"></span>
+        </div>
+        <div class="tabs"><b>Touchpad</b><span>Dock</span><span>Medien</span><span>Tasten</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="funktionen">
+    <div class="wrap">
+      <p class="eyebrow">Funktionen</p>
+      <h2 style="margin-top:14px">Alles, was dein PC<br><span class="grad">aus der Hand braucht.</span></h2>
+      <div class="grid">
+        <div class="card"><svg><use href="#i-dock"/></svg><h3>Dock</h3><p>Deine Lieblings-Apps als Symbole auf dem iPhone. Ein Tippen, und sie starten am PC.</p><span class="tag">Auch ohne Abo</span></div>
+        <div class="card"><svg><use href="#i-pad"/></svg><h3>Touchpad</h3><p>Maus bewegen, klicken, scrollen und ziehen – mit Gesten wie auf einem Laptop.</p><span class="tag">Auch ohne Abo</span></div>
+        <div class="card"><svg><use href="#i-key"/></svg><h3>Tastatur</h3><p>Tippen mit der iPhone-Tastatur, dazu Sondertasten und Tastenkürzel.</p><span class="tag pro">Abo</span></div>
+        <div class="card"><svg><use href="#i-music"/></svg><h3>Medien</h3><p>Musik steuern, Cover sehen, Lautstärke und Bildschirmhelligkeit regeln.</p><span class="tag pro">Abo</span></div>
+        <div class="card"><svg><use href="#i-screen"/></svg><h3>Live-Bild</h3><p>Den PC-Bildschirm auf dem iPhone sehen und direkt darauf steuern – flüssig als Video.</p><span class="tag pro">Abo</span></div>
+        <div class="card"><svg><use href="#i-clip"/></svg><h3>Zwischenablage</h3><p>Text zwischen iPhone und PC hin- und herkopieren, mit Verlauf.</p><span class="tag pro">Abo</span></div>
+        <div class="card" style="grid-column:1/-1"><svg><use href="#i-globe"/></svg><h3>Unterwegs</h3><p>Fernzugriff über das Internet: Mit einem Kopplungscode verbindet sich dein iPhone auch über Mobilfunk direkt und verschlüsselt mit deinem PC.</p><span class="tag pro">Abo</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="so">
+    <div class="wrap center">
+      <p class="eyebrow">So geht's</p>
+      <h2 style="margin-top:14px">In einer Minute <span class="grad-go">verbunden.</span></h2>
+      <ol class="steps" style="text-align:left">
+        <li><b>Installieren</b><p>iDock-Setup.exe laden und doppelt anklicken. Zeigt Windows „Der Computer wurde geschützt“, auf „Weitere Informationen“ und „Trotzdem ausführen“ klicken.</p></li>
+        <li><b>QR-Code scannen</b><p>iDock zeigt einen QR-Code. Mit der iPhone-Kamera scannen, die PIN eingeben – fertig gekoppelt.</p></li>
+        <li><b>Zum Home-Bildschirm</b><p>In Safari auf „Teilen“ → „Zum Home-Bildschirm“. Ab jetzt startet iDock wie eine App. Keine App Store-Installation nötig.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="sec" id="preis">
+    <div class="wrap center">
+      <p class="eyebrow">Preis</p>
+      <h2 style="margin-top:14px">Erst testen. <span class="grad-go">Dann entscheiden.</span></h2>
+      <p class="lead">7 Tage ist alles frei. Danach bleiben Dock und Touchpad im WLAN – alles andere gibt es mit dem Abo.</p>
+      <div class="price-grid">
+        <article class="plan">
+          <h3>iDock</h3>
+          <div class="amount">0 €</div>
+          <ul>
+            <li><svg><use href="#i-tick"/></svg>7 Tage alle Funktionen</li>
+            <li><svg><use href="#i-tick"/></svg>Danach weiter: Dock und Touchpad im WLAN</li>
+            <li class="no"><svg><use href="#i-lock"/></svg>Fernzugriff, Live-Bild, Zwischenablage, Tastatur und Medien nur mit Abo</li>
+          </ul>
+          <div class="cta">
+            <a class="btn btn-big" href="https://github.com/Newxcall/idock-app/releases/latest/download/iDock-Setup.exe"><svg><use href="#i-down"/></svg>iDock-Setup.exe laden</a>
+            <p class="fine">Windows 10 oder 11 · 64 Bit · iPhone oder iPad mit Safari · Updates kommen automatisch.</p>
+          </div>
+        </article>
+        <article class="plan pro">
+          <h3>iDock Abo</h3>
+          <div class="amount">3,99 € <small>im Monat</small></div>
+          <ul>
+            <li><svg><use href="#i-tick"/></svg>Alle Funktionen, auch unterwegs</li>
+            <li><svg><use href="#i-tick"/></svg>Bis zu 3 PCs mit einem Schlüssel</li>
+            <li><svg><use href="#i-tick"/></svg>Alle Updates inklusive</li>
+            <li><svg><use href="#i-tick"/></svg>Monatlich kündbar, mit einem Klick</li>
+          </ul>
+          <div class="cta">
+            <label class="consent"><input type="checkbox" id="agree"><span>Ich akzeptiere die <a href="agb.html">AGB</a> und habe die <a href="widerruf.html">Widerrufsbelehrung</a> gelesen. Ich stimme zu, dass iDock sofort freigeschaltet wird, und weiß, dass ich damit mein Widerrufsrecht verliere.</span></label>
+            <button class="btn btn-big btn-go" id="buy" disabled>Abo abschließen</button>
+            <p class="err" id="buyErr" role="alert"></p>
+            <p class="fine">Sichere Bezahlung über Stripe. Nach dem Bezahlen bekommst du deinen Schlüssel und trägst ihn in iDock ein (Rechtsklick auf das Symbol → Abo).</p>
+          </div>
+        </article>
+      </div>
+      <p class="req">Für den Fernzugriff über Mobilfunk kann je nach Netz eine Portfreigabe im Router nötig sein. iDock zeigt dir, was zu tun ist.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>iDock · iPhone als Dock und Touchpad für Windows · Gemacht von Deniz Gül</span>
+    <nav aria-label="Rechtliches"><a href="../">Alle Programme</a><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="agb.html">AGB</a><a href="widerruf.html">Widerruf</a><a href="kuendigen.html">Verträge hier kündigen</a></nav>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // Abo abschließen: der Lizenz-Dienst erstellt die Stripe-Bezahlseite
+  var API = location.hostname === '127.0.0.1' ? 'http://127.0.0.1:8787/' : 'https://snafgyzhegwkxmunmxje.supabase.co/functions/v1/kehrwerk-license';
+  var agree = document.getElementById('agree'), buy = document.getElementById('buy'), err = document.getElementById('buyErr');
+  agree.addEventListener('change', function () { buy.disabled = !agree.checked; err.textContent = ''; });
+  buy.addEventListener('click', function () {
+    if (!agree.checked) return;
+    buy.disabled = true; buy.textContent = 'Einen Moment …'; err.textContent = '';
+    fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'checkout', product: 'idock' }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j.url && j.url.indexOf('https://checkout.stripe.com/') === 0) { location.href = j.url; return; }
+        throw new Error(j.error || 'Die Bezahlseite ließ sich nicht öffnen.');
+      })
+      .catch(function (e) {
+        var m = e && e.message;
+        err.textContent = (m && m !== 'Failed to fetch' && m.indexOf('JSON') < 0) ? m : 'Keine Verbindung zum Lizenz-Dienst. Bitte später noch einmal versuchen.';
+        buy.disabled = false; buy.textContent = 'Abo abschließen';
+      });
+  });
+})();
+</script>
+</body>
+</html>

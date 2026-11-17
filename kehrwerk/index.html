@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kehrwerk für Windows</title>
+<meta name="description" content="Kehrwerk räumt deinen Windows-PC auf: Müll und Cache, große Dateien, Duplikate, Ordner sortieren, Programme verschieben – sicher, mit Papierkorb und Rückgängig. 7 Tage testen, danach 3,99 € im Monat.">
+<link rel="icon" href="icon.png">
+<style>
+/* Schrift liegt auf der eigenen Seite (Geist, SIL Open Font License) – keine Verbindung zu Google. */
+@font-face { font-family: "Geist"; src: url("fonts/Geist-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Geist Mono"; src: url("fonts/GeistMono-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+/* Schwarze Bühne wie eine Produktseite – das App-Fenster ist der Held. */
+:root {
+  color-scheme: dark;
+  --bg: #050507;
+  --surface: #0e0e12;
+  --surface-2: #17171c;
+  --tile: #212226;
+  --line: rgba(255, 255, 255, 0.08);
+  --fg: #f5f5f7;
+  --muted: #a1a1a6;
+  --dim: #6e6e76;
+  --red: #ff453a;
+  --blue: #0a84ff;
+  --green: #30d158;
+  --mint: #3ecf8e;
+  --orange: #ff9f0a;
+  --violet: #bf5af2;
+  --sky: #64d2ff;
+  --yellow: #ffd60a;
+  /* Farben im App-Fenster (wie in Kehrwerk selbst) */
+  --app-bg: #13151b;
+  --app-side: #181a21;
+  --app-card: #1d2029;
+  --app-card-2: #262a35;
+  --display: "Geist", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+  --body: "Geist", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --mono: "Geist Mono", "Cascadia Mono", Consolas, monospace;
+  --ease: cubic-bezier(.22, 1, .36, 1);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 17px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased; overflow-x: hidden;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 60; background: rgba(5, 5, 7, 0.82); }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 8px; }
+.wrap {
+  max-width: 1120px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; letter-spacing: -0.035em; }
+p { margin: 0; }
+.eyebrow { font-family: var(--mono); font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.grad-fresh { background: linear-gradient(90deg, var(--mint), var(--sky)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.grad-safe { background: linear-gradient(90deg, var(--green), var(--yellow)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* ---------- Navigation */
+.nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50; background: rgba(5, 5, 7, 0.72); backdrop-filter: saturate(1.6) blur(20px); -webkit-backdrop-filter: saturate(1.6) blur(20px); border-bottom: 1px solid var(--line); }
+.nav .wrap { display: flex; align-items: center; gap: 28px; height: 52px; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; font-size: 18px; letter-spacing: -0.02em; text-decoration: none; }
+.brand img { width: 26px; height: 26px; border-radius: 7px; }
+.nav-links { display: flex; gap: 24px; margin-left: auto; font-size: 14px; color: var(--muted); }
+.nav-links a { text-decoration: none; transition: color .2s; }
+.nav-links a:hover { color: var(--fg); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 999px; font-weight: 600; text-decoration: none; border: 0; cursor: pointer; font-family: var(--body); transition: transform .2s var(--ease), background .2s; }
+.btn:active { transform: scale(.97); }
+.btn-small { padding: 6px 14px; font-size: 13px; background: var(--fg); color: #000; }
+.btn-big { padding: 15px 28px; font-size: 17px; background: var(--fg); color: #000; }
+.btn-big:hover, .btn-small:hover { background: #fff; }
+.btn-link { color: var(--blue); font-size: 17px; text-decoration: none; font-weight: 500; }
+.btn-link:hover { text-decoration: underline; }
+.btn svg { width: 18px; height: 18px; }
+
+/* ---------- Hero */
+.hero { padding-block: 72px 40px; text-align: center; position: relative; overflow: hidden; }
+.hero .glow { position: absolute; left: 50%; top: 260px; width: 1200px; height: 700px; transform: translateX(-50%); background: radial-gradient(closest-side, rgba(62,207,142,.18), rgba(10,132,255,.10) 55%, transparent); pointer-events: none; }
+.hero h1 { font-size: clamp(44px, 8vw, 92px); font-weight: 700; line-height: 1.02; position: relative; }
+.hero .lead { max-width: 660px; margin: 22px auto 0; font-size: clamp(18px, 2.2vw, 22px); color: var(--muted); line-height: 1.45; position: relative; }
+.hero .ctas { display: flex; gap: 24px; justify-content: center; align-items: center; flex-wrap: wrap; margin-top: 32px; position: relative; }
+.hero .meta { margin-top: 16px; font-size: 13px; color: var(--dim); font-family: var(--mono); position: relative; }
+
+/* ---------- App-Fenster (nachgebaut, mit Beispieldaten) */
+.screen-wrap { position: relative; margin: 56px auto 0; max-width: 980px; }
+.bezel { border-radius: 22px; padding: 8px; background: linear-gradient(180deg, #2a2a30, #141418); box-shadow: 0 40px 120px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.06); }
+.screen { position: relative; width: 100%; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 15px; background: var(--app-bg); }
+.stage { position: absolute; left: 0; top: 0; width: 960px; height: 600px; transform-origin: 0 0; display: grid; grid-template-columns: 196px minmax(0, 1fr); text-align: left; font-family: var(--body); }
+.side { background: var(--app-side); padding: 22px 12px 16px; display: flex; flex-direction: column; gap: 4px; }
+.side .logo { display: flex; align-items: center; gap: 10px; font: 700 19px var(--display); letter-spacing: -0.02em; padding: 0 8px 18px; }
+.side .logo img { width: 24px; height: 24px; border-radius: 6px; }
+.side button { all: unset; display: flex; align-items: center; gap: 11px; padding: 9px 10px; border-radius: 10px; font-size: 14px; color: #c9ccd4; cursor: pointer; }
+.side button svg { width: 17px; height: 17px; opacity: .8; }
+.side button:hover { background: rgba(255,255,255,.04); }
+.side button[aria-current="true"] { background: var(--app-card); color: #fff; font-weight: 600; }
+.side .foot { margin-top: auto; display: flex; justify-content: space-between; font-size: 11px; color: var(--dim); padding: 0 10px; }
+.main { position: relative; padding: 26px 26px 20px; overflow: hidden; }
+.page { position: absolute; inset: 26px 26px 20px; display: flex; flex-direction: column; gap: 14px; opacity: 0; transform: translateY(8px); transition: opacity .3s, transform .45s var(--ease); pointer-events: none; }
+.page.on { opacity: 1; transform: none; pointer-events: auto; }
+.page h4 { margin: 0; font: 700 25px var(--display); letter-spacing: -0.02em; }
+.page .sub { font-size: 13px; color: #8d919c; margin-top: -10px; }
+.card { background: var(--app-card); border-radius: 14px; padding: 16px 18px; }
+.banner { display: flex; align-items: center; gap: 12px; }
+.banner b { font-size: 18px; }
+.banner small { display: block; font-size: 12px; color: #8d919c; }
+.banner .grow { flex: 1; }
+.abtn { padding: 12px 18px; border-radius: 10px; font-size: 14px; font-weight: 600; background: var(--app-card-2); color: #fff; white-space: nowrap; }
+.abtn.go { background: var(--mint); color: #062015; }
+.abtn.red { background: #e5484d; }
+.abtn.blue { background: #4f8ff7; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; flex: 1; min-height: 0; }
+.donut { display: flex; flex-direction: column; align-items: center; gap: 18px; margin-top: 10px; }
+.donut svg { width: 150px; height: 150px; flex: none; }
+.legend { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 20px; width: 100%; font-size: 12.5px; }
+.legend div { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.legend i { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.legend span { margin-left: auto; font-weight: 600; font-variant-numeric: tabular-nums; }
+.drive { display: grid; gap: 6px; margin-top: 16px; font-size: 13px; }
+.drive:first-of-type { margin-top: 10px; }
+.drive .top { display: flex; justify-content: space-between; }
+.drive .top span { color: #8d919c; font-size: 12px; }
+.drive .tr { height: 10px; border-radius: 5px; background: var(--app-card-2); overflow: hidden; }
+.drive .tr i { display: block; height: 100%; border-radius: 5px; }
+.drive .bot { display: flex; justify-content: space-between; font-size: 11px; color: #8d919c; }
+.drive .bot b { color: var(--mint); font-weight: 600; }
+.ct { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+.seg-a { display: inline-flex; background: var(--app-card); border-radius: 10px; padding: 3px; gap: 2px; font-size: 13px; }
+.seg-a span { padding: 6px 11px; border-radius: 8px; color: #c9ccd4; }
+.seg-a span.on { background: #4f8ff7; color: #fff; }
+.rows { display: grid; gap: 8px; }
+.row { background: var(--app-card); border-radius: 12px; padding: 11px 14px; display: grid; grid-template-columns: 18px minmax(0, 1fr) auto auto; gap: 12px; align-items: center; }
+.row .box { width: 18px; height: 18px; border-radius: 5px; border: 2px solid #4a4f5c; }
+.row .box.on { background: var(--mint); border-color: var(--mint); position: relative; }
+.row .box.on::after { content: ""; position: absolute; left: 4px; top: 0; width: 5px; height: 10px; border: solid #062015; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.row b { font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.row p { font-size: 12px; color: #c9ccd4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row small { font-size: 11px; color: #7d818c; }
+.row .size { font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; }
+.row .show { font-size: 12px; padding: 5px 10px; border-radius: 8px; border: 1px solid #3a3f4b; color: #c9ccd4; }
+.badge { font: 600 10.5px var(--body); padding: 2px 8px; border-radius: 6px; }
+.badge.ok { background: rgba(62,207,142,.14); color: var(--mint); }
+.badge.chk { background: rgba(255,159,10,.14); color: var(--orange); }
+.selbar { margin-top: auto; display: flex; align-items: center; gap: 10px; }
+.selbar .grow { flex: 1; }
+.selbar b { font-size: 15px; }
+.selbar small { display: block; font-size: 11.5px; color: #8d919c; }
+.groups { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.grp { background: var(--app-card); border-radius: 12px; padding: 14px; display: grid; gap: 4px; }
+.grp .h { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; }
+.grp .h .box { width: 16px; height: 16px; border-radius: 4px; background: var(--mint); flex: none; }
+.grp small { font-size: 12px; color: #8d919c; }
+.grp em { font-style: normal; font-size: 11.5px; color: #c9ccd4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.warn { background: rgba(255,159,10,.10); border: 1px solid rgba(255,159,10,.25); color: #ffcf85; border-radius: 12px; padding: 10px 14px; font-size: 12.5px; }
+.prog { display: grid; gap: 10px; }
+.prog .tr { height: 12px; border-radius: 6px; background: var(--app-card-2); overflow: hidden; }
+.prog .tr i { display: block; height: 100%; width: 62%; border-radius: 6px; background: linear-gradient(90deg, var(--mint), var(--sky)); animation: grow 6s var(--ease) infinite; }
+@keyframes grow { 0% { width: 8%; } 80%, 100% { width: 94%; } }
+.prog .meta { display: flex; justify-content: space-between; font: 500 12px var(--mono); color: #8d919c; }
+.pathbox { background: var(--app-card-2); border-radius: 10px; padding: 10px 12px; font: 500 12.5px var(--mono); color: #c9ccd4; display: flex; justify-content: space-between; gap: 10px; }
+.pathbox span { color: #7d818c; }
+
+.chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 28px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px; background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); font: 500 14px var(--body); cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
+.chip svg { width: 16px; height: 16px; }
+.chip:hover { color: var(--fg); }
+.chip[aria-pressed="true"] { background: var(--fg); color: #000; border-color: var(--fg); }
+.shot-note { margin-top: 14px; font-size: 12px; color: var(--dim); }
+
+/* ---------- Sektionen */
+section { position: relative; }
+.sec { padding-block: 120px; }
+.sec-head { text-align: center; max-width: 760px; margin: 0 auto 64px; display: grid; gap: 18px; }
+.sec-head h2 { font-size: clamp(36px, 5.6vw, 64px); font-weight: 700; line-height: 1.05; }
+.sec-head p { font-size: clamp(17px, 2vw, 21px); color: var(--muted); }
+
+/* Bento */
+.bento { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 20px; }
+.tile { background: var(--surface); border-radius: 30px; padding: 32px; border: 1px solid var(--line); display: flex; flex-direction: column; gap: 14px; overflow: hidden; position: relative; min-width: 0; }
+.tile .k { font: 600 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+.tile h3 { font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.15; }
+.tile p { color: var(--muted); font-size: 16px; max-width: 48ch; }
+.tile .vis { margin-top: auto; padding-top: 18px; }
+.w4 { grid-column: span 4; } .w3 { grid-column: span 3; } .w2 { grid-column: span 2; }
+.t-clean { background: radial-gradient(70% 90% at 85% 100%, rgba(62,207,142,.18), transparent 70%), var(--surface); }
+.t-ai { background: radial-gradient(70% 90% at 90% 100%, rgba(191,90,242,.18), transparent 70%), var(--surface); }
+.t-move { background: radial-gradient(70% 90% at 90% 100%, rgba(10,132,255,.18), transparent 70%), var(--surface); }
+.bars { display: grid; gap: 10px; }
+.bar-row { display: grid; grid-template-columns: minmax(0, 1fr) 70px; gap: 12px; align-items: center; font-size: 14px; color: var(--muted); }
+.bar-row .tr { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: -4px; }
+.bar-row .tr i { display: block; height: 100%; border-radius: 3px; }
+.bar-row span { text-align: right; font: 600 13px var(--mono); color: var(--fg); }
+.mini { background: var(--surface-2); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; display: grid; gap: 4px; min-width: 0; }
+.mini b { font-size: 14px; font-weight: 600; display: flex; gap: 8px; align-items: center; }
+.mini p { font-size: 13.5px; color: var(--muted); }
+.stack { display: grid; gap: 10px; }
+.pair { display: flex; align-items: center; gap: 10px; }
+.pair .file { flex: 1; min-width: 0; background: var(--surface-2); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pair .file small { display: block; font: 500 11px var(--mono); color: var(--dim); }
+.pair .eq { font: 600 16px var(--mono); color: var(--dim); }
+.folders { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.folder { background: var(--surface-2); border: 1px solid var(--line); border-radius: 14px; padding: 10px; font-size: 13px; text-align: center; }
+.folder svg { width: 26px; height: 26px; display: block; margin: 0 auto 4px; }
+.folder small { display: block; font: 500 11px var(--mono); color: var(--dim); }
+.chat { display: grid; gap: 8px; }
+.bubble { max-width: 90%; border-radius: 16px; padding: 10px 14px; font-size: 14px; }
+.bubble.me { justify-self: end; background: var(--blue); color: #fff; border-bottom-right-radius: 5px; }
+.bubble.ai { background: var(--surface-2); border: 1px solid var(--line); color: var(--muted); border-bottom-left-radius: 5px; }
+.drives { display: flex; align-items: center; gap: 12px; }
+.drv { flex: 1; background: var(--surface-2); border: 1px solid var(--line); border-radius: 14px; padding: 12px; font-size: 13px; text-align: center; }
+.drv b { display: block; font: 700 22px var(--display); }
+.drv small { color: var(--dim); font-family: var(--mono); font-size: 11px; }
+.arrow { color: var(--sky); font-size: 22px; }
+
+/* Sicherheit */
+.safety { overflow: hidden; }
+.safety .glow { position: absolute; left: -200px; top: 120px; width: 900px; height: 700px; background: radial-gradient(closest-side, rgba(48,209,88,.13), transparent); pointer-events: none; }
+.details { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border-radius: 28px; overflow: hidden; border: 1px solid var(--line); position: relative; }
+.detail { background: var(--surface); padding: 30px 28px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.detail svg { width: 28px; height: 28px; color: var(--green); margin-bottom: 6px; }
+.detail h3 { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+.detail p { font-size: 15px; color: var(--muted); }
+
+/* So geht's */
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; counter-reset: i; padding: 0; margin: 0; }
+.steps li { list-style: none; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 26px; display: grid; gap: 8px; align-content: start; counter-increment: i; }
+.steps li::before { content: "Schritt " counter(i); font: 600 12px var(--mono); letter-spacing: .06em; color: var(--dim); text-transform: uppercase; }
+.steps b { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+.steps p { font-size: 15px; color: var(--muted); }
+
+/* Laden */
+.download { text-align: center; overflow: hidden; }
+.download .glow { position: absolute; left: 50%; top: 40px; width: 1000px; height: 600px; transform: translateX(-50%); background: radial-gradient(closest-side, rgba(62,207,142,.16), rgba(10,132,255,.10) 60%, transparent); pointer-events: none; }
+.download h2 { font-size: clamp(44px, 7.4vw, 88px); font-weight: 700; line-height: 1.02; position: relative; }
+.download .lead { color: var(--muted); font-size: clamp(17px, 2vw, 21px); margin: 20px auto 0; max-width: 580px; position: relative; }
+.dl-note { max-width: 560px; margin: 34px auto 0; font-size: 15px; color: var(--muted); background: var(--surface-2); border: 1px solid var(--line); border-radius: 16px; padding: 14px 18px; position: relative; }
+.req { margin-top: 28px; font-size: 13px; color: var(--dim); position: relative; font-family: var(--mono); }
+
+.price-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; margin-top: 56px; text-align: left; position: relative; }
+.plan { background: var(--surface); border: 1px solid var(--line); border-radius: 30px; padding: 32px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.plan.pro { background: radial-gradient(80% 90% at 85% 0%, rgba(62,207,142,.16), transparent 70%), var(--surface); border-color: rgba(62,207,142,.35); }
+.plan h3 { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
+.plan .amount { font: 700 52px var(--display); letter-spacing: -0.04em; line-height: 1; }
+.plan .amount small { font: 500 17px var(--body); color: var(--muted); letter-spacing: 0; }
+.plan ul { list-style: none; padding: 0; margin: 4px 0 0; display: grid; gap: 9px; }
+.plan li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px; font-size: 15px; color: var(--muted); }
+.plan li svg { width: 20px; height: 20px; color: var(--mint); }
+.plan li.no svg { color: var(--dim); }
+.plan .cta { margin-top: auto; padding-top: 10px; display: grid; gap: 12px; }
+.plan .btn-big { width: 100%; }
+.btn-go { background: var(--mint); color: #062015; }
+.btn-go:hover { background: #5ee0a5; }
+.btn-go[disabled] { opacity: .45; cursor: not-allowed; }
+.consent { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; font-size: 13px; color: var(--muted); cursor: pointer; }
+.consent input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--mint); }
+.consent a { color: var(--fg); }
+.fine { font-size: 12.5px; color: var(--dim); }
+.err { font-size: 14px; color: var(--red); min-height: 1em; }
+footer nav { display: flex; gap: 18px; flex-wrap: wrap; }
+footer nav a { text-decoration: none; }
+footer nav a:hover { color: var(--fg); }
+@media (max-width: 900px) { .price-grid { grid-template-columns: minmax(0, 1fr); } }
+footer { border-top: 1px solid var(--line); padding-block: 28px 40px; font-size: 13px; color: var(--dim); }
+footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+@media (max-width: 900px) {
+  .bento { grid-template-columns: minmax(0, 1fr); }
+  .bento .tile { grid-column: auto; }
+  .details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .steps { grid-template-columns: minmax(0, 1fr); }
+  .sec { padding-block: 88px; }
+}
+@media (max-width: 560px) {
+  .nav-links { display: none; }
+  .nav .btn-small { margin-left: auto; }
+  .details { grid-template-columns: minmax(0, 1fr); }
+  .tile { padding: 24px; border-radius: 24px; }
+  .hero { padding-block: 48px 24px; }
+  .chip { padding: 8px 12px; font-size: 13px; }
+  .bezel { padding: 5px; border-radius: 14px; }
+  .screen { border-radius: 10px; }
+  .folders { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
+  html { scroll-behavior: auto; }
+}
+</style>
+<style>.all-apps{font-size:13px;color:var(--muted);text-decoration:none;padding:4px 11px;border:1px solid var(--line);border-radius:999px;white-space:nowrap}.all-apps:hover{color:var(--fg)}</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M4 10.5 12 4l8 6.5V20h-5v-6h-6v6H4z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v5M14 11v5"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M4 5h16v14H4zM4 9h16M8 13h8"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M8 8h11v12H8zM5 16V4h11"/></symbol>
+  <symbol id="i-sort" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M6 3h12v18H6z"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M9 6h11M9 12h11M9 18h11M4 6h1M4 12h1M4 18h1"/></symbol>
+  <symbol id="i-swap" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 8h15l-3-3M20 16H5l3 3"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M12 3a9 9 0 1 1-8.5 6M3 4v5h5M12 8v4l3 2"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M12 3 5 6v5c0 4.5 3 8.3 7 10 4-1.7 7-5.5 7-10V6z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 3 5 6v5c0 4.5 3 8.3 7 10 4-1.7 7-5.5 7-10V6zM8.5 12l2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-bin" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M5 7h14l-1.2 13H6.2zM9 4h6M10 11l2 2 2-2M12 13v4"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M9 14 4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M5 4h10a4 4 0 0 1 4 4v12H9a4 4 0 0 1-4-4zM9 8h6M9 12h6"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M14 10a4 4 0 1 1-1.2-2.8L21 15v3h-3v-2h-2v-2h-2"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M3 3l18 18M8.5 16.5a5 5 0 0 1 7 0M5 13a10 10 0 0 1 4-2.5M19 13a10 10 0 0 0-2.4-1.8M12 20h.01"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.3l2 2h8.7A1.5 1.5 0 0 1 21 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z"/></symbol>
+  <symbol id="i-tick" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></symbol>
+</svg>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="all-apps" href="../" title="Alle Programme">‹ Alle</a>
+    <a class="brand" href="#top"><img src="icon.png" alt="">Kehrwerk</a>
+    <nav class="nav-links" aria-label="Seiten">
+      <a href="#bereiche">Bereiche</a>
+      <a href="#sicher">Sicherheit</a>
+      <a href="#so">So geht's</a>
+      <a href="#preis">Preis</a>
+    </nav>
+    <a class="btn btn-small" href="#preis">Testen</a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="glow"></div>
+    <div class="wrap">
+      <p class="eyebrow">Für Windows 10 und 11</p>
+      <h1 style="margin-top:14px">Dein PC.<br><span class="grad-fresh">Endlich aufgeräumt.</span></h1>
+      <p class="lead">Kehrwerk findet Müll, riesige Dateien und doppelte Fotos, sortiert volle Ordner und schiebt Programme auf eine andere Platte. Du entscheidest, was passiert, und alles lässt sich rückgängig machen.</p>
+      <div class="ctas">
+        <a class="btn btn-big" href="#preis"><svg><use href="#i-down"/></svg>7 Tage testen</a>
+        <a class="btn-link" href="#bereiche">Bereiche ansehen ›</a>
+      </div>
+      <p class="meta">7 Tage testen · danach 3,99 € im Monat · monatlich kündbar</p>
+
+      <div class="screen-wrap">
+        <div class="bezel">
+          <div class="screen" id="screen">
+            <div class="stage" id="stage">
+              <aside class="side">
+                <div class="logo"><img src="icon.png" alt="">Kehrwerk</div>
+                <button data-go="over" aria-current="true"><svg><use href="#i-home"/></svg>Übersicht</button>
+                <button data-go="over"><svg><use href="#i-trash"/></svg>Aufräumen</button>
+                <button data-go="over"><svg><use href="#i-bulb"/></svg>KI-Berater</button>
+                <button data-go="big"><svg><use href="#i-file"/></svg>Große Dateien</button>
+                <button data-go="big"><svg><use href="#i-copy"/></svg>Duplikate</button>
+                <button data-go="sort"><svg><use href="#i-sort"/></svg>Ordnen</button>
+                <button data-go="move"><svg><use href="#i-list"/></svg>Programme</button>
+                <button data-go="move"><svg><use href="#i-swap"/></svg>Übertragen</button>
+                <div style="flex:1"></div>
+                <button data-go="over"><svg><use href="#i-clock"/></svg>Protokoll</button>
+                <div class="foot"><span>Normale Rechte</span><span>v1.0.0</span></div>
+              </aside>
+              <div class="main">
+                <!-- Übersicht -->
+                <div class="page on" data-page="over">
+                  <h4>Übersicht</h4>
+                  <p class="sub">Wie voll ist dein PC – und was kann weg?</p>
+                  <div class="card banner">
+                    <div class="grow"><b>≈ 6,8 GB lassen sich freimachen</b><small>Sieh dir die Kategorien an und wähle aus, was weg darf.</small></div>
+                    <span class="abtn go">Zum Aufräumen →</span>
+                    <span class="abtn">Neu scannen</span>
+                  </div>
+                  <div class="two">
+                    <div class="card">
+                      <div class="ct">Freimachbar</div>
+                      <div class="donut">
+                        <svg viewBox="0 0 42 42" aria-hidden="true">
+                          <g fill="none" stroke-width="6" transform="rotate(-90 21 21)">
+                            <circle cx="21" cy="21" r="15.9" stroke="#f5a524" stroke-dasharray="32 68"/>
+                            <circle cx="21" cy="21" r="15.9" stroke="#4f8ff7" stroke-dasharray="22 78" stroke-dashoffset="-32"/>
+                            <circle cx="21" cy="21" r="15.9" stroke="#a66cf5" stroke-dasharray="17 83" stroke-dashoffset="-54"/>
+                            <circle cx="21" cy="21" r="15.9" stroke="#e5484d" stroke-dasharray="13 87" stroke-dashoffset="-71"/>
+                            <circle cx="21" cy="21" r="15.9" stroke="#3ecf8e" stroke-dasharray="10 90" stroke-dashoffset="-84"/>
+                            <circle cx="21" cy="21" r="15.9" stroke="#8b919e" stroke-dasharray="6 94" stroke-dashoffset="-94"/>
+                          </g>
+                          <text x="21" y="21" text-anchor="middle" fill="#fff" font-size="6" font-weight="700" font-family="Geist, sans-serif">6,8 GB</text>
+                          <text x="21" y="26.5" text-anchor="middle" fill="#8d919c" font-size="2.6" font-family="Geist, sans-serif">freimachbar</text>
+                        </svg>
+                        <div class="legend">
+                          <div><i style="background:#f5a524"></i>Browser-Cache<span>2,2 GB</span></div>
+                          <div><i style="background:#4f8ff7"></i>Temporäre Dateien<span>1,5 GB</span></div>
+                          <div><i style="background:#a66cf5"></i>Vorschaubilder<span>1,1 GB</span></div>
+                          <div><i style="background:#e5484d"></i>Absturzberichte<span>880 MB</span></div>
+                          <div><i style="background:#3ecf8e"></i>Papierkorb<span>690 MB</span></div>
+                          <div><i style="background:#8b919e"></i>Alte Logdateien<span>410 MB</span></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card">
+                      <div class="ct">Laufwerke</div>
+                      <div class="drive"><div class="top"><b>C: System</b><span>74 GB frei von 476 GB</span></div><div class="tr"><i style="width:84%;background:#e5484d"></i></div><div class="bot"><span>84 % belegt</span><b>≈ 6,8 GB freimachbar</b></div></div>
+                      <div class="drive"><div class="top"><b>D: Daten</b><span>612 GB frei von 931 GB</span></div><div class="tr"><i style="width:34%;background:#4f8ff7"></i></div><div class="bot"><span>34 % belegt</span><span>nichts zum Aufräumen</span></div></div>
+                      <div class="drive"><div class="top"><b>E: Spiele</b><span>188 GB frei von 931 GB</span></div><div class="tr"><i style="width:80%;background:#f5a524"></i></div><div class="bot"><span>80 % belegt</span><span>nichts zum Aufräumen</span></div></div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Große Dateien -->
+                <div class="page" data-page="big">
+                  <h4>Große Dateien</h4>
+                  <p class="sub">Unnötige Dateien aufspüren – alles nur Vorschläge, du entscheidest.</p>
+                  <div><span class="seg-a"><span class="on">Große Dateien</span><span>Lange nicht geöffnet</span><span>Alte Installer</span><span>Leere Ordner</span></span></div>
+                  <div class="rows">
+                    <div class="row"><span class="box on"></span><div><b>Setup_Videoschnitt_2024.exe <span class="badge ok">Kann weg</span></b><p>Installationsdatei – das Programm ist installiert, die Datei wird nicht mehr gebraucht.</p><small>Downloads · zuletzt benutzt vor 8 Monaten</small></div><span class="size">3,8 GB</span><span class="show">Zeigen</span></div>
+                    <div class="row"><span class="box"></span><div><b>Urlaub_Rohschnitt.mp4 <span class="badge chk">Prüfen</span></b><p>Großes Video – wenn du es fertig geschnitten hast, kann es weg oder auf eine externe Platte.</p><small>Videos · zuletzt benutzt vor 5 Monaten</small></div><span class="size">2,6 GB</span><span class="show">Zeigen</span></div>
+                    <div class="row"><span class="box on"></span><div><b>Treiberpaket_alt.zip <span class="badge ok">Kann weg</span></b><p>Gepacktes Archiv – wenn du den Inhalt schon hast, wird es nicht mehr gebraucht.</p><small>Downloads · zuletzt benutzt vor 1 Jahr</small></div><span class="size">1,2 GB</span><span class="show">Zeigen</span></div>
+                  </div>
+                  <div class="card selbar"><div class="grow"><b>2 ausgewählt · 5,0 GB</b><small>Es kommt in den Papierkorb – du kannst es jederzeit zurückholen.</small></div><span class="abtn">Keine</span><span class="abtn red">In Papierkorb</span></div>
+                </div>
+                <!-- Ordnen -->
+                <div class="page" data-page="sort">
+                  <h4>Ordnen</h4>
+                  <p class="sub">Volle Ordner in Unterordner sortieren – mit Vorschau und Rückgängig.</p>
+                  <div class="card banner"><div class="grow"><b>Downloads · 214 Dateien</b><small>So würde Kehrwerk sortieren:</small></div><span class="seg-a"><span class="on">Nach Art</span><span>Nach Monat</span></span></div>
+                  <div class="groups">
+                    <div class="grp"><div class="h"><span class="box"></span>Bilder</div><small>64 Dateien · 1,1 GB</small><em>strand.jpg, scan_01.png …</em></div>
+                    <div class="grp"><div class="h"><span class="box"></span>Dokumente</div><small>51 Dateien · 220 MB</small><em>rechnung.pdf, notizen.docx …</em></div>
+                    <div class="grp"><div class="h"><span class="box"></span>Installer</div><small>23 Dateien · 6,4 GB</small><em>setup.exe, tool.msi …</em></div>
+                    <div class="grp"><div class="h"><span class="box"></span>Archive</div><small>18 Dateien · 2,0 GB</small><em>fotos.zip, backup.7z …</em></div>
+                    <div class="grp"><div class="h"><span class="box"></span>Musik</div><small>40 Dateien · 380 MB</small><em>demo.mp3, loop.wav …</em></div>
+                    <div class="grp"><div class="h"><span class="box"></span>Videos</div><small>18 Dateien · 4,7 GB</small><em>clip.mp4, aufnahme.mkv …</em></div>
+                  </div>
+                  <div class="warn">Projektdateien erkannt: Ordner, die zu einem Projekt gehören, bleiben zusammen.</div>
+                  <div class="card selbar"><div class="grow"><b>214 Dateien in 6 Ordner</b><small>Kein Löschen – nur Verschieben, und das lässt sich rückgängig machen.</small></div><span class="abtn go">Jetzt sortieren</span></div>
+                </div>
+                <!-- Übertragen -->
+                <div class="page" data-page="move">
+                  <h4>Übertragen</h4>
+                  <p class="sub">Dateien und Programme sicher auf ein anderes Laufwerk bringen.</p>
+                  <div class="card"><div class="ct">1. Was?</div><div class="pathbox">C:\Benutzer\…\Videos\Projekte<span>18,4 GB</span></div></div>
+                  <div class="card"><div class="ct">2. Wohin?</div><div class="pathbox">D:\Archiv<span>612 GB frei</span></div></div>
+                  <div class="card prog">
+                    <div class="ct">Wird verschoben …</div>
+                    <div class="tr"><i></i></div>
+                    <div class="meta"><span>11,4 von 18,4 GB · 410 MB/s</span><span>noch etwa 20 Sekunden</span></div>
+                    <small style="font-size:12px;color:#8d919c">Jede Datei wird am Ziel nachgelesen und mit einer Prüfsumme verglichen. Erst dann wandert das Original in den Papierkorb.</small>
+                  </div>
+                  <div class="card selbar"><div class="grow"><b>Lieber doch nicht?</b><small>Ein Klick holt alles an den alten Platz zurück.</small></div><span class="abtn">Letzte Verschiebung rückgängig</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chips" role="group" aria-label="Bereich zeigen">
+          <button class="chip" data-go="over" aria-pressed="true"><svg><use href="#i-home"/></svg>Übersicht</button>
+          <button class="chip" data-go="big" aria-pressed="false"><svg><use href="#i-file"/></svg>Große Dateien</button>
+          <button class="chip" data-go="sort" aria-pressed="false"><svg><use href="#i-sort"/></svg>Ordnen</button>
+          <button class="chip" data-go="move" aria-pressed="false"><svg><use href="#i-swap"/></svg>Übertragen</button>
+        </div>
+        <p class="shot-note">Nachgebaute Ansicht mit Beispieldaten.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="bereiche">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Sieben Bereiche</p>
+        <h2>Alles, was einen PC <span class="grad-fresh">voll macht.</span></h2>
+        <p>Jeder Bereich zeigt dir erst, was er gefunden hat. Gemacht wird nur, was du ankreuzt.</p>
+      </div>
+      <div class="bento">
+        <article class="tile t-clean w4">
+          <span class="k">Aufräumen</span>
+          <h3>Müll und Cache. Weg mit einem Klick.</h3>
+          <p>Temporäre Dateien, Browser-Cache, Vorschaubilder, Absturzberichte und Update-Reste. Kehrwerk zeigt, wie viel jede Sorte belegt, und räumt nur auf, was du auswählst.</p>
+          <div class="vis bars">
+            <div class="bar-row">Browser-Cache<span>2,2 GB</span><div class="tr"><i style="width:100%;background:var(--orange)"></i></div></div>
+            <div class="bar-row">Temporäre Dateien<span>1,5 GB</span><div class="tr"><i style="width:68%;background:var(--blue)"></i></div></div>
+            <div class="bar-row">Vorschaubilder<span>1,1 GB</span><div class="tr"><i style="width:50%;background:var(--violet)"></i></div></div>
+          </div>
+        </article>
+        <article class="tile t-ai w2">
+          <span class="k">KI-Berater</span>
+          <h3>Frag einfach.</h3>
+          <p>Unsicher, ob etwas weg kann? Der Berater erklärt es dir, auf Wunsch mit einer KI direkt auf deinem PC.</p>
+          <div class="vis chat">
+            <div class="bubble me">Brauche ich den Ordner „Installer“?</div>
+            <div class="bubble ai">Nein, das sind alte Setup-Dateien. Die Programme sind schon installiert.</div>
+          </div>
+        </article>
+        <article class="tile w3">
+          <span class="k">Große Dateien</span>
+          <h3>Die dicksten Brocken. Mit Begründung.</h3>
+          <p>Riesige Videos, alte Installer, lange nicht geöffnete Dateien und leere Ordner. Neben jeder Datei steht ein kurzer Satz, warum sie weg kann oder warum du lieber prüfen solltest.</p>
+          <div class="vis stack">
+            <div class="mini"><b>Setup_2024.exe <span class="badge ok">Kann weg</span></b><p>Das Programm ist installiert, die Datei wird nicht mehr gebraucht.</p></div>
+          </div>
+        </article>
+        <article class="tile w3">
+          <span class="k">Duplikate</span>
+          <h3>Doppelt hält nicht besser.</h3>
+          <p>Kehrwerk vergleicht den Inhalt, nicht nur den Namen. So findet es dieselbe Datei auch in verschiedenen Ordnern, und eine Kopie bleibt immer erhalten.</p>
+          <div class="vis stack">
+            <div class="pair"><div class="file">strand.jpg<small>Bilder</small></div><span class="eq">=</span><div class="file">IMG_2041.jpg<small>Downloads</small></div></div>
+          </div>
+        </article>
+        <article class="tile w2">
+          <span class="k">Ordnen</span>
+          <h3>Downloads, sortiert.</h3>
+          <p>Nach Art oder nach Monat, mit Vorschau. Projekte bleiben zusammen.</p>
+          <div class="vis folders">
+            <div class="folder"><svg style="color:var(--sky)"><use href="#i-folder"/></svg>Bilder<small>64</small></div>
+            <div class="folder"><svg style="color:var(--orange)"><use href="#i-folder"/></svg>Installer<small>23</small></div>
+            <div class="folder"><svg style="color:var(--mint)"><use href="#i-folder"/></svg>Musik<small>40</small></div>
+          </div>
+        </article>
+        <article class="tile w2">
+          <span class="k">Programme</span>
+          <h3>C: voll? Programm umziehen.</h3>
+          <p>Deinstallieren oder auf eine andere Platte verschieben. Das Programm startet danach wie gewohnt.</p>
+          <div class="vis drives"><div class="drv"><b>C:</b><small>84 %</small></div><span class="arrow">→</span><div class="drv"><b>D:</b><small>34 %</small></div></div>
+        </article>
+        <article class="tile t-move w2">
+          <span class="k">Übertragen</span>
+          <h3>Sicher kopieren.</h3>
+          <p>Mit Restzeit und Prüfsumme für jede Datei. Nichts wird überschrieben.</p>
+          <div class="vis stack"><div class="mini"><b>18,4 GB · noch 20 s</b><p>Geprüft vom Ziel gelesen.</p></div></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec safety" id="sicher" style="padding-top:40px">
+    <div class="glow"></div>
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Sicherheit zuerst</p>
+        <h2>Aufräumen, <span class="grad-safe">ohne Angst.</span></h2>
+        <p>Ein Aufräumprogramm darf nie etwas kaputt machen. Darum hält sich Kehrwerk an feste Regeln.</p>
+      </div>
+      <div class="details">
+        <div class="detail"><svg><use href="#i-check"/></svg><h3>Nichts ohne dich</h3><p>Kehrwerk löscht und verschiebt nie von selbst. Jede Aktion fragt vorher nach.</p></div>
+        <div class="detail"><svg><use href="#i-bin"/></svg><h3>Erst in den Papierkorb</h3><p>Gelöschte Dateien landen im Papierkorb, nicht endgültig im Nichts.</p></div>
+        <div class="detail"><svg><use href="#i-lock"/></svg><h3>Systemordner sind tabu</h3><p>Windows, Programmdateien und Treiber werden nie angefasst. Keine Registry-„Reinigung“.</p></div>
+        <div class="detail"><svg><use href="#i-undo"/></svg><h3>Rückgängig</h3><p>Sortieren, Verschieben und Programm-Umzüge lassen sich mit einem Klick zurücknehmen.</p></div>
+        <div class="detail"><svg><use href="#i-book"/></svg><h3>Protokoll</h3><p>Alles, was getan wurde, steht mit Datum im Protokoll. Mit Rückgängig-Knopf direkt daneben.</p></div>
+        <div class="detail"><svg><use href="#i-key"/></svg><h3>Fragt nach Admin-Rechten</h3><p>Braucht etwas mehr Rechte, sagt Kehrwerk das und fragt, statt es heimlich zu tun.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="so" style="padding-top:40px">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">So geht's</p>
+        <h2>In drei Schritten <span class="grad-fresh">mehr Platz.</span></h2>
+      </div>
+      <ol class="steps">
+        <li><b>Scannen</b><p>Kehrwerk schaut sich deine Laufwerke an und zeigt in der Übersicht, wie viel sich freimachen lässt.</p></li>
+        <li><b>Ansehen und ankreuzen</b><p>Geh die Vorschläge durch. Jeder hat eine kurze Begründung, und mit „Zeigen“ öffnest du den Ordner.</p></li>
+        <li><b>Aufräumen</b><p>Ein Klick, und es ist erledigt. Passt etwas nicht, holst du es aus dem Papierkorb oder machst es rückgängig.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="sec download" id="preis">
+    <div class="glow"></div>
+    <div class="wrap">
+      <p class="eyebrow">Preis</p>
+      <h2 style="margin-top:14px">Erst testen.<br><span class="grad-fresh">Dann entscheiden.</span></h2>
+      <p class="lead">Ein Programm, eine Datei, keine Installation. Lade Kehrwerk, probier es 7 Tage aus und schalte dann alles frei.</p>
+      <div class="price-grid">
+        <article class="plan">
+          <h3>7 Tage testen</h3>
+          <div class="amount">0 €</div>
+          <ul>
+            <li><svg><use href="#i-tick"/></svg>Alles scannen und ansehen</li>
+            <li><svg><use href="#i-tick"/></svg>Müll und Cache aufräumen</li>
+            <li><svg><use href="#i-tick"/></svg>KI-Berater fragen</li>
+            <li class="no"><svg><use href="#i-lock"/></svg>Löschen, Ordnen, Verschieben und Übertragen erst mit Abo</li>
+          </ul>
+          <div class="cta">
+            <a class="btn btn-big" id="dl" href="https://github.com/Newxcall/kehrwerk/releases/latest/download/Kehrwerk.exe"><svg><use href="#i-down"/></svg>Kehrwerk.exe laden</a>
+            <p class="fine">Windows 10 oder 11 · 64 Bit. Zeigt Windows beim ersten Start „Der Computer wurde durch Windows geschützt“, klicke auf „Weitere Informationen“ und dann „Trotzdem ausführen“.</p>
+          </div>
+        </article>
+        <article class="plan pro">
+          <h3>Kehrwerk Abo</h3>
+          <div class="amount">3,99 € <small>im Monat</small></div>
+          <ul>
+            <li><svg><use href="#i-tick"/></svg>Alle sieben Bereiche ohne Grenzen</li>
+            <li><svg><use href="#i-tick"/></svg>Bis zu 3 PCs mit einem Schlüssel</li>
+            <li><svg><use href="#i-tick"/></svg>Alle Updates inklusive</li>
+            <li><svg><use href="#i-tick"/></svg>Monatlich kündbar, mit einem Klick</li>
+          </ul>
+          <div class="cta">
+            <label class="consent"><input type="checkbox" id="agree"><span>Ich akzeptiere die <a href="agb.html">AGB</a> und habe die <a href="widerruf.html">Widerrufsbelehrung</a> gelesen. Ich stimme zu, dass Kehrwerk sofort freigeschaltet wird, und weiß, dass ich damit mein Widerrufsrecht verliere.</span></label>
+            <button class="btn btn-big btn-go" id="buy" disabled>Abo abschließen</button>
+            <p class="err" id="buyErr" role="alert"></p>
+            <p class="fine">Sichere Bezahlung über Stripe. Nach dem Bezahlen bekommst du deinen Schlüssel und trägst ihn in Kehrwerk unter „Abo“ ein.</p>
+          </div>
+        </article>
+      </div>
+      <p class="req">Kehrwerk arbeitet offline. Nur um das Abo zu prüfen, meldet es sich etwa einmal pro Woche kurz beim Lizenz-Dienst.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Kehrwerk · ein Aufräumprogramm für Windows · Deine Dateien bleiben auf deinem PC.</span>
+    <nav aria-label="Rechtliches"><a href="../">Alle Programme</a><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="agb.html">AGB</a><a href="widerruf.html">Widerruf</a><a href="kuendigen.html">Verträge hier kündigen</a></nav>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var screen = document.getElementById('screen');
+  var stage = document.getElementById('stage');
+  function fit() { stage.style.transform = 'scale(' + (screen.clientWidth / 960) + ')'; }
+  fit();
+  window.addEventListener('resize', fit);
+
+  var pages = document.querySelectorAll('[data-page]');
+  var chips = document.querySelectorAll('.chip');
+  var sideBtns = document.querySelectorAll('.side button');
+  var order = ['over', 'big', 'sort', 'move'];
+  var current = 'over', timer = null;
+
+  function show(id, fromSide) {
+    current = id;
+    pages.forEach(function (p) { p.classList.toggle('on', p.dataset.page === id); });
+    chips.forEach(function (c) { c.setAttribute('aria-pressed', c.dataset.go === id ? 'true' : 'false'); });
+    if (!fromSide) {
+      var first = null;
+      sideBtns.forEach(function (b) { if (!first && b.dataset.go === id) first = b; });
+      sideBtns.forEach(function (b) { b.setAttribute('aria-current', b === first ? 'true' : 'false'); });
+    }
+  }
+  function auto() {
+    clearInterval(timer);
+    timer = setInterval(function () { show(order[(order.indexOf(current) + 1) % order.length]); }, 5000);
+  }
+  chips.forEach(function (c) { c.addEventListener('click', function () { show(c.dataset.go); auto(); }); });
+  sideBtns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      sideBtns.forEach(function (x) { x.setAttribute('aria-current', x === b ? 'true' : 'false'); });
+      show(b.dataset.go, true); auto();
+    });
+  });
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) auto();
+
+  // Abo abschließen: der Lizenz-Dienst erstellt die Stripe-Bezahlseite
+  var API = location.hostname === '127.0.0.1' ? 'http://127.0.0.1:8787/' : 'https://snafgyzhegwkxmunmxje.supabase.co/functions/v1/kehrwerk-license';  // lokal: server/dev_server.mjs
+  var agree = document.getElementById('agree'), buy = document.getElementById('buy'), err = document.getElementById('buyErr');
+  agree.addEventListener('change', function () { buy.disabled = !agree.checked; err.textContent = ''; });
+  buy.addEventListener('click', function () {
+    if (!agree.checked) return;
+    buy.disabled = true; buy.textContent = 'Einen Moment …'; err.textContent = '';
+    fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'checkout' }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j.url && j.url.indexOf('https://checkout.stripe.com/') === 0) { location.href = j.url; return; }
+        throw new Error(j.error || 'Die Bezahlseite ließ sich nicht öffnen.');
+      })
+      .catch(function (e) {
+        var m = e && e.message;
+        err.textContent = (m && m !== 'Failed to fetch' && m.indexOf('JSON') < 0) ? m : 'Keine Verbindung zum Lizenz-Dienst. Bitte später noch einmal versuchen.';
+        buy.disabled = false; buy.textContent = 'Abo abschließen';
+      });
+  });
+})();
+</script>
+</body>
+</html>

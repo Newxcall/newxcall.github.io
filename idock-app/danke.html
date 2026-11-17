@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Danke – iDock</title>
+<meta name="description" content="Dein iDock-Schlüssel.">
+<link rel="icon" href="icon.png">
+<link rel="stylesheet" href="sub.css">
+</head>
+<body>
+<header class="nav"><div class="wrap"><a class="brand" href="./"><img src="icon.png" alt="">iDock</a><a class="back" href="./">‹ Zur Startseite</a></div></header>
+<main class="wrap">
+<p class="eyebrow">Bezahlung abgeschlossen</p>
+<h1>Danke! <span class="grad">Hier ist dein Schlüssel.</span></h1>
+<div class="box">
+  <p id="state">Dein Schlüssel wird geholt …</p>
+  <div class="key" id="key" hidden></div>
+  <div class="row" id="actions" hidden>
+    <button class="btn btn-go" id="copy">Schlüssel kopieren</button>
+    <span class="ok" id="copied" aria-live="polite"></span>
+  </div>
+  <p class="err" id="err" role="alert"></p>
+</div>
+<h2>So schaltest du iDock frei</h2>
+<ol class="steps">
+  <li>Öffne iDock. Noch nicht installiert? <a href="https://github.com/Newxcall/idock-app/releases/latest/download/iDock-Setup.exe">iDock-Setup.exe laden</a>.</li>
+  <li>Klicke mit der rechten Maustaste auf das <strong>iDock-Symbol</strong> unten rechts neben der Uhr und wähle <strong>Abo …</strong>.</li>
+  <li>Füge den Schlüssel bei <strong>Schlüssel eintragen</strong> ein und klicke auf <strong>Freischalten</strong>.</li>
+</ol>
+<p><strong>Bewahre den Schlüssel gut auf</strong> (zum Beispiel in deinem Passwort-Manager). Er gilt für bis zu 3 PCs. Eine Bestätigung der Zahlung schickt dir Stripe per E-Mail.</p>
+</main>
+<footer><div class="wrap"><span>iDock · iPhone als Dock und Touchpad für Windows</span><nav aria-label="Rechtliches"><a href="../">Alle Programme</a><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="agb.html">AGB</a><a href="widerruf.html">Widerruf</a><a href="kuendigen.html">Verträge hier kündigen</a></nav></div></footer>
+<script>
+(function () {
+  var API = location.hostname === '127.0.0.1' ? 'http://127.0.0.1:8787/' : 'https://snafgyzhegwkxmunmxje.supabase.co/functions/v1/kehrwerk-license';  // lokal: server/dev_server.mjs
+  var id = new URLSearchParams(location.search).get('session_id') || '';
+  var state = document.getElementById('state'), keyBox = document.getElementById('key'), err = document.getElementById('err');
+  var tries = 0;
+  if (!/^cs_[A-Za-z0-9_]+$/.test(id)) { state.textContent = 'Hier fehlt die Bestellnummer. Öffne die Seite bitte über den Link nach dem Bezahlen.'; return; }
+  function show(key) {
+    state.textContent = 'Dein Schlüssel:';
+    keyBox.textContent = key; keyBox.hidden = false;
+    document.getElementById('actions').hidden = false;
+  }
+  function load() {
+    tries++;
+    fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'claim', session_id: id }) })
+      .then(function (r) { return r.json().then(function (j) { return { status: r.status, j: j }; }); })
+      .then(function (res) {
+        if (res.j.key) { show(res.j.key); return; }
+        if (res.status === 409 && tries < 10) { state.textContent = 'Die Zahlung wird noch bestätigt …'; setTimeout(load, 3000); return; }
+        throw new Error(res.j.error || 'Der Schlüssel ließ sich nicht holen.');
+      })
+      .catch(function (e) {
+        state.textContent = '';
+        err.textContent = (e && e.message && e.message !== 'Failed to fetch' ? e.message : 'Keine Verbindung.') +
+          ' Lade die Seite in ein paar Minuten neu. Klappt es dann nicht, schreib uns (siehe Impressum).';
+      });
+  }
+  load();
+  document.getElementById('copy').addEventListener('click', function () {
+    var done = function () { document.getElementById('copied').textContent = 'Kopiert'; };
+    if (navigator.clipboard) navigator.clipboard.writeText(keyBox.textContent).then(done, function () {});
+  });
+})();
+</script>
+</body>
+</html>

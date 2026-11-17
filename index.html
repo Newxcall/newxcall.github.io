@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Newcall – Programme für Windows</title>
+<meta name="description" content="Kehrwerk, Pebble und iDock: drei kleine Programme, die Windows aufgeräumter, schöner und bequemer machen. 7 Tage kostenlos testen.">
+<link rel="icon" href="icon.png">
+<style>
+@font-face { font-family: "Geist"; src: url("fonts/Geist-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Geist Mono"; src: url("fonts/GeistMono-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+:root {
+  color-scheme: dark;
+  --bg: #050507; --surface: #0e0e12; --surface-2: #17171c; --line: rgba(255,255,255,.08);
+  --fg: #f5f5f7; --muted: #a1a1a6; --dim: #6e6e76;
+  --blue: #0a84ff; --green: #30d158; --mint: #63e6be; --sky: #64d2ff; --violet: #bf5af2; --pink: #ff5e8a; --peach: #ffb36b;
+  --display: "Geist", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+  --body: "Geist", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --mono: "Geist Mono", "Cascadia Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 17px; line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 8px; }
+h1, h2, h3 { font-family: var(--display); letter-spacing: -0.03em; margin: 0; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-left, 0px)); }
+.eyebrow { font-family: var(--mono); font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.grad { background: linear-gradient(90deg, var(--mint), var(--sky) 35%, var(--violet) 70%, var(--pink)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+.nav { position: sticky; top: 0; z-index: 10; background: rgba(5,5,7,.72); backdrop-filter: saturate(180%) blur(18px); -webkit-backdrop-filter: saturate(180%) blur(18px); border-bottom: 1px solid var(--line); }
+.nav .wrap { display: flex; align-items: center; gap: 20px; height: 56px; }
+.brand { font-weight: 700; font-size: 18px; text-decoration: none; letter-spacing: -0.02em; }
+.nav-links { display: flex; gap: 24px; margin-left: auto; font-size: 14px; color: var(--muted); }
+.nav-links a { text-decoration: none; }
+.nav-links a:hover { color: var(--fg); }
+
+.hero { text-align: center; padding: 104px 0 24px; position: relative; overflow: hidden; }
+.hero .glow { position: absolute; left: 50%; top: -160px; width: 1200px; height: 720px; transform: translateX(-50%); background: radial-gradient(closest-side, rgba(100,210,255,.16), rgba(191,90,242,.08) 60%, transparent); pointer-events: none; }
+.hero h1 { font-size: clamp(44px, 7.6vw, 92px); font-weight: 700; line-height: 1.03; position: relative; }
+.hero .lead { max-width: 640px; margin: 22px auto 0; font-size: clamp(18px, 2.2vw, 22px); color: var(--muted); position: relative; }
+.icons { display: flex; justify-content: center; gap: 18px; margin-top: 40px; position: relative; }
+.icons img { width: 64px; height: 64px; border-radius: 16px; box-shadow: 0 16px 40px rgba(0,0,0,.5); }
+
+.apps { display: grid; gap: 22px; padding: 72px 0 110px; }
+.app { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 28px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 30px; padding: 34px; position: relative; overflow: hidden; }
+.app::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 120% at 100% 0%, var(--tint), transparent 70%); opacity: .18; pointer-events: none; }
+.app .head { display: flex; align-items: center; gap: 16px; }
+.app .head img { width: 56px; height: 56px; border-radius: 14px; }
+.app h2 { font-size: clamp(30px, 4vw, 42px); font-weight: 700; }
+.app .tag { font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--tint); margin: 2px 0 0; }
+.app p.desc { color: var(--muted); margin: 18px 0 0; max-width: 620px; position: relative; }
+.app ul { list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-wrap: wrap; gap: 8px; position: relative; }
+.app li { font-size: 13px; color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; }
+.app .side { display: grid; gap: 12px; justify-items: stretch; min-width: 220px; position: relative; }
+.price { font: 700 30px var(--display); letter-spacing: -0.03em; text-align: center; }
+.price small { display: block; font: 500 13px var(--body); color: var(--muted); letter-spacing: 0; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; border-radius: 999px; font-weight: 600; text-decoration: none; padding: 13px 22px; font-size: 16px; transition: transform .2s; }
+.btn:hover { transform: translateY(-1px); }
+.btn-main { background: var(--fg); color: #000; }
+.btn-ghost { border: 1px solid var(--line); color: var(--fg); background: rgba(255,255,255,.03); }
+.btn svg { width: 18px; height: 18px; }
+
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding-bottom: 110px; }
+.fact { border-top: 1px solid var(--line); padding-top: 20px; }
+.fact b { display: block; font-family: var(--display); font-size: 20px; letter-spacing: -0.02em; }
+.fact p { color: var(--muted); font-size: 15px; margin: 6px 0 0; }
+
+footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--dim); font-size: 13px; }
+footer .wrap { display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+footer nav { display: flex; gap: 18px; flex-wrap: wrap; }
+footer nav a { text-decoration: none; }
+footer nav a:hover { color: var(--fg); }
+
+@media (max-width: 860px) {
+  .app { grid-template-columns: minmax(0, 1fr); padding: 26px; }
+  .app .side { min-width: 0; }
+  .facts { grid-template-columns: minmax(0, 1fr); }
+  .nav-links { gap: 16px; }
+}
+@media (max-width: 520px) { .nav-links a.opt { display: none; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-down" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14"/></symbol>
+</svg>
+
+<nav class="nav" aria-label="Hauptmenü">
+  <div class="wrap">
+    <a class="brand" href="./">Newcall</a>
+    <div class="nav-links">
+      <a href="kehrwerk/">Kehrwerk</a>
+      <a href="pebble/">Pebble</a>
+      <a href="idock-app/">iDock</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <section class="hero">
+    <div class="glow" aria-hidden="true"></div>
+    <div class="wrap">
+      <p class="eyebrow">Programme für Windows</p>
+      <h1 style="margin-top:16px">Windows,<br><span class="grad">nur besser.</span></h1>
+      <p class="lead">Drei kleine Programme, die deinen PC aufgeräumter, schöner und bequemer machen. Jedes 7 Tage kostenlos – und Updates kommen von selbst.</p>
+      <div class="icons" aria-hidden="true">
+        <img src="kehrwerk/icon.png" alt=""><img src="pebble/icon.png" alt=""><img src="idock-app/icon.png" alt="">
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap apps" aria-label="Programme">
+    <article class="app" style="--tint: var(--mint)">
+      <div>
+        <div class="head"><img src="kehrwerk/icon.png" alt=""><div><h2>Kehrwerk</h2><p class="tag">PC aufräumen</p></div></div>
+        <p class="desc">Findet Datenmüll, die größten Brocken und doppelte Dateien, sortiert Downloads und zieht Programme von C: um – und räumt nur auf, was du bestätigst. Gelöschtes landet im Papierkorb, jede Aktion lässt sich rückgängig machen.</p>
+        <ul><li>Müll und Cache</li><li>Duplikate finden</li><li>Downloads sortieren</li><li>Programme umziehen</li></ul>
+      </div>
+      <div class="side">
+        <div class="price">3,99 €<small>im Monat · 7 Tage gratis</small></div>
+        <a class="btn btn-main" href="kehrwerk/">Mehr erfahren</a>
+        <a class="btn btn-ghost" href="https://github.com/Newxcall/kehrwerk/releases/latest/download/Kehrwerk.exe"><svg><use href="#i-down"/></svg>Kehrwerk.exe</a>
+      </div>
+    </article>
+
+    <article class="app" style="--tint: var(--pink)">
+      <div>
+        <div class="head"><img src="pebble/icon.png" alt=""><div><h2>Pebble</h2><p class="tag">Dynamic Island für Windows</p></div></div>
+        <p class="desc">Eine Pille oben am Bildschirm zeigt Musik, Lautstärke, Akku, Timer und Mitteilungen – dazu ein Dock wie am Mac, Spotify und die Steuerung deines OBS-Streams.</p>
+        <ul><li>Musik und Cover</li><li>Lautstärke-Mixer</li><li>Mac-Dock</li><li>OBS-Stream</li></ul>
+      </div>
+      <div class="side">
+        <div class="price">3,99 €<small>im Monat · 7 Tage gratis</small></div>
+        <a class="btn btn-main" href="pebble/">Mehr erfahren</a>
+        <a class="btn btn-ghost" href="https://github.com/Newxcall/pebble/releases/latest/download/PebbleSetup.exe"><svg><use href="#i-down"/></svg>PebbleSetup.exe</a>
+      </div>
+    </article>
+
+    <article class="app" style="--tint: var(--sky)">
+      <div>
+        <div class="head"><img src="idock-app/icon.png" alt=""><div><h2>iDock</h2><p class="tag">iPhone als Dock und Touchpad</p></div></div>
+        <p class="desc">Dein iPhone wird zum Dock, Touchpad, zur Tastatur und Fernbedienung für den PC. Im WLAN sofort – und mit Live-Bild und Fernzugriff auch unterwegs.</p>
+        <ul><li>App-Dock</li><li>Touchpad</li><li>Live-Bild</li><li>Fernzugriff</li></ul>
+      </div>
+      <div class="side">
+        <div class="price">3,99 €<small>im Monat · 7 Tage gratis</small></div>
+        <a class="btn btn-main" href="idock-app/">Mehr erfahren</a>
+        <a class="btn btn-ghost" href="https://github.com/Newxcall/idock-app/releases/latest/download/iDock-Setup.exe"><svg><use href="#i-down"/></svg>iDock-Setup.exe</a>
+      </div>
+    </article>
+  </section>
+
+  <section class="wrap facts" aria-label="Für alle Programme">
+    <div class="fact"><b>Erst testen</b><p>7 Tage alle Funktionen, ohne Konto und ohne Zahlungsdaten. Danach bleiben die Grundfunktionen frei.</p></div>
+    <div class="fact"><b>Updates von selbst</b><p>Jedes Programm meldet neue Versionen und installiert sie mit einem Klick. Nichts neu herunterladen.</p></div>
+    <div class="fact"><b>Monatlich kündbar</b><p>Bezahlt wird sicher über Stripe. Kündigen geht jederzeit mit einem Klick im Programm.</p></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Newcall · Programme von Deniz Gül · Für Windows 10 und 11</span>
+    <nav aria-label="Rechtliches"><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="kehrwerk/kuendigen.html">Verträge hier kündigen</a></nav>
+  </div>
+</footer>
+</body>
+</html>
