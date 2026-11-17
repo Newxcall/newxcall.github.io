@@ -53,8 +53,11 @@ h1, h2, h3 { font-family: var(--display); letter-spacing: -0.03em; margin: 0; }
 .app ul { list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-wrap: wrap; gap: 8px; position: relative; }
 .app li { font-size: 13px; color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; }
 .app .side { display: grid; gap: 12px; justify-items: stretch; min-width: 220px; position: relative; }
-.price { font: 700 30px var(--display); letter-spacing: -0.03em; text-align: center; }
-.price small { display: block; font: 500 13px var(--body); color: var(--muted); letter-spacing: 0; }
+.price { font: 700 40px var(--display); letter-spacing: -0.03em; text-align: center; color: var(--green); line-height: 1.05; }
+.price small { display: block; font: 500 14px var(--body); color: var(--fg); letter-spacing: 0; margin-top: 4px; }
+.upsell { font-size: 12.5px; color: var(--dim); text-align: center; margin: 0; }
+.btn-free { background: var(--green); color: #04210e; }
+.free-badge { display: inline-block; font: 600 13px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--green); border: 1px solid rgba(48,209,88,.4); background: rgba(48,209,88,.08); border-radius: 999px; padding: 6px 14px; margin-top: 26px; position: relative; }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; border-radius: 999px; font-weight: 600; text-decoration: none; padding: 13px 22px; font-size: 16px; transition: transform .2s; }
 .btn:hover { transform: translateY(-1px); }
 .btn-main { background: var(--fg); color: #000; }
@@ -103,7 +106,8 @@ footer nav a:hover { color: var(--fg); }
     <div class="wrap">
       <p class="eyebrow">Programme für Windows</p>
       <h1 style="margin-top:16px">Windows,<br><span class="grad">nur besser.</span></h1>
-      <p class="lead">Drei kleine Programme, die deinen PC aufgeräumter, schöner und bequemer machen. Jedes 7 Tage kostenlos – und Updates kommen von selbst.</p>
+      <p class="lead">Drei kleine Programme, die deinen PC aufgeräumter, schöner und bequemer machen. Alle gratis zum Laden und Nutzen – und Updates kommen von selbst.</p>
+      <span class="free-badge">Gratis · ohne Konto · ohne Werbung</span>
       <div class="icons" aria-hidden="true">
         <img src="kehrwerk/icon.png" alt=""><img src="pebble/icon.png" alt=""><img src="idock-app/icon.png" alt="">
       </div>
@@ -118,9 +122,10 @@ footer nav a:hover { color: var(--fg); }
         <ul><li>Müll und Cache</li><li>Duplikate finden</li><li>Downloads sortieren</li><li>Programme umziehen</li></ul>
       </div>
       <div class="side">
-        <div class="price">3,99 €<small>im Monat · 7 Tage gratis</small></div>
-        <a class="btn btn-main" href="kehrwerk/">Mehr erfahren</a>
-        <a class="btn btn-ghost" href="https://github.com/Newxcall/kehrwerk/releases/latest/download/Kehrwerk.exe"><svg><use href="#i-down"/></svg>Kehrwerk.exe</a>
+        <div class="price">Gratis<small>PC scannen, ansehen und KI fragen</small></div>
+        <a class="btn btn-free" href="https://github.com/Newxcall/kehrwerk/releases/latest/download/Kehrwerk.exe"><svg><use href="#i-down"/></svg>Gratis laden</a>
+        <a class="btn btn-ghost" href="kehrwerk/">Mehr erfahren</a>
+        <p class="upsell">Aufräumen 7 Tage testen · alle Funktionen 3,99&nbsp;€/Monat</p>
       </div>
     </article>
 
@@ -131,9 +136,10 @@ footer nav a:hover { color: var(--fg); }
         <ul><li>Musik und Cover</li><li>Lautstärke-Mixer</li><li>Mac-Dock</li><li>OBS-Stream</li></ul>
       </div>
       <div class="side">
-        <div class="price">3,99 €<small>im Monat · 7 Tage gratis</small></div>
-        <a class="btn btn-main" href="pebble/">Mehr erfahren</a>
-        <a class="btn btn-ghost" href="https://github.com/Newxcall/pebble/releases/latest/download/PebbleSetup.exe"><svg><use href="#i-down"/></svg>PebbleSetup.exe</a>
+        <div class="price">Gratis<small>Pille mit Musik, Akku, Timer und Uhr</small></div>
+        <a class="btn btn-free" href="https://github.com/Newxcall/pebble/releases/latest/download/PebbleSetup.exe"><svg><use href="#i-down"/></svg>Gratis laden</a>
+        <a class="btn btn-ghost" href="pebble/">Mehr erfahren</a>
+        <p class="upsell">Alle Funktionen 7 Tage testen, danach 3,99&nbsp;€/Monat</p>
       </div>
     </article>
 
@@ -144,17 +150,18 @@ footer nav a:hover { color: var(--fg); }
         <ul><li>App-Dock</li><li>Touchpad</li><li>Live-Bild</li><li>Fernzugriff</li></ul>
       </div>
       <div class="side">
-        <div class="price">3,99 €<small>im Monat · 7 Tage gratis</small></div>
-        <a class="btn btn-main" href="idock-app/">Mehr erfahren</a>
-        <a class="btn btn-ghost" href="https://github.com/Newxcall/idock-app/releases/latest/download/iDock-Setup.exe"><svg><use href="#i-down"/></svg>iDock-Setup.exe</a>
+        <div class="price">Gratis<small>Dock und Touchpad im WLAN</small></div>
+        <a class="btn btn-free" href="https://github.com/Newxcall/idock-app/releases/latest/download/iDock-Setup.exe"><svg><use href="#i-down"/></svg>Gratis laden</a>
+        <a class="btn btn-ghost" href="idock-app/">Mehr erfahren</a>
+        <p class="upsell">Alle Funktionen 7 Tage testen, danach 3,99&nbsp;€/Monat</p>
       </div>
     </article>
   </section>
 
   <section class="wrap facts" aria-label="Für alle Programme">
-    <div class="fact"><b>Erst testen</b><p>7 Tage alle Funktionen, ohne Konto und ohne Zahlungsdaten. Danach bleiben die Grundfunktionen frei.</p></div>
+    <div class="fact"><b>Gratis nutzen</b><p>Laden, installieren, loslegen – ohne Konto und ohne Zahlungsdaten. Die Grundfunktionen bleiben für immer gratis.</p></div>
     <div class="fact"><b>Updates von selbst</b><p>Jedes Programm meldet neue Versionen und installiert sie mit einem Klick. Nichts neu herunterladen.</p></div>
-    <div class="fact"><b>Monatlich kündbar</b><p>Bezahlt wird sicher über Stripe. Kündigen geht jederzeit mit einem Klick im Programm.</p></div>
+    <div class="fact"><b>Mehr nur, wenn du willst</b><p>In den ersten 7 Tagen kannst du mehr kostenlos ausprobieren. Wer danach alles will, nimmt das Abo – sicher über Stripe, monatlich kündbar.</p></div>
   </section>
 </main>
 
