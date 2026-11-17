@@ -77,6 +77,21 @@ h1, h2, h3 { font-family: var(--display); letter-spacing: -0.03em; margin: 0; }
 .launcher li::before { content: counter(s); display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: rgba(48,209,88,.14); color: var(--green); font: 700 18px var(--display); }
 .launcher li b { display: block; font-family: var(--display); font-size: 17px; }
 .launcher li p { margin: 2px 0 0; color: var(--muted); font-size: 14.5px; }
+.support { text-align: center; background: var(--surface); border: 1px solid var(--line); border-radius: 30px; padding: 48px 28px; margin-bottom: 110px; position: relative; overflow: hidden; }
+.support::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 100% at 50% 0%, rgba(255,94,138,.16), transparent 70%); pointer-events: none; }
+.support > * { position: relative; }
+.support h2 { font-size: clamp(30px, 4vw, 42px); font-weight: 700; margin-top: 12px; }
+.support .lead2 { color: var(--muted); max-width: 560px; margin: 14px auto 26px; }
+.amounts { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.amounts button { font: 600 17px var(--body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 12px 22px; cursor: pointer; min-width: 76px; }
+.amounts button[aria-pressed="true"] { background: var(--pink); border-color: var(--pink); color: #2a0611; }
+.amounts label { display: inline-flex; align-items: center; gap: 6px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 0 16px; font-weight: 600; }
+.amounts input { width: 64px; background: transparent; border: 0; color: var(--fg); font: 600 17px var(--body); padding: 12px 0; text-align: right; }
+.amounts input:focus { outline: none; }
+.btn-support { background: var(--pink); color: #2a0611; margin-top: 22px; border: 0; cursor: pointer; font-family: inherit; }
+.btn-support[disabled] { opacity: .6; cursor: wait; }
+.support .fine { font-size: 12.5px; color: var(--dim); max-width: 560px; margin: 16px auto 0; }
+.support .err { color: #ff6b6b; font-size: 14px; min-height: 1.4em; margin: 10px 0 0; }
 .facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding-bottom: 110px; }
 .fact { border-top: 1px solid var(--line); padding-top: 20px; }
 .fact b { display: block; font-family: var(--display); font-size: 20px; letter-spacing: -0.02em; }
@@ -111,6 +126,7 @@ footer nav a:hover { color: var(--fg); }
       <a href="pebble/">Pebble</a>
       <a href="idock-app/">iDock</a>
       <a class="opt" href="#launcher">Launcher</a>
+      <a class="opt" href="#unterstuetzen">Unterstützen</a>
     </div>
   </div>
 </nav>
@@ -198,13 +214,59 @@ footer nav a:hover { color: var(--fg); }
     <div class="fact"><b>Updates von selbst</b><p>Der Newcall Launcher installiert alle Programme und holt neue Versionen mit einem Klick. Nichts neu herunterladen.</p></div>
     <div class="fact"><b>Mehr nur, wenn du willst</b><p>In den ersten 7 Tagen kannst du mehr kostenlos ausprobieren. Wer danach alles will, nimmt das Abo – sicher über Stripe, monatlich kündbar.</p></div>
   </section>
+
+  <section class="wrap" id="unterstuetzen" aria-label="Unterstützen">
+    <div class="support">
+      <p class="eyebrow">Freiwillig</p>
+      <h2>Gefällt dir, was wir bauen?</h2>
+      <p class="lead2">Alle Programme bleiben gratis nutzbar – ohne Werbung. Wenn du uns trotzdem etwas geben möchtest, hilft das bei neuen Funktionen und Updates. Einmalig, ohne Konto, ohne Abo.</p>
+      <div class="amounts" role="group" aria-label="Betrag">
+        <button type="button" data-eur="3" aria-pressed="false">3 €</button>
+        <button type="button" data-eur="5" aria-pressed="true">5 €</button>
+        <button type="button" data-eur="10" aria-pressed="false">10 €</button>
+        <button type="button" data-eur="25" aria-pressed="false">25 €</button>
+        <label>Anderer Betrag <input id="eurOther" type="number" inputmode="numeric" min="1" max="500" step="1" placeholder="–" aria-label="Anderer Betrag in Euro"> €</label>
+      </div>
+      <button class="btn btn-support" id="supportBtn" type="button">♥ <span id="supportLabel">5 € geben</span></button>
+      <p class="err" id="supportErr" role="alert"></p>
+      <p class="fine">Sichere Bezahlung über Stripe (Karte, PayPal, Apple Pay und mehr – je nachdem, was Stripe anbietet). Freiwillige Zahlung ohne Gegenleistung an Newcall Apps; keine steuerlich absetzbare Spende. Du schaltest damit keine Funktionen frei.</p>
+    </div>
+  </section>
 </main>
 
 <footer>
   <div class="wrap">
     <span>© 2026 Newcall Apps · Für Windows 10 und 11</span>
-    <nav aria-label="Rechtliches"><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="kehrwerk/kuendigen.html">Verträge hier kündigen</a></nav>
+    <nav aria-label="Rechtliches"><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="kehrwerk/kuendigen.html">Verträge hier kündigen</a><a href="#unterstuetzen">Unterstützen</a></nav>
   </div>
 </footer>
+<script>
+(() => {
+  const API = location.hostname === '127.0.0.1' ? 'http://127.0.0.1:8787/' : 'https://snafgyzhegwkxmunmxje.supabase.co/functions/v1/kehrwerk-license';
+  const btns = [...document.querySelectorAll('.amounts button')], other = document.getElementById('eurOther');
+  const go = document.getElementById('supportBtn'), label = document.getElementById('supportLabel'), err = document.getElementById('supportErr');
+  let eur = 5;
+  const show = () => { label.textContent = eur ? eur + ' € geben' : 'Betrag wählen'; err.textContent = ''; };
+  btns.forEach(b => b.addEventListener('click', () => {
+    btns.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    other.value = ''; eur = Number(b.dataset.eur); show();
+  }));
+  other.addEventListener('input', () => {
+    btns.forEach(x => x.setAttribute('aria-pressed', 'false'));
+    const v = Number(other.value); eur = Number.isInteger(v) && v >= 1 && v <= 500 ? v : 0; show();
+  });
+  go.addEventListener('click', async () => {
+    if (!eur) { err.textContent = 'Bitte einen Betrag zwischen 1 und 500 Euro wählen.'; return; }
+    go.disabled = true; err.textContent = '';
+    try {
+      const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'donate', amount: eur }) });
+      const j = await r.json();
+      if (j.url && j.url.startsWith('https://')) { location.href = j.url; return; }
+      err.textContent = j.error || 'Das hat nicht geklappt. Bitte später noch einmal versuchen.';
+    } catch (e) { err.textContent = 'Keine Verbindung. Bist du online?'; }
+    go.disabled = false;
+  });
+})();
+</script>
 </body>
 </html>
