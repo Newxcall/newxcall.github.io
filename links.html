@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Newcall – alle Links</title>
+<meta name="description" content="Newcall: Unreleased Songs, Spotify, Apple Music, Instagram, Producing/Mixing/Mastering buchen und Newcall Apps.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Newcall – alle Links">
+<meta property="og:description" content="Unreleased Songs, Streaming, Kommissionen und Producing, Mixing, Mastering buchen.">
+<meta property="og:url" content="https://newxcall.github.io/links">
+<meta property="og:image" content="https://newxcall.github.io/musik/bilder/cover/2qDhqtHKGts.jpg">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#ff3d6e">
+<link rel="icon" href="musik/bilder/icon.svg" type="image/svg+xml">
+<style>
+@font-face { font-family: "Geist"; src: url("fonts/Geist-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+:root { color-scheme: dark; --bg: #08080b; --card: rgba(255,255,255,.06); --line: rgba(255,255,255,.1); --fg: #f5f5f7; --muted: #a1a1a6;
+  --grad: linear-gradient(120deg, #ff3d6e, #8a5cff); --font: "Geist", -apple-system, "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100svh; background: var(--bg); color: var(--fg); font-family: var(--font); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+body::before { content: ""; position: fixed; inset: -20%; z-index: -1; pointer-events: none;
+  background: radial-gradient(40% 35% at 20% 15%, rgba(255,61,110,.28), transparent 70%), radial-gradient(45% 40% at 85% 70%, rgba(138,92,255,.26), transparent 70%); filter: blur(10px); }
+a { color: inherit; text-decoration: none; }
+main { width: min(520px, 100%); margin: 0 auto; padding: 48px 16px 40px; }
+.head { text-align: center; }
+.avatar { width: 112px; height: 112px; border-radius: 50%; object-fit: cover; padding: 3px; background: var(--grad); box-shadow: 0 16px 50px rgba(255,61,110,.3); }
+h1 { margin: 16px 0 4px; font-size: 32px; letter-spacing: -0.03em; }
+.sub { margin: 0; color: var(--muted); font-size: 15px; }
+.socials { display: flex; justify-content: center; gap: 10px; margin: 18px 0 26px; }
+.socials a { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--card); border: 1px solid var(--line); transition: transform .2s, background .2s; }
+.socials a:hover { transform: translateY(-2px); background: rgba(255,255,255,.12); }
+.socials svg { width: 20px; height: 20px; fill: currentColor; }
+.links { display: grid; gap: 12px; }
+.link { position: relative; display: flex; align-items: center; gap: 14px; min-height: 62px; padding: 12px 18px; border-radius: 18px;
+  background: var(--card); border: 1px solid var(--line); font-weight: 600; font-size: 16px; transition: transform .2s, background .2s, border-color .2s; }
+.link:hover { transform: translateY(-2px); background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.2); }
+.link .ic { width: 38px; height: 38px; flex: none; border-radius: 11px; display: grid; place-items: center; font-size: 18px; background: rgba(255,255,255,.08); }
+.link .ic svg { width: 20px; height: 20px; fill: currentColor; }
+.link small { display: block; font-weight: 400; color: var(--muted); font-size: 13px; margin-top: 2px; }
+.link .arr { margin-left: auto; color: var(--muted); }
+.link.hot { background: var(--grad); border: 0; box-shadow: 0 14px 40px -12px rgba(255,61,110,.7); }
+.link.hot small, .link.hot .arr { color: rgba(255,255,255,.85); }
+.link.hot .ic { background: rgba(255,255,255,.2); }
+.live { width: 8px; height: 8px; border-radius: 50%; background: #fff; display: inline-block; margin-right: 6px; vertical-align: middle; animation: puls 1.6s infinite; }
+@keyframes puls { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,.7); } 100% { box-shadow: 0 0 0 9px rgba(255,255,255,0); } }
+.label { margin: 22px 4px 2px; font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+/* Neuester Song mit Abspielknopf */
+.song { display: flex; align-items: center; gap: 14px; padding: 10px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); }
+.song img { width: 62px; height: 62px; border-radius: 12px; object-fit: cover; flex: none; }
+.song .t { min-width: 0; flex: 1; }
+.song b { display: block; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.song .bar { height: 4px; margin-top: 8px; border-radius: 2px; background: rgba(255,255,255,.15); overflow: hidden; }
+.song .bar i { display: block; height: 100%; width: 0; background: var(--grad); }
+.song button { width: 46px; height: 46px; flex: none; border: 0; border-radius: 50%; background: #fff; color: #000; font-size: 16px; cursor: pointer; }
+footer { margin-top: 34px; text-align: center; font-size: 12px; color: var(--muted); }
+footer a { margin: 0 8px; }
+footer a:hover { color: var(--fg); }
+:focus-visible { outline: 2px solid #8a5cff; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .live { animation: none; } .link, .socials a { transition: none; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="yt" viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z"/></symbol>
+  <symbol id="ig" viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8C2.4 3.9 3.9 2.4 7.2 2.3 8.4 2.2 8.8 2.2 12 2.2ZM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1 0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7 1.2.1 1.6.1 4.9.1s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0Zm0 5.8a6.2 6.2 0 1 0 0 12.4 6.2 6.2 0 0 0 0-12.4ZM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm6.4-11.8a1.4 1.4 0 1 0 0 2.9 1.4 1.4 0 0 0 0-2.9Z"/></symbol>
+  <symbol id="sp" viewBox="0 0 24 24"><path d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24Zm5.5 17.3a.7.7 0 0 1-1 .3c-2.8-1.7-6.4-2.1-10.6-1.2a.7.7 0 1 1-.3-1.5c4.6-1 8.5-.6 11.6 1.4.4.2.5.6.3 1Zm1.5-3.3a.9.9 0 0 1-1.3.3c-3.2-2-8.1-2.6-11.9-1.4a.9.9 0 0 1-.5-1.8c4.3-1.3 9.7-.7 13.4 1.6.4.3.6.9.3 1.3Zm.1-3.4C15.3 8.3 8.9 8.1 5.2 9.2a1.1 1.1 0 1 1-.6-2.1c4.2-1.3 11.3-1 15.7 1.6a1.1 1.1 0 0 1-1.2 1.9Z"/></symbol>
+  <symbol id="am" viewBox="0 0 24 24"><path d="M16.7 2.1 8.6 3.7c-.6.1-1 .6-1 1.2v11a3.6 3.6 0 1 0 2 3.2V9.3l7.3-1.4v6.4a3.6 3.6 0 1 0 2 3.2V3.1c0-.6-.6-1.1-1.2-1Z"/></symbol>
+</svg>
+<main>
+  <div class="head">
+    <img class="avatar" src="musik/bilder/cover/2qDhqtHKGts.jpg" alt="Newcall">
+    <h1>Newcall</h1>
+    <p class="sub">Producer · Mixing · Mastering · Vocals</p>
+    <div class="socials">
+      <a href="https://www.youtube.com/@newcall3843" target="_blank" rel="noopener" aria-label="YouTube"><svg><use href="#yt"/></svg></a>
+      <a href="https://www.instagram.com/New._.call" target="_blank" rel="noopener" aria-label="Instagram"><svg><use href="#ig"/></svg></a>
+      <a href="https://open.spotify.com/intl-de/artist/2d4HQ05QBgt1most7wdx7U" target="_blank" rel="noopener" aria-label="Spotify"><svg><use href="#sp"/></svg></a>
+      <a href="https://music.apple.com/de/artist/newcall/1567614364" target="_blank" rel="noopener" aria-label="Apple Music"><svg><use href="#am"/></svg></a>
+    </div>
+  </div>
+
+  <div class="links">
+    <a class="link hot" href="https://www.youtube.com/@newcall3843" target="_blank" rel="noopener">
+      <span class="ic"><svg><use href="#yt"/></svg></span>
+      <span><span class="live"></span>Unreleased Songs reinhören<small>Neue Tracks zuerst auf YouTube</small></span><span class="arr">→</span>
+    </a>
+
+    <div class="song" id="song" hidden>
+      <img id="songCover" alt="">
+      <div class="t"><small style="color:var(--muted);font-size:12px">Neuester Song</small><b id="songTitle"></b><div class="bar"><i id="songBar"></i></div></div>
+      <button id="songPlay" aria-label="Abspielen">▶</button>
+    </div>
+
+    <p class="label">Streaming</p>
+    <a class="link" href="https://open.spotify.com/intl-de/artist/2d4HQ05QBgt1most7wdx7U" target="_blank" rel="noopener">
+      <span class="ic" style="color:#1ed760"><svg><use href="#sp"/></svg></span>Spotify<span class="arr">→</span></a>
+    <a class="link" href="https://music.apple.com/de/artist/newcall/1567614364" target="_blank" rel="noopener">
+      <span class="ic" style="color:#fa2d48"><svg><use href="#am"/></svg></span>Apple Music<span class="arr">→</span></a>
+    <a class="link" href="https://amazon.de/music/player/artists/B09541DB8X/newcall" target="_blank" rel="noopener">
+      <span class="ic" style="color:#25d1da"><svg><use href="#am"/></svg></span>Amazon Music<span class="arr">→</span></a>
+
+    <p class="label">Zusammenarbeiten</p>
+    <a class="link" href="https://www.instagram.com/New._.call" target="_blank" rel="noopener">
+      <span class="ic" style="color:#e1306c"><svg><use href="#ig"/></svg></span>
+      <span>Kommissionen & Anfragen<small>Schreib mir auf Instagram</small></span><span class="arr">→</span></a>
+    <a class="link" href="musik/#leistungen">
+      <span class="ic">🎛️</span><span>Producing, Mixing & Mastering buchen<small>Direkt online bezahlen</small></span><span class="arr">→</span></a>
+
+    <p class="label">Mehr</p>
+    <a class="link" href="musik/">
+      <span class="ic">🎧</span><span>Alle Songs hören<small>Meine Musik-Website</small></span><span class="arr">→</span></a>
+    <a class="link" href="musik/#newsletter">
+      <span class="ic">✉️</span><span>Newsletter<small>Neue Musik zuerst per E-Mail</small></span><span class="arr">→</span></a>
+    <a class="link" href="./#apps">
+      <span class="ic">💻</span><span>Newcall Apps<small>WinClean, Pebble, iDock – gratis</small></span><span class="arr">→</span></a>
+  </div>
+
+  <footer><a href="impressum.html">Impressum</a><a href="musik/datenschutz.html">Datenschutz</a></footer>
+</main>
+<audio id="audio" preload="none"></audio>
+<script src="musik/songs.js"></script>
+<script>
+(function () {
+  var s = (window.SONGS || [])[0];
+  if (!s) return;
+  var $ = function (id) { return document.getElementById(id); }, a = $('audio');
+  $('song').hidden = false;
+  $('songCover').src = 'musik/' + s.cover;
+  $('songTitle').textContent = s.titel + (s.feat ? ' (' + s.feat + ')' : '');
+  $('songPlay').setAttribute('aria-label', s.titel + ' abspielen');
+  $('songPlay').addEventListener('click', function () {
+    if (!a.src) a.src = 'musik/' + s.datei;
+    a.paused ? a.play() : a.pause();
+  });
+  a.addEventListener('play', function () { $('songPlay').textContent = '❚❚'; });
+  a.addEventListener('pause', function () { $('songPlay').textContent = '▶'; });
+  a.addEventListener('timeupdate', function () { $('songBar').style.width = a.duration ? (a.currentTime / a.duration * 100) + '%' : 0; });
+})();
+</script>
+</body>
+</html>
