@@ -8,7 +8,7 @@
 <link rel="icon" href="icon.png">
 <link rel="stylesheet" href="sub.css">
 <style>
-/* Admin für alle Newcall-Programme: Kunden, kostenlos freischalten, sperren, Konten, E-Mail-Verteiler. Die Prüfung macht der Lizenz-Dienst (ADMIN_TOKEN). */
+/* Admin für Newcall Apps und Newcall Musik (oben umschaltbar): Kunden, Freischaltungen, Konten, zwei E-Mail-Verteiler, Musik-Aufträge und Preise. Die Prüfung macht der Lizenz-Dienst (ADMIN_TOKEN). */
 main.wide { max-width: 1120px; }
 .wide .wrap, main.wide { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 .mode { display: inline-block; font: 600 12px var(--mono); letter-spacing: .06em; padding: 4px 10px; border-radius: 999px; margin-left: 10px; vertical-align: middle; }
@@ -46,6 +46,14 @@ label.small { font-size: 13px; color: var(--muted); }
 .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .row input { flex: 1; min-width: 200px; margin: 0; font: 500 15px var(--body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
 .hidden { display: none !important; }
+.switch { display: inline-grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); margin: 6px 0 4px; }
+.switch button { border: 0; border-radius: 999px; padding: 10px 22px; background: transparent; color: var(--muted); font: 600 15px var(--body); cursor: pointer; }
+.switch button.on { background: var(--fg); color: #000; }
+.svc { display: grid; grid-template-columns: minmax(140px, 1fr) minmax(0, 2fr) 110px auto auto; gap: 8px; align-items: center; margin-bottom: 8px; }
+.svc input[type=text], .svc input[type=number] { width: 100%; font: 500 14px var(--body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; margin: 0; }
+.svc label { font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; white-space: nowrap; }
+.note { font-size: 13px; color: var(--muted); white-space: pre-wrap; margin-top: 4px; }
+@media (max-width: 760px) { .svc { grid-template-columns: minmax(0, 1fr) 100px; } .svc .svc-text { grid-column: 1 / -1; } }
 @media (max-width: 760px) {
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .cust { grid-template-columns: minmax(0, 1fr); }
@@ -69,6 +77,46 @@ label.small { font-size: 13px; color: var(--muted); }
   </div>
 
   <div id="panel" class="hidden">
+    <div class="switch" role="tablist" aria-label="Bereich">
+      <button type="button" data-view="apps" class="on">Newcall Apps</button>
+      <button type="button" data-view="musik">Musik</button>
+    </div>
+
+    <!-- ===================== MUSIK ===================== -->
+    <div data-view="musik" class="hidden">
+      <div class="stats">
+        <div class="stat"><b id="mNew">0</b><span>neue Aufträge</span></div>
+        <div class="stat"><b id="mWork">0</b><span>in Arbeit</span></div>
+        <div class="stat"><b id="mDone">0</b><span>fertig</span></div>
+        <div class="stat"><b id="mSum">0 €</b><span>Umsatz gesamt (brutto)</span></div>
+      </div>
+
+      <h2>Aufträge</h2>
+      <p class="small" style="margin-top:-6px">Gebuchte und bezahlte Leistungen von der Musikseite. Den Status sieht die Kundin oder der Kunde unter „Mein Konto“. Erstattungen machst du im Stripe-Dashboard.</p>
+      <div class="tools">
+        <input type="search" id="mq" placeholder="Suchen: E-Mail, Projekt, Leistung …">
+        <select id="mfilter" class="btn btn-ghost btn-s"><option value="offen">Offen</option><option value="all">Alle</option><option value="fertig">Fertig</option></select>
+        <button class="btn btn-ghost btn-s" id="mreload">Neu laden</button>
+      </div>
+      <p class="err" id="mErr" role="alert"></p>
+      <div class="list" id="orders"></div>
+
+      <div class="box" style="margin-top:28px">
+        <h2 style="margin-top:0">Leistungen & Preise</h2>
+        <p>So erscheinen sie auf der Musikseite. Preis in ganzen Euro – <b>0 = „Preis auf Anfrage“</b> (dann gibt es statt „Buchen“ einen Knopf zu Instagram). Ohne Haken bei „sichtbar“ wird die Leistung versteckt.</p>
+        <label class="small" style="display:flex;gap:8px;align-items:center;margin:4px 0 14px"><input type="checkbox" id="mAccept"> Neue Buchungen annehmen (aus = Pause, z. B. im Urlaub)</label>
+        <div id="svcList"></div>
+        <div class="row" style="margin-top:6px">
+          <button class="btn btn-ghost btn-s" id="svcAdd">+ Leistung hinzufügen</button>
+          <button class="btn btn-go" id="svcSave">Speichern</button>
+        </div>
+        <p class="err" id="svcErr" role="alert"></p>
+        <p class="ok" id="svcOk"></p>
+      </div>
+    </div>
+
+    <!-- ===================== APPS ===================== -->
+    <div data-view="apps">
     <div class="stats">
       <div class="stat"><b id="sActive">0</b><span>zahlende Abos aktiv</span></div>
       <div class="stat"><b id="sFree">0</b><span>kostenlos freigeschaltet</span></div>
@@ -106,6 +154,8 @@ label.small { font-size: 13px; color: var(--muted); }
     <p class="err" id="instErr" role="alert"></p>
     <div class="list" id="installs"></div>
 
+    </div><!-- Ende Apps (oberer Teil) -->
+
     <h2>Konten</h2>
     <p class="small" style="margin-top:-6px">Newcall-Konten aus dem Launcher. Abos mit derselben E-Mail gelten automatisch. Hat jemand sein Passwort vergessen, setzt du hier ein neues und sagst es der Person.</p>
     <div class="tools">
@@ -115,8 +165,8 @@ label.small { font-size: 13px; color: var(--muted); }
     <p class="err" id="accErr" role="alert"></p>
     <div class="list" id="accounts"></div>
 
-    <h2>E-Mail-Verteiler</h2>
-    <p class="small" style="margin-top:-6px">Wer beim Konto-Erstellen oder im Launcher „Neuigkeiten per E-Mail“ einschaltet, bekommt erst eine Bestätigungs-Mail. Nur bestätigte Adressen erhalten deine Rundmails – jede mit einem Abbestell-Link.</p>
+    <h2 id="nHead">E-Mail-Verteiler</h2>
+    <p class="small" style="margin-top:-6px" id="nIntro">Wer beim Konto-Erstellen oder im Launcher „Neuigkeiten per E-Mail“ einschaltet, bekommt erst eine Bestätigungs-Mail. Nur bestätigte Adressen erhalten deine Rundmails – jede mit einem Abbestell-Link.</p>
     <div class="stats">
       <div class="stat"><b id="nActive">0</b><span>bestätigt (bekommen Mails)</span></div>
       <div class="stat"><b id="nWait">0</b><span>warten auf Bestätigung</span></div>
@@ -125,7 +175,7 @@ label.small { font-size: 13px; color: var(--muted); }
     </div>
     <div class="box">
       <h2 style="margin-top:0">Rundmail schreiben</h2>
-      <div class="row" style="margin-bottom:10px">
+      <div class="row" style="margin-bottom:10px" id="nNotesRow">
         <select id="nApp" class="btn btn-ghost btn-s"><option value="kehrwerk">WinClean</option><option value="pebble">Pebble</option><option value="idock">iDock</option><option value="launcher">Newcall Launcher</option></select>
         <button class="btn btn-ghost btn-s" id="nNotes">Neueste Patch Notes übernehmen</button>
       </div>
@@ -143,6 +193,7 @@ label.small { font-size: 13px; color: var(--muted); }
     <div class="tools"><b style="color:var(--fg)">Empfänger</b><button class="btn btn-ghost btn-s" id="nreload">Neu laden</button></div>
     <div class="list" id="newsList"></div>
 
+    <div data-view="apps">
     <h2>Kunden</h2>
     <div class="tools">
       <input type="search" id="q" placeholder="Suchen: Name, E-Mail, Schlüssel …">
@@ -157,6 +208,7 @@ label.small { font-size: 13px; color: var(--muted); }
     </div>
     <p class="err" id="listErr" role="alert"></p>
     <div class="list" id="list"></div>
+    </div><!-- Ende Apps (Kunden) -->
     <div class="box" style="margin-top:28px">
       <h2 style="margin-top:0">Admin-Passwort ändern</h2>
       <p>Danach gilt nur noch das neue Passwort – auch auf anderen Geräten musst du dich neu anmelden. Mindestens 12 Zeichen.</p>
@@ -169,7 +221,7 @@ label.small { font-size: 13px; color: var(--muted); }
       <p class="ok" id="pwOk"></p>
     </div>
 
-    <p class="stand">Zahlungen, Rückerstattungen und Rechnungen verwaltest du im Stripe-Dashboard. Hier geht es nur um die Freischaltung in WinClean, Pebble und iDock.</p>
+    <p class="stand">Zahlungen, Rückerstattungen und Rechnungen verwaltest du im Stripe-Dashboard. Konten und das Admin-Passwort gelten für beide Bereiche.</p>
   </div>
 </main>
 
@@ -190,13 +242,37 @@ label.small { font-size: 13px; color: var(--muted); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function date(ts) { return ts ? new Date(ts * 1000).toLocaleDateString('de-DE') : ''; }
 
+  // ---------- Bereich: Newcall Apps oder Musik (gemerkt in diesem Browser, auch über #musik / #apps)
+  var view = 'apps';
+  try { view = localStorage.getItem('ncAdminView') || 'apps'; } catch (e) {}
+  if (location.hash === '#musik' || location.hash === '#apps') view = location.hash.slice(1);
+  var loaded = {};
+  function setView(v) {
+    view = v === 'musik' ? 'musik' : 'apps';
+    try { localStorage.setItem('ncAdminView', view); } catch (e) {}
+    history.replaceState(null, '', '#' + view);
+    document.querySelectorAll('.switch button').forEach(function (b) { b.classList.toggle('on', b.dataset.view === view); });
+    document.querySelectorAll('div[data-view]').forEach(function (d) { d.classList.toggle('hidden', d.dataset.view !== view); });
+    document.title = (view === 'musik' ? 'Newcall Musik' : 'Newcall Apps') + ' · Admin';
+    $('nHead').textContent = view === 'musik' ? 'E-Mail-Verteiler – Musik' : 'E-Mail-Verteiler – Apps';
+    $('nIntro').textContent = view === 'musik'
+      ? 'Wer auf der Musikseite den Newsletter abonniert, bekommt erst eine Bestätigungs-Mail. Nur bestätigte Adressen erhalten deine Rundmails zu neuer Musik – jede mit einem Abbestell-Link. Getrennt vom Apps-Verteiler.'
+      : 'Wer beim Konto-Erstellen oder im Launcher „Neuigkeiten per E-Mail“ einschaltet, bekommt erst eine Bestätigungs-Mail. Nur bestätigte Adressen erhalten deine Rundmails – jede mit einem Abbestell-Link.';
+    $('nNotesRow').classList.toggle('hidden', view === 'musik');
+    $('nSubject').placeholder = view === 'musik' ? 'z. B. Neuer Song: Pille ist draußen' : 'z. B. WinClean 1.4.0 ist da';
+    $('nText').placeholder = view === 'musik' ? 'Was gibt es Neues? Link zum Song …' : 'Was ist neu? …';
+    if ($('panel').classList.contains('hidden')) return;
+    if (view === 'apps' && !loaded.apps) { loaded.apps = true; load(); loadInstalls(); }
+    if (view === 'musik' && !loaded.musik) { loaded.musik = true; loadMusic(); }
+    loadNews();
+  }
+  document.querySelectorAll('.switch button').forEach(function (b) { b.addEventListener('click', function () { setView(b.dataset.view); }); });
+
   function showPanel(test) {
     $('login').classList.add('hidden'); $('panel').classList.remove('hidden'); $('logout').hidden = false;
     var m = $('mode'); m.hidden = false; m.className = 'mode ' + (test ? 'test' : 'live'); m.textContent = test ? 'TESTMODUS' : 'LIVE';
-    load();
-    loadInstalls();
     loadAccounts();
-    loadNews();
+    setView(view);
   }
   function login() {
     token = $('token').value.trim();
@@ -273,7 +349,8 @@ label.small { font-size: 13px; color: var(--muted); }
     var q = $('aq').value.trim().toLowerCase();
     var shown = accounts.filter(function (a) { return !q || (a.email + ' ' + a.name).toLowerCase().indexOf(q) >= 0; });
     $('accounts').innerHTML = shown.length ? shown.map(function (a, i) {
-      var meta = ['erstellt ' + date(a.created), a.last_login ? 'zuletzt angemeldet ' + ago(a.last_login) : ''].filter(Boolean).join(' · ');
+      var meta = ['erstellt ' + date(a.created), a.last_login ? 'zuletzt angemeldet ' + ago(a.last_login) : '',
+        a.news === 'an' ? 'Apps-Newsletter' : '', a.mnews === 'an' ? 'Musik-Newsletter' : ''].filter(Boolean).join(' · ');
       return '<div class="cust"><div class="who"><b>' + esc(a.name || a.email) + (a.blocked ? ' <span class="tag bad">gesperrt</span>' : '') + '</b>' +
         '<div class="meta">' + (a.name ? esc(a.email) + ' · ' : '') + meta + '</div></div><div class="acts">' +
         '<button class="btn btn-ghost btn-s" data-aact="pw" data-i="' + i + '">Passwort setzen</button>' +
@@ -306,7 +383,8 @@ label.small { font-size: 13px; color: var(--muted); }
   var REPOS = { kehrwerk: ['Newxcall/kehrwerk', 'WinClean', 'winclean/'], pebble: ['Newxcall/pebble', 'Pebble', 'pebble/'], idock: ['Newxcall/idock-app', 'iDock', 'idock/'], launcher: ['Newxcall/launcher', 'Newcall Launcher', ''] };
   function loadNews() {
     $('newsErr').textContent = ''; $('nreload').disabled = true;
-    call({ action: 'admin_news' }).then(function (j) { news = j; renderNews(); })
+    var forView = view;
+    call({ action: 'admin_news', list: view }).then(function (j) { if (forView === view) { news = j; renderNews(); } })
       .catch(function (e) { $('newsErr').textContent = e.message; }).then(function () { $('nreload').disabled = false; });
   }
   function renderNews() {
@@ -324,7 +402,7 @@ label.small { font-size: 13px; color: var(--muted); }
       var tag = r.blocked ? '<span class="tag bad">gesperrt</span>' : r.news === 'an' ? '<span class="tag ok">bestätigt</span>' : '<span class="tag warn">wartet</span>';
       return '<div class="cust"><div class="who"><b>' + esc(r.name || r.email) + ' ' + tag + '</b><div class="meta">' + (r.name ? esc(r.email) + ' · ' : '') +
         (r.news === 'an' ? 'seit ' : 'angefragt ') + date(r.since) + '</div></div><div></div></div>';
-    }).join('') : '<p>Noch niemand hat Neuigkeiten bestellt.</p>';
+    }).join('') : '<p>' + (view === 'musik' ? 'Noch niemand hat den Musik-Newsletter bestellt.' : 'Noch niemand hat Neuigkeiten bestellt.') + '</p>';
   }
   // Markdown der GitHub-Release-Notes in den einfachen Mailtext umwandeln
   function notesToText(md) {
@@ -351,11 +429,11 @@ label.small { font-size: 13px; color: var(--muted); }
   function sendNews(test) {
     var subject = $('nSubject').value.trim(), text = $('nText').value.trim();
     $('newsErr').textContent = ''; $('newsOk').textContent = '';
-    if (test && !subject) subject = 'Testmail von Newcall Apps';
+    if (test && !subject) subject = view === 'musik' ? 'Testmail von Newcall Musik' : 'Testmail von Newcall Apps';
     if (test && text.length < 10) text = 'das ist eine Testmail aus der Admin-Seite. Wenn du sie liest, funktioniert der Versand.\n\nSo sieht eine Aufzählung aus:\n- erster Punkt\n- zweiter Punkt';
     if (!test && subject.length < 3) { $('newsErr').textContent = 'Bitte einen Betreff eingeben (oder „Neueste Patch Notes übernehmen“).'; return; }
     if (!test && text.length < 10) { $('newsErr').textContent = 'Bitte einen Text eingeben (oder „Neueste Patch Notes übernehmen“).'; return; }
-    var p = { action: 'admin_news_send', subject: subject, text: text };
+    var p = { action: 'admin_news_send', subject: subject, text: text, list: view };
     if (test) {
       var to = $('nTestTo').value.trim();
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(to)) { $('newsErr').textContent = 'Bitte eine Adresse für die Testmail eingeben.'; return; }
@@ -372,6 +450,84 @@ label.small { font-size: 13px; color: var(--muted); }
   $('nTest').addEventListener('click', function () { sendNews(true); });
   $('nSend').addEventListener('click', function () { sendNews(false); });
   $('nreload').addEventListener('click', loadNews);
+
+
+  // ---------- Musik: Aufträge, Leistungen & Preise
+  var music = { orders: [], config: { accepting: true, services: [] } };
+  var STATES = { neu: ['neu', 'warn'], in_arbeit: ['in Arbeit', 'free'], fertig: ['fertig', 'ok'] };
+  function eur(n) { return Number(n || 0).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
+  function loadMusic() {
+    $('mErr').textContent = ''; $('mreload').disabled = true;
+    call({ action: 'admin_music' }).then(function (j) { music = j; renderOrders(); renderServices(); })
+      .catch(function (e) { $('mErr').textContent = e.message; }).then(function () { $('mreload').disabled = false; });
+  }
+  function renderOrders() {
+    var o = music.orders || [];
+    $('mNew').textContent = o.filter(function (x) { return x.state === 'neu' && !x.refunded; }).length;
+    $('mWork').textContent = o.filter(function (x) { return x.state === 'in_arbeit' && !x.refunded; }).length;
+    $('mDone').textContent = o.filter(function (x) { return x.state === 'fertig'; }).length;
+    $('mSum').textContent = eur(o.filter(function (x) { return !x.refunded; }).reduce(function (s, x) { return s + x.amount; }, 0));
+    var q = $('mq').value.trim().toLowerCase(), f = $('mfilter').value;
+    var shown = o.filter(function (x) {
+      if (f === 'offen' && (x.state === 'fertig' || x.refunded)) return false;
+      if (f === 'fertig' && x.state !== 'fertig') return false;
+      return !q || [x.email, x.project, x.service, x.note].join(' ').toLowerCase().indexOf(q) >= 0;
+    });
+    $('orders').innerHTML = shown.length ? shown.map(function (x, i) {
+      var st = STATES[x.state] || STATES.neu;
+      var tag = x.refunded ? '<span class="tag off">erstattet</span>' : '<span class="tag ' + st[1] + '">' + st[0] + '</span>';
+      var acts = Object.keys(STATES).filter(function (k) { return k !== x.state; }).map(function (k) {
+        return '<button class="btn btn-ghost btn-s" data-mact="' + k + '" data-i="' + i + '">' + (k === 'neu' ? 'Zurück auf neu' : k === 'in_arbeit' ? 'In Arbeit' : 'Fertig') + '</button>';
+      }).join('') + '<a class="btn btn-ghost btn-s" href="mailto:' + esc(x.email) + '?subject=' + encodeURIComponent('Dein Auftrag: ' + x.service + ' – ' + x.project) + '">E-Mail</a>';
+      return '<div class="cust"><div class="who"><b>' + esc(x.service) + ' – ' + esc(x.project) + ' ' + tag + '</b>' +
+        '<div class="meta">' + esc(x.email) + ' · ' + eur(x.amount) + ' · ' + date(x.created) + '</div>' +
+        (x.note ? '<div class="note">' + esc(x.note) + '</div>' : '') + '</div><div class="acts">' + acts + '</div></div>';
+    }).join('') : '<p>' + (o.length ? 'Keine Aufträge in dieser Ansicht.' : 'Noch keine Aufträge.') + '</p>';
+    $('orders').querySelectorAll('button[data-mact]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var x = shown[+b.dataset.i]; b.disabled = true; $('mErr').textContent = '';
+        call({ action: 'admin_music_order', id: x.id, state: b.dataset.mact }).then(function (j) {
+          x.state = j.order.state; renderOrders();
+        }).catch(function (e) { $('mErr').textContent = e.message; b.disabled = false; });
+      });
+    });
+  }
+  function svcRow(sv) {
+    var d = document.createElement('div'); d.className = 'svc';
+    d.innerHTML = '<input type="text" class="svc-title" maxlength="60" placeholder="Name, z. B. Mixing">' +
+      '<input type="text" class="svc-text" maxlength="300" placeholder="Kurze Beschreibung">' +
+      '<input type="number" class="svc-price" min="0" max="5000" step="1" placeholder="Preis €">' +
+      '<label><input type="checkbox" class="svc-active"> sichtbar</label>' +
+      '<button class="btn btn-red btn-s svc-del" type="button" title="Entfernen">✕</button>';
+    d.querySelector('.svc-title').value = sv.title || '';
+    d.querySelector('.svc-text').value = sv.text || '';
+    d.querySelector('.svc-price').value = sv.price || 0;
+    d.querySelector('.svc-active').checked = sv.active !== false;
+    d.dataset.id = sv.id || '';
+    d.querySelector('.svc-del').addEventListener('click', function () { d.remove(); });
+    return d;
+  }
+  function renderServices() {
+    var c = music.config || { accepting: true, services: [] };
+    $('mAccept').checked = c.accepting !== false;
+    var box = $('svcList'); box.innerHTML = '';
+    (c.services || []).forEach(function (sv) { box.appendChild(svcRow(sv)); });
+  }
+  $('svcAdd').addEventListener('click', function () { $('svcList').appendChild(svcRow({ price: 0, active: true })); });
+  $('svcSave').addEventListener('click', function () {
+    var services = [].map.call($('svcList').children, function (d) {
+      return { id: d.dataset.id, title: d.querySelector('.svc-title').value, text: d.querySelector('.svc-text').value,
+        price: Math.round(+d.querySelector('.svc-price').value || 0), active: d.querySelector('.svc-active').checked };
+    });
+    $('svcErr').textContent = ''; $('svcOk').textContent = ''; $('svcSave').disabled = true;
+    call({ action: 'admin_music_set', accepting: $('mAccept').checked, services: services }).then(function (j) {
+      music.config = j.config; renderServices();
+      $('svcOk').textContent = 'Gespeichert – die Musikseite zeigt es sofort (Seite neu laden).';
+    }).catch(function (e) { $('svcErr').textContent = e.message; }).then(function () { $('svcSave').disabled = false; });
+  });
+  $('mreload').addEventListener('click', loadMusic);
+  $('mq').addEventListener('input', renderOrders);
+  $('mfilter').addEventListener('change', renderOrders);
 
   // ---------- Admin-Passwort ändern
   $('pwBtn').addEventListener('click', function () {

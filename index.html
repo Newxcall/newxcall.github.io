@@ -6,6 +6,8 @@
 <title>Newcall Apps – Programme für Windows</title>
 <meta name="description" content="WinClean, Pebble und iDock: drei kleine Programme, die Windows aufgeräumter, schöner und bequemer machen. 7 Tage kostenlos testen.">
 <link rel="icon" href="icon.png">
+<script>/* Erst die Auswahl Apps / Musik zeigen – außer ein Link springt schon an eine Stelle (#apps, #launcher …) */
+if (!location.hash) document.documentElement.classList.add('choosing');</script>
 <style>
 @font-face { font-family: "Geist"; src: url("fonts/Geist-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
 @font-face { font-family: "Geist Mono"; src: url("fonts/GeistMono-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
@@ -111,6 +113,36 @@ footer nav a:hover { color: var(--fg); }
   .nav-links { gap: 16px; }
 }
 @media (max-width: 520px) { .nav-links a.opt { display: none; } }
+
+/* Startauswahl: Newcall Apps oder Musik */
+.choose { display: none; }
+.choosing body { overflow: hidden; }
+.choosing .choose { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; overflow-y: auto; padding: 32px 16px;
+  background: radial-gradient(50% 60% at 25% 40%, rgba(100,210,255,.13), transparent 70%), radial-gradient(50% 60% at 75% 60%, rgba(255,61,110,.14), transparent 70%), var(--bg); }
+.choose-in { width: min(980px, 100%); text-align: center; }
+.choose h1 { font-size: clamp(38px, 6.5vw, 72px); font-weight: 700; line-height: 1.05; margin-top: 14px; }
+.choose .sub { color: var(--muted); font-size: clamp(16px, 2vw, 20px); margin: 14px 0 0; }
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: 44px; }
+.tile { position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 10px; min-height: 300px; padding: 32px;
+  border-radius: 32px; background: var(--surface); border: 1px solid var(--line); text-decoration: none; transition: transform .25s, border-color .25s; }
+.tile:hover { transform: translateY(-4px); border-color: rgba(255,255,255,.2); }
+.tile::before { content: ""; position: absolute; inset: 0; background: radial-gradient(80% 90% at 100% 0%, var(--tint), transparent 70%); opacity: .25; pointer-events: none; }
+.tile > * { position: relative; }
+.tile h2 { font-size: clamp(30px, 4vw, 44px); font-weight: 700; margin-top: auto; }
+.tile p { color: var(--muted); margin: 0; font-size: 16px; }
+.tile .go { margin-top: 14px; font-weight: 600; font-size: 16px; display: inline-flex; gap: 8px; align-items: center; }
+.tile .go span { transition: transform .25s; }
+.tile:hover .go span { transform: translateX(5px); }
+.tile .imgs { display: flex; gap: 10px; }
+.tile .imgs img { width: 52px; height: 52px; border-radius: 13px; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+.bars { display: flex; align-items: flex-end; gap: 6px; height: 52px; }
+.bars i { width: 9px; border-radius: 5px; background: linear-gradient(180deg, #ff3d6e, #8a5cff); animation: eq 1.1s ease-in-out infinite alternate; }
+.bars i:nth-child(1) { height: 40%; } .bars i:nth-child(2) { height: 90%; animation-delay: -.3s; } .bars i:nth-child(3) { height: 60%; animation-delay: -.6s; }
+.bars i:nth-child(4) { height: 100%; animation-delay: -.2s; } .bars i:nth-child(5) { height: 50%; animation-delay: -.8s; }
+@keyframes eq { to { transform: scaleY(.45); } }
+.bars i { transform-origin: bottom; }
+@media (prefers-reduced-motion: reduce) { .bars i { animation: none; } }
+@media (max-width: 700px) { .tiles { grid-template-columns: minmax(0, 1fr); } .tile { min-height: 220px; padding: 26px; } }
 </style>
 </head>
 <body>
@@ -118,10 +150,33 @@ footer nav a:hover { color: var(--fg); }
   <symbol id="i-down" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14"/></symbol>
 </svg>
 
+<div class="choose" id="choose" role="dialog" aria-labelledby="chooseTitle">
+  <div class="choose-in">
+    <p class="eyebrow">Newcall</p>
+    <h1 id="chooseTitle">Wohin <span class="grad">möchtest du?</span></h1>
+    <p class="sub">Programme für deinen PC – oder Musik zum Hören und Buchen.</p>
+    <div class="tiles">
+      <a class="tile" href="#apps" style="--tint: var(--sky)">
+        <div class="imgs" aria-hidden="true"><img src="winclean/icon.png" alt=""><img src="pebble/icon.png" alt=""><img src="idock-app/icon.png" alt=""></div>
+        <h2>Newcall Apps</h2>
+        <p>WinClean, Pebble und iDock – Programme für Windows und iPhone. Gratis laden.</p>
+        <span class="go">Zu den Apps <span>→</span></span>
+      </a>
+      <a class="tile" href="musik/" style="--tint: #ff3d6e">
+        <div class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        <h2>Musik</h2>
+        <p>Songs hören, Unreleased auf YouTube – und Producing, Mixing, Mastering oder Vocals buchen.</p>
+        <span class="go">Zur Musik <span>→</span></span>
+      </a>
+    </div>
+  </div>
+</div>
+
 <nav class="nav" aria-label="Hauptmenü">
   <div class="wrap">
     <a class="brand" href="./">Newcall Apps</a>
     <div class="nav-links">
+      <a href="musik/">Musik</a>
       <a href="winclean/">WinClean</a>
       <a href="pebble/">Pebble</a>
       <a href="idock-app/">iDock</a>
@@ -132,7 +187,7 @@ footer nav a:hover { color: var(--fg); }
 </nav>
 
 <main>
-  <section class="hero">
+  <section class="hero" id="apps">
     <div class="glow" aria-hidden="true"></div>
     <div class="wrap">
       <p class="eyebrow">Programme für Windows</p>
@@ -240,6 +295,14 @@ footer nav a:hover { color: var(--fg); }
     <nav aria-label="Rechtliches"><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="winclean/kuendigen.html">Verträge hier kündigen</a><a href="#unterstuetzen">Unterstützen</a></nav>
   </div>
 </footer>
+<script>
+// Auswahl ein-/ausblenden, wenn sich die Adresse ändert (zurück-Taste führt wieder zur Auswahl)
+window.addEventListener('hashchange', function () {
+  var c = !location.hash;
+  document.documentElement.classList.toggle('choosing', c);
+  if (location.hash === '#apps') window.scrollTo(0, 0);
+});
+</script>
 <script>
 (() => {
   const API = location.hostname === '127.0.0.1' ? 'http://127.0.0.1:8787/' : 'https://snafgyzhegwkxmunmxje.supabase.co/functions/v1/kehrwerk-license';
