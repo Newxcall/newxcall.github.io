@@ -42,6 +42,9 @@ main.wide { max-width: 1120px; }
 .grid2 input, .grid2 select { width: 100%; font: 500 15px var(--body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; margin: 6px 0 12px; }
 label.small { font-size: 13px; color: var(--muted); }
 #newKey { display: none; }
+.box textarea { width: 100%; min-height: 260px; resize: vertical; font: 500 14px/1.5 var(--body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin: 6px 0 12px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.row input { flex: 1; min-width: 200px; margin: 0; font: 500 15px var(--body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
 .hidden { display: none !important; }
 @media (max-width: 760px) {
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -112,6 +115,34 @@ label.small { font-size: 13px; color: var(--muted); }
     <p class="err" id="accErr" role="alert"></p>
     <div class="list" id="accounts"></div>
 
+    <h2>E-Mail-Verteiler</h2>
+    <p class="small" style="margin-top:-6px">Wer beim Konto-Erstellen oder im Launcher „Neuigkeiten per E-Mail“ einschaltet, bekommt erst eine Bestätigungs-Mail. Nur bestätigte Adressen erhalten deine Rundmails – jede mit einem Abbestell-Link.</p>
+    <div class="stats">
+      <div class="stat"><b id="nActive">0</b><span>bestätigt (bekommen Mails)</span></div>
+      <div class="stat"><b id="nWait">0</b><span>warten auf Bestätigung</span></div>
+      <div class="stat"><b id="nAcc">0</b><span>Konten insgesamt</span></div>
+      <div class="stat"><b id="nReady" style="font-size:18px;padding:7px 0 6px">…</b><span id="nSender">Versand</span></div>
+    </div>
+    <div class="box">
+      <h2 style="margin-top:0">Rundmail schreiben</h2>
+      <div class="row" style="margin-bottom:10px">
+        <select id="nApp" class="btn btn-ghost btn-s"><option value="kehrwerk">WinClean</option><option value="pebble">Pebble</option><option value="idock">iDock</option><option value="launcher">Newcall Launcher</option></select>
+        <button class="btn btn-ghost btn-s" id="nNotes">Neueste Patch Notes übernehmen</button>
+      </div>
+      <div class="grid2" style="grid-template-columns:minmax(0,1fr)"><div><label class="small" for="nSubject">Betreff</label><input id="nSubject" maxlength="150" placeholder="z. B. WinClean 1.4.0 ist da"></div></div>
+      <label class="small" for="nText">Text – „Hallo Name,“ und der Abbestell-Link kommen automatisch dazu. Zeilen mit „- “ werden Aufzählungen, „# “ Überschriften, **so** fett.</label>
+      <textarea id="nText" placeholder="Was ist neu? …"></textarea>
+      <div class="row">
+        <input id="nTestTo" type="email" placeholder="Testmail an … (deine Adresse)">
+        <button class="btn btn-ghost btn-s" id="nTest">Testmail senden</button>
+        <button class="btn btn-go" id="nSend">An alle senden</button>
+      </div>
+      <p class="err" id="newsErr" role="alert"></p>
+      <p class="ok" id="newsOk"></p>
+    </div>
+    <div class="tools"><b style="color:var(--fg)">Empfänger</b><button class="btn btn-ghost btn-s" id="nreload">Neu laden</button></div>
+    <div class="list" id="newsList"></div>
+
     <h2>Kunden</h2>
     <div class="tools">
       <input type="search" id="q" placeholder="Suchen: Name, E-Mail, Schlüssel …">
@@ -153,6 +184,7 @@ label.small { font-size: 13px; color: var(--muted); }
     load();
     loadInstalls();
     loadAccounts();
+    loadNews();
   }
   function login() {
     token = $('token').value.trim();
@@ -256,6 +288,74 @@ label.small { font-size: 13px; color: var(--muted); }
     });
   }
   $('areload').addEventListener('click', loadAccounts);
+
+  // ---------- E-Mail-Verteiler (Neuigkeiten)
+  var news = { rows: [], active: 0 };
+  var REPOS = { kehrwerk: ['Newxcall/kehrwerk', 'WinClean', 'winclean/'], pebble: ['Newxcall/pebble', 'Pebble', 'pebble/'], idock: ['Newxcall/idock-app', 'iDock', 'idock/'], launcher: ['Newxcall/launcher', 'Newcall Launcher', ''] };
+  function loadNews() {
+    $('newsErr').textContent = ''; $('nreload').disabled = true;
+    call({ action: 'admin_news' }).then(function (j) { news = j; renderNews(); })
+      .catch(function (e) { $('newsErr').textContent = e.message; }).then(function () { $('nreload').disabled = false; });
+  }
+  function renderNews() {
+    var rows = news.rows || [];
+    $('nActive').textContent = news.active || 0;
+    $('nWait').textContent = rows.filter(function (r) { return r.news === 'wartet'; }).length;
+    $('nAcc').textContent = news.accounts || 0;
+    $('nReady').textContent = news.ready ? 'eingerichtet' : 'nicht eingerichtet';
+    $('nReady').style.color = news.ready ? 'var(--mint)' : '#ff9f0a';
+    $('nSender').textContent = news.ready ? 'Absender: ' + news.sender : 'Gmail-Zugang fehlt (mail-zugang-einrichten.bat)';
+    $('nSend').textContent = 'An alle senden (' + (news.active || 0) + ')';
+    $('nSend').disabled = !news.ready || !news.active;
+    $('nTest').disabled = !news.ready;
+    $('newsList').innerHTML = rows.length ? rows.map(function (r) {
+      var tag = r.blocked ? '<span class="tag bad">gesperrt</span>' : r.news === 'an' ? '<span class="tag ok">bestätigt</span>' : '<span class="tag warn">wartet</span>';
+      return '<div class="cust"><div class="who"><b>' + esc(r.name || r.email) + ' ' + tag + '</b><div class="meta">' + (r.name ? esc(r.email) + ' · ' : '') +
+        (r.news === 'an' ? 'seit ' : 'angefragt ') + date(r.since) + '</div></div><div></div></div>';
+    }).join('') : '<p>Noch niemand hat Neuigkeiten bestellt.</p>';
+  }
+  // Markdown der GitHub-Release-Notes in den einfachen Mailtext umwandeln
+  function notesToText(md) {
+    return String(md || '').replace(/\r/g, '').split('\n').map(function (l) {
+      return l.replace(/^#{1,6}\s*/, '# ').replace(/^\s*[*+]\s+/, '- ').replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1: $2');
+    }).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+  }
+  $('nNotes').addEventListener('click', function () {
+    var app = REPOS[$('nApp').value], b = $('nNotes');
+    b.disabled = true; $('newsErr').textContent = ''; $('newsOk').textContent = '';
+    fetch('https://api.github.com/repos/' + app[0] + '/releases?per_page=1', { headers: { Accept: 'application/vnd.github+json' } })
+      .then(function (r) { if (!r.ok) throw new Error('GitHub antwortet nicht (' + r.status + ').'); return r.json(); })
+      .then(function (list) {
+        var rel = list && list[0];
+        if (!rel) throw new Error('Noch keine Veröffentlichung gefunden.');
+        var v = String(rel.tag_name || '').replace(/^v/, '');
+        $('nSubject').value = app[1] + ' ' + v + ' ist da';
+        $('nText').value = 'die neue Version ' + v + ' von ' + app[1] + ' ist fertig. Das ist neu:\n\n' + notesToText(rel.body) +
+          '\n\nDer Newcall Launcher aktualisiert alles mit einem Klick – oder du lädst die neue Version hier: https://newxcall.github.io/' + app[2] +
+          '\n\nViele Grüße\nDeniz';
+      }).catch(function (e) { $('newsErr').textContent = e.message === 'Failed to fetch' ? 'Keine Verbindung zu GitHub.' : e.message; })
+      .then(function () { b.disabled = false; });
+  });
+  function sendNews(test) {
+    var subject = $('nSubject').value.trim(), text = $('nText').value.trim();
+    $('newsErr').textContent = ''; $('newsOk').textContent = '';
+    var p = { action: 'admin_news_send', subject: subject, text: text };
+    if (test) {
+      var to = $('nTestTo').value.trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(to)) { $('newsErr').textContent = 'Bitte eine Adresse für die Testmail eingeben.'; return; }
+      p.test = to;
+    } else if (!confirm('Diese E-Mail jetzt an ' + news.active + ' bestätigte Empfänger senden?\n\nBetreff: ' + subject)) return;
+    var b = test ? $('nTest') : $('nSend');
+    b.disabled = true;
+    call(p).then(function (j) {
+      $('newsOk').textContent = test ? 'Testmail an ' + p.test + ' verschickt – schau in dein Postfach.'
+        : 'Verschickt an ' + j.sent + ' von ' + j.total + (j.failed && j.failed.length ? ' (fehlgeschlagen: ' + j.failed.join(', ') + ')' : '') + '.';
+      if (!test) loadNews();
+    }).catch(function (e) { $('newsErr').textContent = e.message; }).then(function () { renderNews(); });
+  }
+  $('nTest').addEventListener('click', function () { sendNews(true); });
+  $('nSend').addEventListener('click', function () { sendNews(false); });
+  $('nreload').addEventListener('click', loadNews);
   $('aq').addEventListener('input', renderAccounts);
 
   $('ireload').addEventListener('click', loadInstalls);
