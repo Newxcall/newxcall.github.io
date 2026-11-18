@@ -1,63 +1,7 @@
 <!doctype html>
-<html lang="de">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Verträge hier kündigen – Kehrwerk</title>
-<meta name="description" content="Kehrwerk-Abo kündigen.">
-<link rel="icon" href="icon.png">
-<link rel="stylesheet" href="sub.css">
-</head>
-<body>
-<header class="nav"><div class="wrap"><a class="brand" href="./"><img src="icon.png" alt="">Kehrwerk</a><a class="back" href="./">‹ Zur Startseite</a></div></header>
-<main class="wrap">
-<p class="eyebrow">Abo kündigen</p>
-<h1>Verträge hier kündigen</h1>
-<p>Du kannst dein Kehrwerk-Abo jederzeit kündigen. Es endet dann zum Ende des bezahlten Monats – bis dahin bleibt alles freigeschaltet. Die Abo-Verwaltung läuft über unseren Zahlungsdienst Stripe. Dort bekommst du nach der Kündigung sofort eine Bestätigung per E-Mail.</p>
-
-<div class="box">
-  <h2 style="margin-top:0">Mit deiner E-Mail-Adresse</h2>
-  <p>Gib bei Stripe die E-Mail-Adresse ein, mit der du bezahlt hast. Du bekommst einen Anmeldelink und kannst dort auf <strong>Abo kündigen</strong> klicken.</p>
-  <button class="btn btn-go" id="byMail">Jetzt kündigen</button>
-  <p class="err" id="errMail" role="alert"></p>
-</div>
-
-<div class="box">
-  <h2 style="margin-top:0">Mit deinem Schlüssel</h2>
-  <p>Du hast deinen Kehrwerk-Schlüssel zur Hand? Dann geht es ohne E-Mail-Anmeldung direkt zur Abo-Verwaltung. (In Kehrwerk: <strong>Abo → Zahlung ändern oder kündigen</strong>.)</p>
-  <label for="key">Schlüssel</label>
-  <input type="text" id="key" placeholder="KW-…" autocomplete="off" spellcheck="false">
-  <button class="btn" id="byKey">Zur Abo-Verwaltung</button>
-  <p class="err" id="errKey" role="alert"></p>
-</div>
-
-<p>Du kannst auch formlos per E-Mail kündigen: <a href="mailto:denizxguel@gmail.com">denizxguel@gmail.com</a>. Gib dabei bitte die E-Mail-Adresse an, mit der du bezahlt hast.</p>
-</main>
-<footer><div class="wrap"><span>Kehrwerk · ein Aufräumprogramm für Windows</span><nav aria-label="Rechtliches"><a href="../">Alle Programme</a><a href="../#unterstuetzen">Unterstützen</a><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="agb.html">AGB</a><a href="widerruf.html">Widerruf</a><a href="kuendigen.html">Verträge hier kündigen</a></nav></div></footer>
-<script>
-(function () {
-  var API = location.hostname === '127.0.0.1' ? 'http://127.0.0.1:8787/' : 'https://snafgyzhegwkxmunmxje.supabase.co/functions/v1/kehrwerk-license';  // lokal: server/dev_server.mjs
-  function go(payload, btn, err) {
-    btn.disabled = true; err.textContent = '';
-    fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-      .then(function (r) { return r.json(); })
-      .then(function (j) {
-        if (j.url && /^https:\/\/billing\.stripe\.com\//.test(j.url)) { location.href = j.url; return; }
-        throw new Error(j.error || 'Die Abo-Verwaltung ließ sich nicht öffnen.');
-      })
-      .catch(function (e) {
-        err.textContent = (e && e.message && e.message !== 'Failed to fetch' ? e.message : 'Keine Verbindung.') + ' Du kannst auch per E-Mail kündigen (siehe unten).';
-        btn.disabled = false;
-      });
-  }
-  var bm = document.getElementById('byMail'), bk = document.getElementById('byKey');
-  bm.addEventListener('click', function () { go({ action: 'portal_login' }, bm, document.getElementById('errMail')); });
-  bk.addEventListener('click', function () {
-    var k = document.getElementById('key').value.replace(/\s+/g, '');
-    if (!k) return;
-    go({ action: 'portal', key: k }, bk, document.getElementById('errKey'));
-  });
-})();
-</script>
-</body>
-</html>
+<html lang="de"><head><meta charset="utf-8">
+<title>Weiterleitung</title><meta name="robots" content="noindex">
+<link rel="canonical" href="../winclean/kuendigen.html">
+<script>location.replace("../winclean/kuendigen.html" + location.search + location.hash);</script>
+<noscript><meta http-equiv="refresh" content="0; url=../winclean/kuendigen.html"></noscript>
+</head><body><p>Diese Seite ist umgezogen: <a href="../winclean/kuendigen.html">../winclean/kuendigen.html</a></p></body></html>

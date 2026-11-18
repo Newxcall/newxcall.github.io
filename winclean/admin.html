@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>WinClean Admin</title>
+<link rel="icon" href="icon.png">
+<link rel="stylesheet" href="sub.css">
+<style>
+/* Admin: alle Kunden, kostenlos freischalten, sperren. Die Prüfung macht der Lizenz-Dienst (ADMIN_TOKEN). */
+main.wide { max-width: 1120px; }
+.wide .wrap, main.wide { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.mode { display: inline-block; font: 600 12px var(--mono); letter-spacing: .06em; padding: 4px 10px; border-radius: 999px; margin-left: 10px; vertical-align: middle; }
+.mode.test { background: rgba(255,159,10,.15); color: #ff9f0a; }
+.mode.live { background: rgba(48,209,88,.15); color: #30d158; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 22px 0; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; }
+.stat b { display: block; font: 700 28px var(--display); color: var(--fg); letter-spacing: -0.03em; }
+.stat span { font-size: 13px; color: var(--muted); }
+.tools { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 10px 0 14px; }
+.tools input[type=search] { flex: 1; min-width: 200px; margin: 0; font-family: var(--body); }
+.btn-s { padding: 8px 14px; font-size: 13px; }
+.btn-ghost { background: var(--surface-2); color: var(--fg); border: 1px solid var(--line); }
+.btn-ghost:hover { background: #222228; }
+.btn-red { background: rgba(255,69,58,.16); color: #ff6b61; }
+.btn-red:hover { background: rgba(255,69,58,.26); }
+.list { display: grid; gap: 10px; }
+.cust { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; align-items: center; }
+.cust .who { min-width: 0; }
+.cust .who b { color: var(--fg); font-size: 16px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.cust .meta { font-size: 13px; color: var(--muted); }
+.cust .k { font: 500 12px var(--mono); color: var(--dim); word-break: break-all; }
+.cust .acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.tag { font: 600 11px var(--body); padding: 2px 8px; border-radius: 6px; }
+.tag.ok { background: rgba(62,207,142,.14); color: var(--mint); }
+.tag.free { background: rgba(100,210,255,.14); color: var(--sky); }
+.tag.off { background: rgba(255,255,255,.08); color: var(--muted); }
+.tag.bad { background: rgba(255,69,58,.15); color: #ff6b61; }
+.tag.warn { background: rgba(255,159,10,.14); color: #ff9f0a; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
+.grid2 input, .grid2 select { width: 100%; font: 500 15px var(--body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; margin: 6px 0 12px; }
+label.small { font-size: 13px; color: var(--muted); }
+#newKey { display: none; }
+.hidden { display: none !important; }
+@media (max-width: 760px) {
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cust { grid-template-columns: minmax(0, 1fr); }
+  .cust .acts { justify-content: flex-start; }
+  .grid2 { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+</head>
+<body>
+<header class="nav"><div class="wrap"><a class="brand" href="./"><img src="icon.png" alt="">WinClean</a><a class="back" href="#" id="logout" hidden>Abmelden</a></div></header>
+<main class="wrap wide">
+  <p class="eyebrow">Verwaltung</p>
+  <h1>Admin <span class="mode" id="mode" hidden></span></h1>
+
+  <!-- Anmelden -->
+  <div class="box" id="login">
+    <p>Admin-Passwort eingeben. Es bleibt nur in diesem Browser-Tab, bis du ihn schließt.</p>
+    <input type="text" id="token" placeholder="Admin-Passwort" autocomplete="off" spellcheck="false" style="-webkit-text-security: disc">
+    <button class="btn btn-go" id="loginBtn">Anmelden</button>
+    <p class="err" id="loginErr" role="alert"></p>
+  </div>
+
+  <div id="panel" class="hidden">
+    <div class="stats">
+      <div class="stat"><b id="sActive">0</b><span>zahlende Abos aktiv</span></div>
+      <div class="stat"><b id="sFree">0</b><span>kostenlos freigeschaltet</span></div>
+      <div class="stat"><b id="sMonth">0 €</b><span>pro Monat (brutto)</span></div>
+      <div class="stat"><b id="sEnded">0</b><span>beendet oder gesperrt</span></div>
+    </div>
+
+    <div class="box">
+      <h2 style="margin-top:0">Kostenlos freischalten</h2>
+      <p>Für dich selbst, Tester oder Freunde. Es entsteht ein Schlüssel ohne Abo – es wird nie etwas abgebucht. Gilt wie ein Abo für bis zu 3 PCs.</p>
+      <div class="grid2">
+        <div><label class="small" for="gProduct">Programm</label>
+          <select id="gProduct"><option value="kehrwerk">WinClean</option><option value="pebble">Pebble</option><option value="idock">iDock</option></select></div>
+        <div><label class="small" for="gName">Name</label><input id="gName" placeholder="z. B. Deniz"></div>
+        <div><label class="small" for="gMail">E-Mail (optional)</label><input id="gMail" type="email" placeholder="name@beispiel.de"></div>
+        <div><label class="small" for="gNote">Notiz (optional)</label><input id="gNote" placeholder="z. B. Entwickler, Tester"></div>
+        <div><label class="small" for="gUntil">Gültig</label>
+          <select id="gUntil"><option value="0">unbegrenzt</option><option value="30">30 Tage</option><option value="90">90 Tage</option><option value="365">1 Jahr</option></select></div>
+      </div>
+      <button class="btn btn-go" id="grantBtn">Schlüssel erstellen</button>
+      <p class="err" id="grantErr" role="alert"></p>
+      <div id="newKey">
+        <p class="ok" id="newKeyHint">Fertig. Schlüssel (im Programm unter „Abo“ eintragen):</p>
+        <div class="key" id="newKeyText"></div>
+        <button class="btn btn-ghost btn-s" data-copy="newKeyText">Kopieren</button>
+      </div>
+    </div>
+
+    <h2>Installationen</h2>
+    <p class="small" style="margin-top:-6px">Alle PCs, auf denen der Newcall Launcher läuft – mit freiwilligem Namen und Geräte-Code. „Gratis freischalten“ gilt beim nächsten Start des Launchers.</p>
+    <div class="tools">
+      <input type="search" id="iq" placeholder="Suchen: Name oder Geräte-Code …">
+      <button class="btn btn-ghost btn-s" id="ireload">Neu laden</button>
+    </div>
+    <p class="err" id="instErr" role="alert"></p>
+    <div class="list" id="installs"></div>
+
+    <h2>Konten</h2>
+    <p class="small" style="margin-top:-6px">Newcall-Konten aus dem Launcher. Abos mit derselben E-Mail gelten automatisch. Hat jemand sein Passwort vergessen, setzt du hier ein neues und sagst es der Person.</p>
+    <div class="tools">
+      <input type="search" id="aq" placeholder="Suchen: E-Mail oder Name …">
+      <button class="btn btn-ghost btn-s" id="areload">Neu laden</button>
+    </div>
+    <p class="err" id="accErr" role="alert"></p>
+    <div class="list" id="accounts"></div>
+
+    <h2>Kunden</h2>
+    <div class="tools">
+      <input type="search" id="q" placeholder="Suchen: Name, E-Mail, Schlüssel …">
+      <select id="filter" class="btn btn-ghost btn-s">
+        <option value="all">Alle</option><option value="active">Aktiv</option><option value="abo">Zahlende</option>
+        <option value="frei">Kostenlos</option><option value="off">Beendet/gesperrt</option>
+      </select>
+      <select id="prod" class="btn btn-ghost btn-s">
+        <option value="all">Alle Programme</option><option value="kehrwerk">WinClean</option><option value="pebble">Pebble</option><option value="idock">iDock</option>
+      </select>
+      <button class="btn btn-ghost btn-s" id="reload">Neu laden</button>
+    </div>
+    <p class="err" id="listErr" role="alert"></p>
+    <div class="list" id="list"></div>
+    <p class="stand">Zahlungen, Rückerstattungen und Rechnungen verwaltest du im Stripe-Dashboard. Hier geht es nur um die Freischaltung in WinClean, Pebble und iDock.</p>
+  </div>
+</main>
+
+<script>
+(function () {
+  var API = location.hostname === '127.0.0.1' ? 'http://127.0.0.1:8787/' : 'https://snafgyzhegwkxmunmxje.supabase.co/functions/v1/kehrwerk-license';  // lokal: server/dev_server.mjs
+  var token = '';
+  try { token = sessionStorage.getItem('kwAdmin') || ''; } catch (e) {}
+  var rows = [];
+  var $ = function (id) { return document.getElementById(id); };
+
+  function call(payload) {
+    payload.token = token;
+    return fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      .then(function (r) { return r.json().then(function (j) { if (!r.ok || j.error) throw new Error(j.error || ('Fehler ' + r.status)); return j; }); })
+      .catch(function (e) { throw new Error(e.message === 'Failed to fetch' ? 'Keine Verbindung zum Lizenz-Dienst.' : e.message); });
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function date(ts) { return ts ? new Date(ts * 1000).toLocaleDateString('de-DE') : ''; }
+
+  function showPanel(test) {
+    $('login').classList.add('hidden'); $('panel').classList.remove('hidden'); $('logout').hidden = false;
+    var m = $('mode'); m.hidden = false; m.className = 'mode ' + (test ? 'test' : 'live'); m.textContent = test ? 'TESTMODUS' : 'LIVE';
+    load();
+    loadInstalls();
+    loadAccounts();
+  }
+  function login() {
+    token = $('token').value.trim();
+    if (!token) return;
+    $('loginBtn').disabled = true; $('loginErr').textContent = '';
+    call({ action: 'admin_login' }).then(function (j) {
+      try { sessionStorage.setItem('kwAdmin', token); } catch (e) {}
+      showPanel(j.test);
+    }).catch(function (e) { $('loginErr').textContent = e.message; }).then(function () { $('loginBtn').disabled = false; });
+  }
+  $('loginBtn').addEventListener('click', login);
+  $('token').addEventListener('keydown', function (e) { if (e.key === 'Enter') login(); });
+  $('logout').addEventListener('click', function (e) {
+    e.preventDefault(); token = ''; try { sessionStorage.removeItem('kwAdmin'); } catch (x) {} location.reload();
+  });
+
+  function load() {
+    $('listErr').textContent = ''; $('reload').disabled = true;
+    call({ action: 'admin_list' }).then(function (j) {
+      rows = j.rows || [];
+      var m = $('mode'); m.className = 'mode ' + (j.test ? 'test' : 'live'); m.textContent = j.test ? 'TESTMODUS' : 'LIVE';
+      render();
+    }).catch(function (e) { $('listErr').textContent = e.message; }).then(function () { $('reload').disabled = false; });
+  }
+  $('reload').addEventListener('click', load);
+
+  // ---------- Installationen (Newcall Launcher)
+  var installs = [];
+  function loadInstalls() {
+    $('instErr').textContent = ''; $('ireload').disabled = true;
+    call({ action: 'admin_installs' }).then(function (j) { installs = j.rows || []; renderInstalls(); })
+      .catch(function (e) { $('instErr').textContent = e.message; }).then(function () { $('ireload').disabled = false; });
+  }
+  function ago(ts) {
+    if (!ts) return '';
+    var d = Math.floor((Date.now() / 1000 - ts) / 86400);
+    return d <= 0 ? 'heute' : d === 1 ? 'gestern' : 'vor ' + d + ' Tagen';
+  }
+  function renderInstalls() {
+    var q = $('iq').value.trim().toLowerCase();
+    var shown = installs.filter(function (r) { return !q || (r.name + ' ' + r.code).toLowerCase().indexOf(q) >= 0; });
+    $('installs').innerHTML = shown.length ? shown.map(function (r, i) {
+      var apps = Object.keys(NAMES).filter(function (p) { return r.apps && r.apps[p]; }).map(function (p) { return NAMES[p] + ' ' + esc(r.apps[p]); });
+      var keys = r.keys || {};
+      var tags = Object.keys(NAMES).filter(function (p) { return keys[p]; }).map(function (p) { return '<span class="tag free">' + NAMES[p] + ' gratis</span>'; }).join(' ');
+      var missing = Object.keys(NAMES).filter(function (p) { return !keys[p]; });
+      var meta = [apps.length ? apps.join(', ') : 'noch nichts installiert', 'zuerst ' + date(r.first_seen), 'zuletzt ' + ago(r.last_seen),
+        r.launcher ? 'Launcher ' + esc(r.launcher) : ''].filter(Boolean).join(' · ');
+      var acts = missing.length ? '<button class="btn btn-go btn-s" data-iact="all" data-i="' + i + '">' + (missing.length === 3 ? 'Alles gratis freischalten' : 'Rest gratis freischalten') + '</button>' : '';
+      missing.forEach(function (p) { acts += '<button class="btn btn-ghost btn-s" data-iact="' + p + '" data-i="' + i + '">' + NAMES[p] + ' gratis</button>'; });
+      return '<div class="cust"><div class="who"><b>' + esc(r.name || '(ohne Namen)') + ' <span class="tag off">' + esc(r.code) + '</span> ' + tags + '</b>' +
+        '<div class="meta">' + meta + '</div></div><div class="acts">' + acts + '</div></div>';
+    }).join('') : '<p>' + (installs.length ? 'Keine Treffer.' : 'Noch keine Installationen.') + '</p>';
+    $('installs').querySelectorAll('button[data-iact]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var r = shown[+b.dataset.i], a = b.dataset.iact;
+        var what = a === 'all' ? 'alle Programme' : NAMES[a];
+        if (!confirm((r.name || 'Gerät ' + r.code) + ': ' + what + ' kostenlos freischalten?')) return;
+        b.disabled = true;
+        call({ action: 'admin_install_grant', device: r.device, products: a === 'all' ? [] : [a] })
+          .then(function () { loadInstalls(); load(); })
+          .catch(function (e) { $('instErr').textContent = e.message; b.disabled = false; });
+      });
+    });
+  }
+  // ---------- Newcall-Konten
+  var accounts = [];
+  function loadAccounts() {
+    $('accErr').textContent = ''; $('areload').disabled = true;
+    call({ action: 'admin_accounts' }).then(function (j) { accounts = j.rows || []; renderAccounts(); })
+      .catch(function (e) { $('accErr').textContent = e.message; }).then(function () { $('areload').disabled = false; });
+  }
+  function renderAccounts() {
+    var q = $('aq').value.trim().toLowerCase();
+    var shown = accounts.filter(function (a) { return !q || (a.email + ' ' + a.name).toLowerCase().indexOf(q) >= 0; });
+    $('accounts').innerHTML = shown.length ? shown.map(function (a, i) {
+      var meta = ['erstellt ' + date(a.created), a.last_login ? 'zuletzt angemeldet ' + ago(a.last_login) : ''].filter(Boolean).join(' · ');
+      return '<div class="cust"><div class="who"><b>' + esc(a.name || a.email) + (a.blocked ? ' <span class="tag bad">gesperrt</span>' : '') + '</b>' +
+        '<div class="meta">' + (a.name ? esc(a.email) + ' · ' : '') + meta + '</div></div><div class="acts">' +
+        '<button class="btn btn-ghost btn-s" data-aact="pw" data-i="' + i + '">Passwort setzen</button>' +
+        '<button class="btn btn-ghost btn-s" data-aact="block" data-i="' + i + '">' + (a.blocked ? 'Entsperren' : 'Sperren') + '</button></div></div>';
+    }).join('') : '<p>' + (accounts.length ? 'Keine Treffer.' : 'Noch keine Konten.') + '</p>';
+    $('accounts').querySelectorAll('button[data-aact]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var a = shown[+b.dataset.i], payload = { action: 'admin_account_set', email: a.email };
+        if (b.dataset.aact === 'pw') {
+          var pw = prompt('Neues Passwort für ' + a.email + ' (mindestens 8 Zeichen). Danach ist die Person auf allen PCs abgemeldet:');
+          if (pw === null) return;
+          if (pw.length < 8) { $('accErr').textContent = 'Das Passwort braucht mindestens 8 Zeichen.'; return; }
+          payload.password = pw;
+        } else {
+          if (!confirm(a.email + (a.blocked ? ' wieder entsperren?' : ' sperren? Die Anmeldung geht dann nicht mehr.'))) return;
+          payload.blocked = !a.blocked;
+        }
+        b.disabled = true; $('accErr').textContent = '';
+        call(payload).then(function () {
+          if (payload.password) alert('Neues Passwort gesetzt. Sag es ' + a.email + ' – damit kann sich die Person wieder anmelden.');
+          loadAccounts();
+        }).catch(function (e) { $('accErr').textContent = e.message; b.disabled = false; });
+      });
+    });
+  }
+  $('areload').addEventListener('click', loadAccounts);
+  $('aq').addEventListener('input', renderAccounts);
+
+  $('ireload').addEventListener('click', loadInstalls);
+  $('iq').addEventListener('input', renderInstalls);
+  $('q').addEventListener('input', render);
+  $('filter').addEventListener('change', render);
+  $('prod').addEventListener('change', render);
+  var NAMES = { kehrwerk: 'WinClean', pebble: 'Pebble', idock: 'iDock' };
+
+  function status(r) {
+    if (r.blocked) return '<span class="tag bad">gesperrt</span>';
+    if (r.type === 'frei') return r.active ? '<span class="tag free">kostenlos</span>' : '<span class="tag off">abgelaufen</span>';
+    if (!r.active) return '<span class="tag off">' + (r.status === 'canceled' ? 'beendet' : esc(r.status)) + '</span>';
+    if (r.cancelled) return '<span class="tag warn">gekündigt</span>';
+    return r.status === 'past_due' ? '<span class="tag warn">Zahlung offen</span>' : '<span class="tag ok">aktiv</span>';
+  }
+  function render() {
+    var active = rows.filter(function (r) { return r.type === 'abo' && r.active && !r.blocked; }).length;
+    $('sActive').textContent = active;
+    $('sFree').textContent = rows.filter(function (r) { return r.type === 'frei' && r.active && !r.blocked; }).length;
+    $('sMonth').textContent = (active * 3.99).toFixed(2).replace('.', ',') + ' €';
+    $('sEnded').textContent = rows.filter(function (r) { return !r.active || r.blocked; }).length;
+    var q = $('q').value.trim().toLowerCase(), f = $('filter').value, pf = $('prod').value;
+    var shown = rows.filter(function (r) {
+      var on = r.active && !r.blocked;
+      if (pf !== 'all' && (r.product || 'kehrwerk') !== pf) return false;
+      if (f === 'active' && !on) return false;
+      if (f === 'abo' && r.type !== 'abo') return false;
+      if (f === 'frei' && r.type !== 'frei') return false;
+      if (f === 'off' && on) return false;
+      return !q || [r.name, r.email, r.key, r.note, r.id].join(' ').toLowerCase().indexOf(q) >= 0;
+    });
+    $('list').innerHTML = shown.length ? shown.map(function (r, i) {
+      var meta = [NAMES[r.product || 'kehrwerk'], r.type === 'abo' ? 'Abo 3,99 €' : 'Kostenlos' + (r.note ? ' · ' + esc(r.note) : ''),
+        'seit ' + date(r.created),
+        r.until ? (r.type === 'frei' ? 'gültig bis ' : (r.cancelled ? 'endet ' : 'nächste Zahlung ')) + date(r.until) : (r.type === 'frei' ? 'unbegrenzt' : ''),
+        r.devices.length + ' von 3 PCs'].filter(Boolean).join(' · ');
+      var acts = '<button class="btn btn-ghost btn-s" data-act="copy" data-i="' + i + '">Schlüssel kopieren</button>';
+      if (r.devices.length) acts += '<button class="btn btn-ghost btn-s" data-act="reset" data-i="' + i + '">PCs zurücksetzen</button>';
+      if (r.type === 'frei') acts += r.active
+        ? '<button class="btn btn-red btn-s" data-act="unfree" data-i="' + i + '">Freischaltung beenden</button>'
+        : '<button class="btn btn-ghost btn-s" data-act="refree" data-i="' + i + '">Wieder freischalten</button>';
+      acts += r.blocked
+        ? '<button class="btn btn-ghost btn-s" data-act="unblock" data-i="' + i + '">Entsperren</button>'
+        : '<button class="btn btn-red btn-s" data-act="block" data-i="' + i + '">Sperren</button>';
+      return '<div class="cust"><div class="who"><b>' + esc(r.name || r.email || '(ohne Namen)') + ' ' + status(r) + '</b>' +
+        '<div class="meta">' + (r.name && r.email ? esc(r.email) + ' · ' : '') + meta + '</div>' +
+        '<div class="k">' + esc(r.key) + '</div></div><div class="acts">' + acts + '</div></div>';
+    }).join('') : '<p>Keine Einträge.</p>';
+    $('list').querySelectorAll('button[data-act]').forEach(function (b) {
+      b.addEventListener('click', function () { act(b, b.dataset.act, shown[+b.dataset.i]); });
+    });
+  }
+
+  function copy(text, btn) {
+    var done = function () { var o = btn.textContent; btn.textContent = 'Kopiert'; setTimeout(function () { btn.textContent = o; }, 1500); };
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () {});
+  }
+  function act(btn, a, r) {
+    if (a === 'copy') return copy(r.key, btn);
+    var who = r.name || r.email || r.id;
+    var ask = { block: who + ' sperren? Das Programm wird bei der nächsten Prüfung gesperrt (Zahlungen laufen bei Stripe weiter).',
+      unfree: 'Kostenlose Freischaltung von ' + who + ' beenden?', reset: 'Alle PCs von ' + who + ' abmelden? Der Schlüssel kann danach neu eingetragen werden.' }[a];
+    if (ask && !confirm(ask)) return;
+    var p = { action: 'admin_set', id: r.id };
+    if (a === 'block') p.blocked = true;
+    if (a === 'unblock') p.blocked = false;
+    if (a === 'reset') p.reset_devices = true;
+    if (a === 'unfree') p.free = false;
+    if (a === 'refree') { p.free = true; p.until = 0; }
+    btn.disabled = true;
+    call(p).then(load).catch(function (e) { $('listErr').textContent = e.message; btn.disabled = false; });
+  }
+
+  $('grantBtn').addEventListener('click', function () {
+    var days = +$('gUntil').value;
+    var p = { action: 'admin_grant', product: $('gProduct').value, name: $('gName').value, email: $('gMail').value, note: $('gNote').value,
+      until: days ? Math.floor(Date.now() / 1000) + days * 86400 : 0 };
+    $('grantBtn').disabled = true; $('grantErr').textContent = ''; $('newKey').style.display = 'none';
+    call(p).then(function (j) {
+      $('newKeyHint').textContent = 'Fertig. Schlüssel (in ' + NAMES[j.product || 'kehrwerk'] + ' unter „Abo“ eintragen):';
+      $('newKeyText').textContent = j.key; $('newKey').style.display = 'block';
+      $('gName').value = $('gMail').value = $('gNote').value = '';
+      load();
+    }).catch(function (e) { $('grantErr').textContent = e.message; }).then(function () { $('grantBtn').disabled = false; });
+  });
+  document.querySelectorAll('[data-copy]').forEach(function (b) {
+    b.addEventListener('click', function () { copy($(b.dataset.copy).textContent, b); });
+  });
+
+  if (token) call({ action: 'admin_login' }).then(function (j) { showPanel(j.test); }).catch(function () { token = ''; });
+})();
+</script>
+</body>
+</html>
