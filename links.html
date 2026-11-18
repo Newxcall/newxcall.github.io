@@ -45,15 +45,45 @@ h1 { margin: 16px 0 4px; font-size: 32px; letter-spacing: -0.03em; }
 .live { width: 8px; height: 8px; border-radius: 50%; background: #fff; display: inline-block; margin-right: 6px; vertical-align: middle; animation: puls 1.6s infinite; }
 @keyframes puls { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,.7); } 100% { box-shadow: 0 0 0 9px rgba(255,255,255,0); } }
 .label { margin: 22px 4px 2px; font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
-/* Neuester Song mit Abspielknopf */
-.song { display: flex; align-items: center; gap: 14px; padding: 10px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); }
-.song img { width: 62px; height: 62px; border-radius: 12px; object-fit: cover; flex: none; }
-.song .t { min-width: 0; flex: 1; }
-.song b { display: block; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.song .bar { height: 4px; margin-top: 8px; border-radius: 2px; background: rgba(255,255,255,.15); overflow: hidden; }
-.song .bar i { display: block; height: 100%; width: 0; background: var(--grad); }
-.song button { width: 46px; height: 46px; flex: none; border: 0; border-radius: 50%; background: #fff; color: #000; font-size: 16px; cursor: pointer; }
-/* Große Kacheln Musik / Apps mit Umgebungslicht */
+/* Player: die neuesten Songs */
+.player { padding: 14px; border-radius: 20px; background: var(--card); border: 1px solid var(--line); }
+.player .now { display: flex; align-items: center; gap: 14px; }
+.player .now img { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; flex: none; }
+.player .now .t { min-width: 0; flex: 1; }
+.player .now small { color: var(--muted); font-size: 12px; }
+.player .now b { display: block; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seek { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.seek span { width: 34px; flex: none; } .seek span:last-child { text-align: right; }
+.player input[type=range] { -webkit-appearance: none; appearance: none; flex: 1; min-width: 0; height: 22px; background: transparent; cursor: pointer; margin: 0; }
+.player input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, #ff3d6e, #8a5cff) 0 / var(--p, 0%) 100% no-repeat, rgba(255,255,255,.15); }
+.player input[type=range]::-moz-range-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, #ff3d6e, #8a5cff) 0 / var(--p, 0%) 100% no-repeat, rgba(255,255,255,.15); }
+.player input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; margin-top: -5px; border-radius: 50%; background: #fff; border: 0; }
+.player input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 0; }
+.ctrl { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 6px; }
+.ctrl .btns { display: flex; align-items: center; gap: 8px; }
+.ctrl button { border: 0; cursor: pointer; display: grid; place-items: center; color: var(--fg); background: rgba(255,255,255,.08); width: 40px; height: 40px; border-radius: 50%; padding: 0; }
+.ctrl button:hover { background: rgba(255,255,255,.16); }
+.ctrl button svg { width: 18px; height: 18px; fill: currentColor; }
+.ctrl button.play { width: 50px; height: 50px; background: #fff; color: #000; transition: transform .15s; }
+.ctrl button.play:hover { background: #fff; transform: scale(1.05); }
+.ctrl button.play svg { width: 20px; height: 20px; }
+.vol { display: flex; align-items: center; gap: 6px; width: 130px; }
+.vol button { width: 32px; height: 32px; background: transparent; color: var(--muted); }
+.tracks { list-style: none; margin: 12px 0 0; padding: 10px 0 0; border-top: 1px solid var(--line); display: grid; gap: 4px; }
+.tracks button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 7px 8px; border: 0; border-radius: 12px; background: transparent; color: var(--fg); font: inherit; text-align: left; cursor: pointer; }
+.tracks button:hover { background: rgba(255,255,255,.06); }
+.tracks button[aria-current="true"] { background: rgba(255,61,110,.12); }
+.tracks img { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; flex: none; }
+.tracks .n { flex: 1; min-width: 0; font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tracks .d { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.eq { display: none; gap: 2px; align-items: flex-end; height: 14px; }
+.eq i { width: 3px; background: #ff3d6e; border-radius: 1px; animation: eq .9s ease-in-out infinite alternate; }
+.eq i:nth-child(2) { animation-delay: -.3s; } .eq i:nth-child(3) { animation-delay: -.6s; }
+@keyframes eq { from { height: 3px; } to { height: 14px; } }
+.playing [aria-current="true"] .eq { display: flex; }
+.playing [aria-current="true"] .d { display: none; }
+@media (prefers-reduced-motion: reduce) { .eq i { animation: none; height: 10px; } }
+@media (max-width: 380px) { .vol { width: 96px; } }
 .big { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 4px 0 30px; }
 .tile { position: relative; isolation: isolate; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; min-height: 172px; padding: 18px;
   border-radius: 24px; background: #0e0e14; border: 1px solid rgba(255,255,255,.16); transition: transform .25s; }
@@ -119,10 +149,24 @@ footer a:hover { color: var(--fg); }
       <span><span class="live"></span>Unreleased Songs reinhören<small>Neue Tracks zuerst auf YouTube</small></span><span class="arr">→</span>
     </a>
 
-    <div class="song" id="song" hidden>
-      <img id="songCover" alt="">
-      <div class="t"><small style="color:var(--muted);font-size:12px">Neuester Song</small><b id="songTitle"></b><div class="bar"><i id="songBar"></i></div></div>
-      <button id="songPlay" aria-label="Abspielen">▶</button>
+    <div class="player" id="player" hidden>
+      <div class="now">
+        <img id="pCover" alt="">
+        <div class="t"><small id="pLabel">Neueste Songs</small><b id="pTitle"></b></div>
+      </div>
+      <div class="seek"><span id="pCur">0:00</span><input type="range" id="pSeek" min="0" max="100" step="0.1" value="0" aria-label="Spulen"><span id="pDur">0:00</span></div>
+      <div class="ctrl">
+        <div class="btns">
+          <button type="button" id="pPrev" aria-label="Vorheriger Song"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+          <button type="button" id="pPlay" class="play" aria-label="Abspielen"><svg viewBox="0 0 24 24"><path id="pIcon" d="M7 4v16l13-8z"/></svg></button>
+          <button type="button" id="pNext" aria-label="Nächster Song"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button>
+        </div>
+        <div class="vol" id="pVolBox">
+          <button type="button" id="pMute" aria-label="Stumm schalten"><svg viewBox="0 0 24 24"><path id="pVolIcon" d=""/></svg></button>
+          <input type="range" id="pVol" min="0" max="1" step="0.01" value="0.8" aria-label="Lautstärke">
+        </div>
+      </div>
+      <ul class="tracks" id="pList"></ul>
     </div>
 
     <p class="label">Streaming</p>
@@ -151,20 +195,109 @@ footer a:hover { color: var(--fg); }
 <script src="musik/songs.js"></script>
 <script>
 (function () {
-  var s = (window.SONGS || [])[0];
-  if (!s) return;
-  var $ = function (id) { return document.getElementById(id); }, a = $('audio');
-  $('song').hidden = false;
-  $('songCover').src = 'musik/' + s.cover;
-  $('songTitle').textContent = s.titel + (s.feat ? ' (' + s.feat + ')' : '');
-  $('songPlay').setAttribute('aria-label', s.titel + ' abspielen');
-  $('songPlay').addEventListener('click', function () {
-    if (!a.src) a.src = 'musik/' + s.datei;
-    a.paused ? a.play() : a.pause();
+  var songs = (window.SONGS || []).slice(0, 2);   // die 2 neuesten Songs
+  if (!songs.length) return;
+  var $ = function (id) { return document.getElementById(id); };
+  var a = $('audio'), box = $('player'), seek = $('pSeek'), vol = $('pVol'), cur = 0, seeking = false;
+  var PLAY = 'M7 4v16l13-8z', PAUSE = 'M6 4h4v16H6zm8 0h4v16h-4z';
+  var VOL = 'M4 9v6h4l5 4V5L8 9zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z';
+  var MUTE = 'M4 9v6h4l5 4V5L8 9zm12.6 3 2.4-2.4-1.4-1.4-2.4 2.4-2.4-2.4-1.4 1.4 2.4 2.4-2.4 2.4 1.4 1.4 2.4-2.4 2.4 2.4 1.4-1.4z';
+  function name(s) { return s.titel + (s.feat ? ' (' + s.feat + ')' : ''); }
+  function t(x) { x = Math.max(0, Math.floor(x || 0)); return Math.floor(x / 60) + ':' + ('0' + x % 60).slice(-2); }
+  function fill(r) { r.style.setProperty('--p', ((r.value - r.min) / (r.max - r.min) * 100) + '%'); }
+  function hasSrc() { return !!a.getAttribute('src'); }
+  box.hidden = false;
+  if (songs.length < 2) { $('pPrev').hidden = true; $('pNext').hidden = true; }
+
+  songs.forEach(function (s, i) {
+    var li = document.createElement('li'), b = document.createElement('button');
+    b.type = 'button';
+    b.innerHTML = '<img alt=""><span class="n"></span><span class="eq" aria-hidden="true"><i></i><i></i><i></i></span><span class="d"></span>';
+    b.querySelector('img').src = 'musik/' + s.cover;
+    b.querySelector('.n').textContent = name(s);
+    b.querySelector('.d').textContent = t(s.dauer);
+    b.setAttribute('aria-label', name(s) + ' abspielen');
+    b.addEventListener('click', function () { if (i === cur && hasSrc()) toggle(); else load(i, true); });
+    li.appendChild(b); $('pList').appendChild(li);
   });
-  a.addEventListener('play', function () { $('songPlay').textContent = '❚❚'; });
-  a.addEventListener('pause', function () { $('songPlay').textContent = '▶'; });
-  a.addEventListener('timeupdate', function () { $('songBar').style.width = a.duration ? (a.currentTime / a.duration * 100) + '%' : 0; });
+
+  function load(i, play) {
+    cur = (i + songs.length) % songs.length;
+    var s = songs[cur];
+    $('pCover').src = 'musik/' + s.cover;
+    $('pTitle').textContent = name(s);
+    $('pLabel').textContent = (cur === 0 ? 'Neuester Song' : 'Neuer Song') + ' · ' + (cur + 1) + '/' + songs.length;
+    $('pDur').textContent = t(s.dauer); $('pCur').textContent = '0:00';
+    seek.value = 0; fill(seek);
+    [].forEach.call($('pList').querySelectorAll('button'), function (b, k) { b.setAttribute('aria-current', k === cur ? 'true' : 'false'); });
+    if (play) { a.src = 'musik/' + s.datei; a.play(); }
+    if ('mediaSession' in navigator && window.MediaMetadata) navigator.mediaSession.metadata = new MediaMetadata({ title: name(s), artist: 'Newcall', artwork: [{ src: new URL('musik/' + s.cover, location.href).href, sizes: '800x800', type: 'image/jpeg' }] });
+  }
+  function toggle() { if (!hasSrc()) a.src = 'musik/' + songs[cur].datei; if (a.paused) a.play(); else a.pause(); }
+  function step(d) {
+    if (d < 0 && a.currentTime > 3) { a.currentTime = 0; return; }   // erst an den Songanfang, dann zum vorherigen
+    load(cur + d, true);
+  }
+
+  $('pPlay').addEventListener('click', toggle);
+  $('pPrev').addEventListener('click', function () { step(-1); });
+  $('pNext').addEventListener('click', function () { step(1); });
+  a.addEventListener('play', function () { $('pIcon').setAttribute('d', PAUSE); $('pPlay').setAttribute('aria-label', 'Pause'); box.classList.add('playing'); });
+  a.addEventListener('pause', function () { $('pIcon').setAttribute('d', PLAY); $('pPlay').setAttribute('aria-label', 'Abspielen'); box.classList.remove('playing'); });
+  a.addEventListener('ended', function () { if (cur < songs.length - 1) load(cur + 1, true); });
+  a.addEventListener('loadedmetadata', function () { $('pDur').textContent = t(a.duration); });
+  a.addEventListener('timeupdate', function () {
+    if (seeking || !a.duration) return;
+    seek.value = a.currentTime / a.duration * 100; fill(seek);
+    $('pCur').textContent = t(a.currentTime);
+  });
+
+  // Spulen über den Fortschrittsbalken
+  seek.addEventListener('input', function () {
+    seeking = true; fill(seek);
+    $('pCur').textContent = t(seek.value / 100 * (a.duration || songs[cur].dauer));
+  });
+  seek.addEventListener('change', function () {
+    seeking = false;
+    if (!hasSrc()) a.src = 'musik/' + songs[cur].datei;
+    var go = function () { a.currentTime = seek.value / 100 * a.duration; };
+    if (a.duration) go(); else a.addEventListener('loadedmetadata', go, { once: true });
+    a.play();
+  });
+
+  // Lautstärke (iPhones erlauben das nicht, dort regeln die Gerätetasten – Regler wird ausgeblendet)
+  var saved = 0.8;
+  try { var v = parseFloat(localStorage.getItem('ncLinksVol')); if (v >= 0 && v <= 1) saved = v; } catch (e) {}
+  a.volume = 0.5;
+  if (a.volume !== 0.5) $('pVolBox').hidden = true;
+  a.volume = saved; vol.value = saved; fill(vol);
+  var before = saved || 0.8;
+  function showVol() {
+    var off = a.muted || a.volume === 0;
+    $('pVolIcon').setAttribute('d', off ? MUTE : VOL);
+    $('pMute').setAttribute('aria-label', off ? 'Ton an' : 'Stumm schalten');
+  }
+  vol.addEventListener('input', function () {
+    a.volume = +vol.value; a.muted = false; fill(vol); showVol();
+    if (a.volume > 0) before = a.volume;
+    try { localStorage.setItem('ncLinksVol', vol.value); } catch (e) {}
+  });
+  $('pMute').addEventListener('click', function () {
+    if (a.muted || a.volume === 0) {
+      a.muted = false;
+      if (a.volume === 0) { a.volume = before; vol.value = before; fill(vol); }
+    } else a.muted = true;
+    showVol();
+  });
+  showVol();
+
+  if ('mediaSession' in navigator) {
+    try {
+      navigator.mediaSession.setActionHandler('previoustrack', function () { step(-1); });
+      navigator.mediaSession.setActionHandler('nexttrack', function () { step(1); });
+    } catch (e) {}
+  }
+  load(0, false);
 })();
 </script>
 </body>
