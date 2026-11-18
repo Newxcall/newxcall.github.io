@@ -53,6 +53,28 @@ h1 { margin: 16px 0 4px; font-size: 32px; letter-spacing: -0.03em; }
 .song .bar { height: 4px; margin-top: 8px; border-radius: 2px; background: rgba(255,255,255,.15); overflow: hidden; }
 .song .bar i { display: block; height: 100%; width: 0; background: var(--grad); }
 .song button { width: 46px; height: 46px; flex: none; border: 0; border-radius: 50%; background: #fff; color: #000; font-size: 16px; cursor: pointer; }
+/* Große Kacheln Musik / Apps mit Umgebungslicht */
+.big { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 4px 0 30px; }
+.tile { position: relative; isolation: isolate; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; min-height: 172px; padding: 18px;
+  border-radius: 24px; background: rgba(14,14,20,.82); border: 1px solid rgba(255,255,255,.16); transition: transform .25s; }
+.tile::before { content: ""; position: absolute; inset: -14px; z-index: -1; border-radius: 34px; background: var(--glow); filter: blur(26px); opacity: .75;
+  animation: atmen 4.5s ease-in-out infinite alternate; }
+.tile::after { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; padding: 1.5px; background: var(--glow);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+.tile:hover { transform: translateY(-3px) scale(1.01); }
+.tile:hover::before { opacity: 1; }
+.tile.music { --glow: linear-gradient(135deg, #ff3d6e, #ff8a00 45%, #8a5cff); }
+.tile.apps { --glow: linear-gradient(135deg, #63e6be, #64d2ff 45%, #bf5af2); animation-delay: -2s; }
+.tile.apps::before { animation-delay: -2.2s; }
+.tile .emoji { position: absolute; top: 16px; left: 18px; font-size: 30px; }
+.tile .imgs { position: absolute; top: 16px; left: 16px; display: flex; gap: 6px; }
+.tile .imgs img { width: 34px; height: 34px; border-radius: 9px; }
+.tile b { font-size: 22px; letter-spacing: -0.02em; line-height: 1.1; }
+.tile span { font-size: 13px; color: var(--muted); }
+.tile .go { color: var(--fg); font-weight: 600; margin-top: 6px; }
+@keyframes atmen { from { opacity: .45; transform: scale(.96); } to { opacity: .85; transform: scale(1.03); } }
+@media (prefers-reduced-motion: reduce) { .tile::before { animation: none; } }
+@media (max-width: 360px) { .big { grid-template-columns: 1fr; } }
 footer { margin-top: 34px; text-align: center; font-size: 12px; color: var(--muted); }
 footer a { margin: 0 8px; }
 footer a:hover { color: var(--fg); }
@@ -78,6 +100,17 @@ footer a:hover { color: var(--fg); }
       <a href="https://open.spotify.com/intl-de/artist/2d4HQ05QBgt1most7wdx7U" target="_blank" rel="noopener" aria-label="Spotify"><svg><use href="#sp"/></svg></a>
       <a href="https://music.apple.com/de/artist/newcall/1567614364" target="_blank" rel="noopener" aria-label="Apple Music"><svg><use href="#am"/></svg></a>
     </div>
+  </div>
+
+  <div class="big">
+    <a class="tile music" href="musik/">
+      <span class="emoji" aria-hidden="true">🎧</span>
+      <b>Musik</b><span>Songs hören & Mixing, Mastering buchen</span><span class="go">Öffnen →</span>
+    </a>
+    <a class="tile apps" href="./#apps">
+      <span class="imgs" aria-hidden="true"><img src="winclean/icon.png" alt=""><img src="pebble/icon.png" alt=""><img src="idock-app/icon.png" alt=""></span>
+      <b>Newcall Apps</b><span>WinClean, Pebble, iDock – gratis</span><span class="go">Öffnen →</span>
+    </a>
   </div>
 
   <div class="links">
@@ -108,12 +141,8 @@ footer a:hover { color: var(--fg); }
       <span class="ic">🎛️</span><span>Producing, Mixing & Mastering buchen<small>Direkt online bezahlen</small></span><span class="arr">→</span></a>
 
     <p class="label">Mehr</p>
-    <a class="link" href="musik/">
-      <span class="ic">🎧</span><span>Alle Songs hören<small>Meine Musik-Website</small></span><span class="arr">→</span></a>
     <a class="link" href="musik/#newsletter">
       <span class="ic">✉️</span><span>Newsletter<small>Neue Musik zuerst per E-Mail</small></span><span class="arr">→</span></a>
-    <a class="link" href="./#apps">
-      <span class="ic">💻</span><span>Newcall Apps<small>WinClean, Pebble, iDock – gratis</small></span><span class="arr">→</span></a>
   </div>
 
   <footer><a href="impressum.html">Impressum</a><a href="musik/datenschutz.html">Datenschutz</a></footer>
