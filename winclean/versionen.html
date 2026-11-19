@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<script src="/site-edit.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Versionen – WinClean</title>
+<meta name="description" content="Alle Versionen von WinClean mit Prüfsummen.">
+<link rel="icon" href="icon.png">
+<link rel="stylesheet" href="sub.css">
+</head>
+<body>
+<header class="nav"><div class="wrap"><a class="brand" href="./"><img src="icon.png" alt="">WinClean</a><a class="back" href="./">‹ Zur Startseite</a></div></header>
+<main class="wrap">
+<div class="legal">
+<p class="eyebrow">Sicherheit</p>
+<h1>Versionen &amp; Prüfsummen</h1>
+<p>Hier steht jede veröffentlichte Version von WinClean mit ihrer <strong>SHA-256-Prüfsumme</strong>. Damit kannst du prüfen, ob deine Datei genau die ist, die wir veröffentlicht haben – und nicht unterwegs verändert wurde.</p>
+<p><strong>So prüfst du deine Datei:</strong> Öffne PowerShell im Ordner mit der Datei und gib ein:</p>
+<p><code>Get-FileHash .\WinClean.exe -Algorithm SHA256</code></p>
+<p>Die angezeigte Zahlen- und Buchstabenfolge muss genau mit der Prüfsumme unten übereinstimmen.</p>
+<p>Ab Version 1.5.0 ist jedes Update zusätzlich <strong>digital unterschrieben</strong> (Ed25519). WinClean lädt die Unterschrift mit und setzt ein Update nur ein, wenn sie zu unserem Schlüssel passt. Selbst wer unser GitHub-Konto übernehmen würde, könnte so kein fremdes Programm als Update verteilen.</p>
+
+<h2>Versionen</h2>
+<!-- VERSIONEN -->
+<h3>Version 1.5.0 <span style="font-weight:400;color:var(--muted)">· 19.11.2026</span></h3>
+<p>Sicherheit: unterschriebene Updates, Spiele- und Programmordner auf allen Laufwerken geschützt, nichts Großes mehr endgültig löschen, vorsichtigere Duplikat- und Berater-Vorschläge, Einzelauswahl bei alten Downloads, Verweis-Prüfung für verschobene Programme, gekürzte Pfade für die KI.</p>
+<p><small>SHA-256</small><br><code style="word-break:break-all">1f889ae7e0a2436c2f81c4ac1de8895961f869f65d038c2d9862b84a656f0027</code></p>
+<h3>Version 1.4.1 <span style="font-weight:400;color:var(--muted)">· 18.11.2026</span></h3>
+<p>Übersicht zeigt Laufwerke nach Kategorien.</p>
+<p><small>SHA-256</small><br><code style="word-break:break-all">6542ba8a099d79f4d7a6d27fc423fbebd4665d463c0b8425118a1df0c0c64058</code></p>
+<h3>Version 1.4.0 <span style="font-weight:400;color:var(--muted)">· 18.11.2026</span></h3>
+<p>Laufwerkswahl, neue Aufräum-Kategorien.</p>
+<p><small>SHA-256</small><br><code style="word-break:break-all">9ec4ec770547ff6a52c718a051d4c297b08ed5a8c1462eb257a66437ccd08de7</code></p>
+<h3>Version 1.3.0 <span style="font-weight:400;color:var(--muted)">· 18.11.2026</span></h3>
+<p>Neuer Name: WinClean (früher Kehrwerk).</p>
+<p><small>SHA-256</small><br><code style="word-break:break-all">2820b46f39b869d85cfe76e26344adee6aed780f897253421023b131d89800c6</code></p>
+<h3>Version 1.2.1 <span style="font-weight:400;color:var(--muted)">· 17.11.2026</span></h3>
+<p>Freischaltung über den Newcall Launcher.</p>
+<p><small>SHA-256</small><br><code style="word-break:break-all">631e175cb4f402df10147e9dc47c6d7294f5b2fffc310600add73b025bd8dd88</code></p>
+<h3>Version 1.2.0 <span style="font-weight:400;color:var(--muted)">· 17.11.2026</span></h3>
+<p>Selbst-Aktualisierung.</p>
+<p><small>SHA-256</small><br><code style="word-break:break-all">089ca718017fc0db366892e6a07f2b35424d9b684692435e73ef9088d0b8aa97</code></p>
+<h3>Version 1.1.0 <span style="font-weight:400;color:var(--muted)">· 17.11.2026</span></h3>
+<p>Abo.</p>
+<p><small>SHA-256</small><br><code style="word-break:break-all">8fe6f67750cb70e2547f2294df4ae7281b3f9012b92f44a8115ee8ce1d705333</code></p>
+
+<p class="stand">Stand: November 2026</p>
+</div>
+</main>
+<footer><div class="wrap"><span>WinClean · ein Aufräumprogramm für Windows</span><nav aria-label="Rechtliches"><a href="../#apps">Alle Programme</a><a href="../#unterstuetzen">Unterstützen</a><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="agb.html">AGB</a><a href="widerruf.html">Widerruf</a><a href="kuendigen.html">Verträge hier kündigen</a><a href="versionen.html">Versionen</a></nav></div></footer>
+
+</body>
+</html>

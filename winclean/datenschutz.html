@@ -35,8 +35,17 @@
 
 <h2>5. Was WinClean auf deinem PC tut</h2>
 <p>WinClean durchsucht deine Laufwerke nur auf deinem PC. Dateinamen, Ordner und Inhalte werden <strong>nicht</strong> übertragen. Einstellungen, Protokoll und Abo-Stand liegen in <code>%LOCALAPPDATA%\Kehrwerk</code> (der Ordner heißt noch wie früher).</p>
-<p>Der <strong>KI-Berater</strong> arbeitet ohne Einstellungen nur mit festen Regeln auf deinem PC. Optional kannst du eine lokale KI (Ollama) nutzen – auch die bleibt auf deinem PC. Trägst du selbst einen Schlüssel für die Claude-KI von Anthropic ein, schickt WinClean die Liste der zu bewertenden Dateinamen, Größen und Daten an Anthropic (Anthropic PBC, USA), wenn du auf „Analysieren“ klickst. Das passiert nur, wenn du es selbst einrichtest; dafür gelten die Datenschutzbestimmungen von Anthropic.</p>
-<p><strong>Updates:</strong> WinClean fragt beim Start und danach etwa alle 6 Stunden bei <strong>GitHub</strong> (GitHub Inc., USA) nach, ob es eine neue Version gibt, und lädt sie nur, wenn du auf „Update installieren“ klickst. Dabei werden deine IP-Adresse und die Versionsnummer übertragen. Rechtsgrundlage ist unser berechtigtes Interesse, dir Fehlerbehebungen bereitzustellen (Art. 6 Abs. 1 lit. f DSGVO).</p>
+<p>Der <strong>KI-Berater</strong> arbeitet ohne Einstellungen nur mit festen Regeln auf deinem PC. Optional kannst du eine lokale KI (Ollama) nutzen – auch die bleibt auf deinem PC. Trägst du selbst einen Schlüssel für die Claude-KI von Anthropic ein, schickt WinClean nach deiner Bestätigung eine Liste der größten Einträge an Anthropic (Anthropic PBC, USA): Name, Größe, Datum und einen <strong>gekürzten Pfad</strong>. Dein Benutzername wird entfernt, persönliche Ordnernamen werden auf jedem Laufwerk durch „…“ ersetzt (aus <code>D:\Projekte\Kunde\video.mp4</code> wird <code>D:\…\video.mp4</code>); Beispiele siehst du vor dem Senden. Dateiinhalte werden nie übertragen. Das passiert nur, wenn du es selbst einrichtest; dafür gelten die Datenschutzbestimmungen von Anthropic.</p>
+<p><strong>Updates:</strong> WinClean fragt beim Start und danach etwa alle 6 Stunden bei <strong>GitHub</strong> (GitHub Inc., USA) nach, ob es eine neue Version gibt, und lädt sie nur, wenn du auf „Update installieren“ klickst. Dabei werden deine IP-Adresse und die Versionsnummer übertragen. Rechtsgrundlage ist unser berechtigtes Interesse, dir Fehlerbehebungen bereitzustellen (Art. 6 Abs. 1 lit. f DSGVO). Jede Version ist digital unterschrieben: WinClean setzt ein Update nur ein, wenn die Unterschrift passt. Die Prüfsummen aller Versionen stehen unter <a href="versionen.html">Versionen &amp; Prüfsummen</a>.</p>
+<p><strong>Alle Verbindungen auf einen Blick:</strong></p>
+<ul>
+<li><strong>GitHub</strong> (Updates): Versionsnummer und IP-Adresse – beim Start und etwa alle 6 Stunden.</li>
+<li><strong>Supabase</strong> (unser Lizenz-Dienst, nur mit Abo oder Newcall-Konto): Schlüssel, zufällige Geräte-Kennung, IP-Adresse – etwa einmal pro Woche.</li>
+<li><strong>Stripe</strong> (nur beim Abschließen oder Verwalten eines Abos): siehe Abschnitt 3.</li>
+<li><strong>Anthropic</strong> (nur mit eigenem KI-Schlüssel und nach deiner Bestätigung): gekürzte Dateiliste wie oben beschrieben.</li>
+<li><strong>Ollama</strong> (optional): läuft auf deinem eigenen PC (<code>localhost</code>), nichts verlässt den PC.</li>
+</ul>
+<p>Sonst baut WinClean keine Verbindungen auf.</p>
 
 <h2>6. E-Mail, Newcall-Konto und Neuigkeiten</h2>
 <p>Schreibst du uns eine E-Mail, verwenden wir deine Angaben nur, um deine Anfrage zu beantworten (Art. 6 Abs. 1 lit. b bzw. f DSGVO), und löschen sie, wenn sie nicht mehr gebraucht werden.</p>
@@ -51,7 +60,7 @@
 <p class="stand">Stand: November 2026</p>
 </div>
 </main>
-<footer><div class="wrap"><span>WinClean · ein Aufräumprogramm für Windows</span><nav aria-label="Rechtliches"><a href="../#apps">Alle Programme</a><a href="../#unterstuetzen">Unterstützen</a><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="agb.html">AGB</a><a href="widerruf.html">Widerruf</a><a href="kuendigen.html">Verträge hier kündigen</a></nav></div></footer>
+<footer><div class="wrap"><span>WinClean · ein Aufräumprogramm für Windows</span><nav aria-label="Rechtliches"><a href="../#apps">Alle Programme</a><a href="../#unterstuetzen">Unterstützen</a><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="agb.html">AGB</a><a href="widerruf.html">Widerruf</a><a href="kuendigen.html">Verträge hier kündigen</a><a href="versionen.html">Versionen</a></nav></div></footer>
 
 </body>
 </html>
