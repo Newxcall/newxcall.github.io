@@ -4,56 +4,188 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Newcall Apps · Admin</title>
+<title>Admin · Newcall</title>
 <link rel="icon" href="icon.png">
 <link rel="stylesheet" href="sub.css">
 <style>
-/* Admin für Newcall Apps und Newcall Musik (oben umschaltbar): Kunden, Freischaltungen, Konten, zwei E-Mail-Verteiler, Musik-Aufträge und Preise. Die Prüfung macht der Lizenz-Dienst (ADMIN_TOKEN). */
-main.wide { max-width: 1120px; }
-.wide .wrap, main.wide { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-.mode { display: inline-block; font: 600 12px var(--mono); letter-spacing: .06em; padding: 4px 10px; border-radius: 999px; margin-left: 10px; vertical-align: middle; }
-.mode.test { background: rgba(255,159,10,.15); color: #ff9f0a; }
-.mode.live { background: rgba(48,209,88,.15); color: #30d158; }
-.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 22px 0; }
-.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; }
-.stat b { display: block; font: 700 28px var(--display); color: var(--fg); letter-spacing: -0.03em; }
-.stat span { font-size: 13px; color: var(--muted); }
-.tools { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 10px 0 14px; }
-.tools input[type=search] { flex: 1; min-width: 200px; margin: 0; font-family: var(--body); }
+/* Admin für Newcall Apps und Newcall Musik. Links die Bereiche, in der Mitte die Listen, ein Klick auf einen Eintrag öffnet rechts alle Aktionen.
+   Die Prüfung macht der Lizenz-Dienst (ADMIN_TOKEN) – diese Seite enthält keine Daten, sie holt alles erst nach dem Anmelden. */
+body { overflow-x: hidden; }
+.hidden { display: none !important; }
 .btn-s { padding: 8px 14px; font-size: 13px; }
 .btn-ghost { background: var(--surface-2); color: var(--fg); border: 1px solid var(--line); }
 .btn-ghost:hover { background: #222228; }
 .btn-red { background: rgba(255,69,58,.16); color: #ff6b61; }
 .btn-red:hover { background: rgba(255,69,58,.26); }
-.list { display: grid; gap: 10px; }
-.cust { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; align-items: center; }
-.cust .who { min-width: 0; }
-.cust .who b { color: var(--fg); font-size: 16px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.cust .meta { font-size: 13px; color: var(--muted); }
-.cust .k { font: 500 12px var(--mono); color: var(--dim); word-break: break-all; }
-.cust .acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-.tag { font: 600 11px var(--body); padding: 2px 8px; border-radius: 6px; }
+.tag { font: 600 11px var(--body); padding: 2px 8px; border-radius: 6px; white-space: nowrap; }
 .tag.ok { background: rgba(62,207,142,.14); color: var(--mint); }
 .tag.free { background: rgba(100,210,255,.14); color: var(--sky); }
 .tag.off { background: rgba(255,255,255,.08); color: var(--muted); }
 .tag.bad { background: rgba(255,69,58,.15); color: #ff6b61; }
 .tag.warn { background: rgba(255,159,10,.14); color: #ff9f0a; }
-.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
-.grid2 input, .grid2 select { width: 100%; font: 500 15px var(--body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; margin: 6px 0 12px; }
+.mode { font: 600 10px var(--mono); letter-spacing: .08em; padding: 3px 8px; border-radius: 999px; }
+.mode.test { background: rgba(255,159,10,.15); color: #ff9f0a; }
+.mode.live { background: rgba(48,209,88,.15); color: #30d158; }
 label.small { font-size: 13px; color: var(--muted); }
-#newKey { display: none; }
-.box textarea { width: 100%; min-height: 260px; resize: vertical; font: 500 14px/1.5 var(--body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin: 6px 0 12px; }
 .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .row input { flex: 1; min-width: 200px; margin: 0; font: 500 15px var(--body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
-.hidden { display: none !important; }
-.switch { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); margin: 6px 0 4px; }
-.switch button { border: 0; border-radius: 999px; padding: 10px 22px; background: transparent; color: var(--muted); font: 600 15px var(--body); cursor: pointer; }
-.switch button.on { background: var(--fg); color: #000; }
-/* Websites bearbeiten */
-main.wide.web-wide { max-width: 1680px; }
-#panel.web-mode > :not(.switch):not([data-view="web"]) { display: none !important; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
+.grid2 input, .grid2 select, .field { width: 100%; font: 500 15px var(--body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; margin: 6px 0 12px; }
+textarea.field, .card textarea { width: 100%; min-height: 240px; resize: vertical; font: 500 14px/1.5 var(--body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin: 6px 0 12px; }
+select { cursor: pointer; }
+
+/* ---------- Anmelden */
+.login { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; background: radial-gradient(60% 50% at 50% 0%, rgba(62,207,142,.10), transparent 70%), radial-gradient(50% 40% at 80% 100%, rgba(100,210,255,.08), transparent 70%); }
+.login-card { width: min(420px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 26px; padding: 30px; }
+.login-card img { width: 44px; height: 44px; border-radius: 12px; display: block; margin-bottom: 18px; }
+.login-card h1 { font-size: 34px; margin: 6px 0 10px; }
+.login-card .btn { width: 100%; }
+
+/* ---------- Grundgerüst: Seitenleiste + Inhalt */
+.app { display: grid; grid-template-columns: 252px minmax(0, 1fr); min-height: 100vh; }
+.side { position: sticky; top: 0; height: 100vh; overflow: auto; background: #08080b; border-right: 1px solid var(--line); padding: 16px 12px; display: flex; flex-direction: column; gap: 12px; }
+.side-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 6px; }
+.side-top .brand { font-size: 17px; }
+.search-btn { display: flex; align-items: center; gap: 8px; width: 100%; border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 12px; padding: 9px 10px; font: 500 14px var(--body); cursor: pointer; }
+.search-btn:hover { color: var(--fg); border-color: rgba(255,255,255,.16); }
+.search-btn svg { width: 16px; height: 16px; }
+kbd { margin-left: auto; font: 500 11px var(--mono); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; color: var(--dim); }
+.nav-h { font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--dim); margin: 14px 10px 4px; }
+#nav a, .side-foot a, .side-foot button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border-radius: 10px; color: var(--muted); text-decoration: none; font: 500 14px var(--body); cursor: pointer; background: transparent; border: 0; text-align: left; }
+#nav a:hover, .side-foot a:hover, .side-foot button:hover { background: var(--surface); color: var(--fg); }
+#nav a.on { background: var(--surface-2); color: var(--fg); box-shadow: inset 2px 0 0 var(--mint); }
+#nav svg, .side-foot svg { width: 18px; height: 18px; flex: none; }
+.cnt { margin-left: auto; font: 600 11px var(--mono); color: var(--dim); }
+.cnt.hot { background: var(--mint); color: #062015; border-radius: 999px; padding: 1px 7px; }
+.cnt.alarm { background: #ff9f0a; color: #1a1000; border-radius: 999px; padding: 1px 7px; }
+.side-foot { margin-top: auto; display: grid; gap: 2px; border-top: 1px solid var(--line); padding-top: 10px; }
+.main { min-width: 0; }
+.top { display: none; }
+.content { padding: 34px clamp(16px, 4vw, 48px) 90px; max-width: 1180px; }
+body.is-web .content { max-width: none; }
+.ic-btn { display: inline-grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; flex: none; }
+.ic-btn svg { width: 18px; height: 18px; }
+
+/* ---------- Seitenkopf, Kennzahlen, Karten */
+.ph { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+.ph h1 { font-size: clamp(30px, 4vw, 40px); margin: 6px 0 6px; }
+.ph-acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.lead { margin: 0; max-width: 660px; font-size: 15px; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.kpi { display: block; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; text-align: left; color: inherit; font: inherit; }
+button.kpi { cursor: pointer; }
+button.kpi:hover { border-color: rgba(255,255,255,.18); }
+.kpi b { display: block; font: 700 28px var(--display); letter-spacing: -.03em; color: var(--fg); line-height: 1.2; }
+.kpi span { display: block; font-size: 13px; color: var(--muted); }
+.kpi small { display: block; font-size: 12px; color: var(--dim); margin-top: 2px; }
+.cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; }
+.cols.wide-left { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 18px 20px; min-width: 0; }
+.card h2 { font-size: 17px; margin: 0 0 12px; }
+.card-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.card-h a { font-size: 13px; color: var(--muted); cursor: pointer; text-decoration: none; }
+.card-h a:hover { color: var(--fg); }
+.todo { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 12px; background: var(--surface-2); margin-bottom: 8px; cursor: pointer; border: 1px solid transparent; width: 100%; text-align: left; color: var(--fg); font: 500 14px var(--body); }
+.todo:hover { border-color: rgba(255,255,255,.14); }
+.todo span { flex: 1; }
+.todo em { font-style: normal; color: var(--dim); }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.dot.warn { background: #ff9f0a; } .dot.bad { background: #ff453a; } .dot.info { background: var(--sky); } .dot.ok { background: var(--mint); }
+.quick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.quick button { display: flex; gap: 10px; align-items: center; background: var(--surface-2); border: 1px solid var(--line); color: var(--fg); border-radius: 12px; padding: 12px; text-align: left; font: 500 14px var(--body); cursor: pointer; }
+.quick button:hover { border-color: rgba(255,255,255,.18); }
+.quick svg { width: 18px; height: 18px; color: var(--mint); flex: none; }
+.mini { display: grid; gap: 2px; }
+.mini button { display: flex; justify-content: space-between; gap: 10px; width: 100%; background: transparent; border: 0; border-radius: 10px; padding: 8px 8px; color: var(--fg); font: 500 14px var(--body); text-align: left; cursor: pointer; }
+.mini button:hover { background: var(--surface-2); }
+.mini button span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mini small { color: var(--dim); font-size: 12px; white-space: nowrap; }
+
+/* ---------- Listen */
+.bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 6px; }
+.bar input[type=search], .bar select { font: 500 14px var(--body); color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin: 0; }
+.bar input[type=search] { flex: 1; min-width: 200px; }
+.grow { flex: 1; }
+.chips { display: inline-flex; flex-wrap: wrap; gap: 3px; padding: 3px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
+.chips button { border: 0; background: transparent; color: var(--muted); padding: 7px 12px; border-radius: 9px; font: 600 13px var(--body); cursor: pointer; }
+.chips button.on { background: var(--surface-2); color: var(--fg); }
+.count { font-size: 13px; color: var(--dim); margin: 6px 2px 8px; min-height: 1em; }
+.list { display: grid; gap: 6px; }
+.item { display: grid; grid-template-columns: minmax(0, 1fr) auto 12px; gap: 14px; align-items: center; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; color: inherit; font: inherit; cursor: pointer; }
+.item:hover { border-color: rgba(255,255,255,.16); background: #121217; }
+.it-main { min-width: 0; }
+.it-title { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; color: var(--fg); font-weight: 600; font-size: 15px; }
+.it-meta { display: block; font-size: 13px; color: var(--muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.it-side { font-size: 13px; color: var(--muted); white-space: nowrap; display: flex; gap: 6px; align-items: center; }
+.chev { color: var(--dim); font-size: 20px; line-height: 1; }
+.empty { padding: 28px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: 14px; }
+.pill { font: 600 11px var(--mono); padding: 3px 8px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
+.err { color: var(--red); min-height: 0; }
+.err:empty, .ok:empty { display: none; }
+
+/* ---------- Detail-Fenster rechts */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 70; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.overlay.on { opacity: 1; pointer-events: auto; }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(500px, 100%); background: #0b0b0f; border-left: 1px solid var(--line); z-index: 80; transform: translateX(105%); transition: transform .22s ease; display: flex; flex-direction: column; box-shadow: -20px 0 60px rgba(0,0,0,.5); }
+.drawer.open { transform: none; }
+.d-head { padding: 18px 20px 14px; border-bottom: 1px solid var(--line); display: flex; gap: 12px; align-items: flex-start; }
+.d-head h2 { margin: 0; font-size: 21px; word-break: break-word; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+.d-sub { font-size: 13px; color: var(--muted); margin-top: 4px; word-break: break-all; }
+.d-head .ic-btn { margin-left: auto; }
+.d-body { padding: 8px 20px 40px; overflow: auto; flex: 1; }
+.fields { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 8px 12px; font-size: 14px; margin: 10px 0 4px; }
+.fields dt { color: var(--dim); }
+.fields dd { margin: 0; color: var(--fg); word-break: break-word; }
+.fields .mono { font: 500 13px var(--mono); }
+.d-body h3 { font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--dim); margin: 22px 0 8px; }
+.d-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.d-acts .btn { padding: 8px 14px; font-size: 13px; }
+.d-hint { font-size: 13px; color: var(--dim); margin: 8px 0 0; }
+.d-body textarea { width: 100%; min-height: 90px; resize: vertical; font: 500 14px/1.45 var(--body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 10px; margin: 0 0 8px; }
+.d-msg { font-size: 14px; color: var(--muted); white-space: pre-wrap; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+
+/* ---------- Dialoge, Suche, Meldungen */
+.modal { position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; background: rgba(0,0,0,.62); }
+.modal.on { display: flex; }
+.m-card { width: min(460px, 100%); background: #0e0e12; border: 1px solid var(--line); border-radius: 22px; padding: 22px; max-height: calc(100vh - 32px); overflow: auto; }
+.m-card.wide { width: min(780px, 100%); }
+.m-card h3 { margin: 0 0 8px; font-size: 20px; }
+.m-card p { white-space: pre-line; }
+.m-acts { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+.m-card iframe { width: 100%; height: 62vh; border: 0; border-radius: 12px; background: #050507; }
+.palette { position: fixed; inset: 0; z-index: 110; display: none; justify-content: center; align-items: flex-start; padding: 12vh 16px 16px; background: rgba(0,0,0,.62); }
+.palette.on { display: flex; }
+.p-card { width: min(640px, 100%); background: #0e0e12; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+.p-card input { width: 100%; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--fg); font: 500 17px var(--body); padding: 16px 18px; outline: none; margin: 0; border-radius: 0; }
+.p-res { max-height: 56vh; overflow: auto; padding: 6px; }
+.p-h { font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--dim); margin: 10px 10px 4px; }
+.p-it { display: flex; justify-content: space-between; gap: 12px; width: 100%; text-align: left; background: transparent; border: 0; border-radius: 10px; padding: 9px 10px; color: var(--fg); font: 500 14px var(--body); cursor: pointer; }
+.p-it small { color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%; }
+.p-it.on, .p-it:hover { background: var(--surface-2); }
+.p-none { padding: 18px; color: var(--muted); text-align: center; font-size: 14px; }
+#toasts { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); z-index: 120; display: grid; gap: 8px; justify-items: center; pointer-events: none; width: max-content; max-width: calc(100vw - 32px); }
+.toast { background: var(--fg); color: #000; font: 600 14px var(--body); padding: 10px 18px; border-radius: 999px; box-shadow: 0 10px 30px rgba(0,0,0,.45); animation: tin .2s ease; text-align: center; }
+.toast.bad { background: #ff453a; color: #fff; }
+@keyframes tin { from { opacity: 0; transform: translateY(8px); } }
+
+/* ---------- Sicherheit */
+.meter { padding: 12px 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 14px; align-items: center; }
+.meter:last-child { border-bottom: 0; }
+.meter .track { grid-column: 1 / -1; height: 6px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.meter .fill { height: 100%; border-radius: 99px; background: var(--mint); }
+.meter .fill.warn { background: #ff9f0a; } .meter .fill.bad { background: #ff453a; }
+.meter b { color: var(--fg); font-weight: 600; font-size: 14px; }
+.meter small { display: block; color: var(--dim); font-size: 12px; }
+.plain { margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.7; }
+
+/* ---------- Musik: Leistungen */
+.svc { display: grid; grid-template-columns: minmax(140px, 1fr) minmax(0, 2fr) 110px auto auto; gap: 8px; align-items: center; margin-bottom: 8px; }
+.svc input[type=text], .svc input[type=number] { width: 100%; font: 500 14px var(--body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; margin: 0; }
+.svc label { font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; white-space: nowrap; }
+
+/* ---------- Websites bearbeiten (Editor unverändert übernommen) */
 .web-side [hidden], .web-bar [hidden] { display: none !important; }
-.web-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 18px 0 10px; }
+.web-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 0 0 10px; }
 .web-bar select, .web-bar input { font: 500 14px var(--body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 9px 12px; margin: 0; }
 .web-bar select { min-width: 240px; }
 .web-bar .grow { flex: 1; }
@@ -62,9 +194,9 @@ main.wide.web-wide { max-width: 1680px; }
 .seg button.on { background: var(--surface-2); color: var(--fg); }
 .web { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
 .web-frame { background: #000; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; display: flex; justify-content: center; }
-.web-frame iframe { width: 100%; height: calc(100vh - 210px); min-height: 560px; border: 0; background: #fff; transition: width .25s; }
+.web-frame iframe { width: 100%; height: calc(100vh - 200px); min-height: 560px; border: 0; background: #fff; transition: width .25s; }
 .web-frame.mob iframe { width: 390px; max-width: 100%; border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
-.web-side { position: sticky; top: 76px; max-height: calc(100vh - 96px); overflow: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
+.web-side { position: sticky; top: 20px; max-height: calc(100vh - 40px); overflow: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
 .web-side h3 { font: 600 12px var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 18px 0 8px; }
 .web-side h3:first-child { margin-top: 0; }
 .web-side textarea, .web-side input[type=text] { width: 100%; font: 500 14px/1.45 var(--body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; margin: 4px 0 10px; }
@@ -87,262 +219,407 @@ main.wide.web-wide { max-width: 1680px; }
 .web-help { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 4px 14px; margin-bottom: 12px; font-size: 14px; color: var(--muted); }
 .web-help summary { cursor: pointer; color: var(--fg); font-weight: 600; padding: 8px 0; }
 .web-help ul { margin: 4px 0 10px; padding-left: 20px; line-height: 1.6; }
-@media (max-width: 980px) { .web { grid-template-columns: minmax(0, 1fr); } .web-side { position: static; max-height: none; } }
-.svc { display: grid; grid-template-columns: minmax(140px, 1fr) minmax(0, 2fr) 110px auto auto; gap: 8px; align-items: center; margin-bottom: 8px; }
-.svc input[type=text], .svc input[type=number] { width: 100%; font: 500 14px var(--body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; margin: 0; }
-.svc label { font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; white-space: nowrap; }
-.note { font-size: 13px; color: var(--muted); white-space: pre-wrap; margin-top: 4px; }
-@media (max-width: 760px) { .svc { grid-template-columns: minmax(0, 1fr) 100px; } .svc .svc-text { grid-column: 1 / -1; } }
-@media (max-width: 760px) {
-  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .cust { grid-template-columns: minmax(0, 1fr); }
-  .cust .acts { justify-content: flex-start; }
-  .grid2 { grid-template-columns: minmax(0, 1fr); }
+
+@media (max-width: 1100px) { .web { grid-template-columns: minmax(0, 1fr); } .web-side { position: static; max-height: none; } .cols.wide-left { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 900px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .side { position: fixed; left: 0; top: 0; bottom: 0; width: min(290px, 86vw); z-index: 90; transform: translateX(-105%); transition: transform .22s ease; }
+  body.menu .side { transform: none; }
+  .top { display: flex; position: sticky; top: 0; z-index: 60; align-items: center; gap: 12px; height: 56px; padding: 0 max(12px, env(safe-area-inset-left, 0px)); background: rgba(5,5,7,.82); backdrop-filter: saturate(1.6) blur(20px); -webkit-backdrop-filter: saturate(1.6) blur(20px); border-bottom: 1px solid var(--line); }
+  .top b { flex: 1; font: 600 16px var(--display); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .content { padding-top: 22px; }
+  .cols { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .item { grid-template-columns: minmax(0, 1fr) 12px; }
+  .it-side { display: none; }
+  .fields { grid-template-columns: minmax(0, 1fr); gap: 0 12px; }
+  .fields dt { margin-top: 8px; }
+  .quick, .grid2 { grid-template-columns: minmax(0, 1fr); }
+  .svc { grid-template-columns: minmax(0, 1fr) 100px; } .svc .svc-text { grid-column: 1 / -1; }
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi b { font-size: 24px; }
 }
 </style>
 </head>
 <body>
-<header class="nav"><div class="wrap"><a class="brand" href="./"><img src="icon.png" alt="">Newcall Apps</a><a class="back" href="#" id="logout" hidden>Abmelden</a></div></header>
-<main class="wrap wide">
-  <p class="eyebrow">Verwaltung</p>
-  <h1>Admin <span class="mode" id="mode" hidden></span></h1>
 
-  <!-- Anmelden -->
-  <div class="box" id="login">
+<!-- ===================== ANMELDEN ===================== -->
+<div class="login" id="login">
+  <div class="login-card">
+    <img src="icon.png" alt="">
+    <p class="eyebrow">Newcall · Verwaltung</p>
+    <h1>Admin</h1>
     <p>Admin-Passwort eingeben. Es bleibt nur in diesem Browser-Tab, bis du ihn schließt.</p>
     <input type="text" id="token" placeholder="Admin-Passwort" autocomplete="off" spellcheck="false" style="-webkit-text-security: disc">
     <button class="btn btn-go" id="loginBtn">Anmelden</button>
-    <p class="err" id="loginErr" role="alert"></p>
+    <p class="err" id="loginErr" role="alert" style="margin-top:12px"></p>
   </div>
+</div>
 
-  <div id="panel" class="hidden">
-    <div class="switch" role="tablist" aria-label="Bereich">
-      <button type="button" data-view="apps" class="on">Newcall Apps</button>
-      <button type="button" data-view="musik">Musik</button>
-      <button type="button" data-view="web">Websites</button>
+<!-- ===================== VERWALTUNG ===================== -->
+<div class="app hidden" id="app">
+  <aside class="side" id="side" aria-label="Bereiche">
+    <div class="side-top"><a class="brand" href="./"><img src="icon.png" alt="">Newcall</a><span class="mode" id="mode"></span></div>
+    <button class="search-btn" id="searchBtn" type="button"><i data-ic="search"></i><span>Suchen …</span><kbd>Strg K</kbd></button>
+    <nav id="nav">
+      <a data-page="home"><i data-ic="home"></i>Übersicht</a>
+      <p class="nav-h">Apps</p>
+      <a data-page="keys"><i data-ic="key"></i>Abos &amp; Schlüssel<b class="cnt" id="cKeys"></b></a>
+      <a data-page="devices"><i data-ic="device"></i>Geräte<b class="cnt" id="cDevices"></b></a>
+      <a data-page="accounts"><i data-ic="user"></i>Konten<b class="cnt" id="cAccounts"></b></a>
+      <p class="nav-h">Musik</p>
+      <a data-page="orders"><i data-ic="music"></i>Aufträge<b class="cnt" id="cOrders"></b></a>
+      <a data-page="services"><i data-ic="price"></i>Leistungen &amp; Preise</a>
+      <p class="nav-h">Kommunikation</p>
+      <a data-page="mail"><i data-ic="mail"></i>Rundmail &amp; Verteiler<b class="cnt" id="cMail"></b></a>
+      <p class="nav-h">Website</p>
+      <a data-page="web"><i data-ic="edit"></i>Websites bearbeiten</a>
+      <p class="nav-h">System</p>
+      <a data-page="security"><i data-ic="shield"></i>Sicherheit<b class="cnt" id="cSec"></b></a>
+      <a data-page="settings"><i data-ic="lock"></i>Admin-Passwort</a>
+    </nav>
+    <div class="side-foot">
+      <a id="stripeLink" href="https://dashboard.stripe.com/" target="_blank" rel="noopener"><i data-ic="card"></i>Stripe-Dashboard ↗</a>
+      <button type="button" id="logout"><i data-ic="out"></i>Abmelden</button>
     </div>
+  </aside>
+  <div class="overlay" id="scrim"></div>
 
-    <!-- ===================== WEBSITES ===================== -->
-    <div data-view="web" class="hidden">
-      <div class="web-bar">
-        <select id="wPage" aria-label="Seite"></select>
-        <input type="text" id="wPath" placeholder="/seite.html" hidden aria-label="Andere Seite (Pfad)">
-        <div class="seg" role="group" aria-label="Ansicht"><button type="button" data-vp="desk" class="on">Computer</button><button type="button" data-vp="mob">Handy</button></div>
-        <span class="grow"></span>
-        <button class="btn btn-ghost btn-s" id="wUndo" disabled title="Strg+Z">↶ Rückgängig</button>
-        <button class="btn btn-ghost btn-s" id="wOpen">Seite öffnen ↗</button>
-        <span class="tag ok" id="wState">Gespeichert</span>
-        <button class="btn btn-go btn-s" id="wSave" disabled>Speichern</button>
-      </div>
-      <details class="web-help">
-        <summary>So funktioniert's</summary>
-        <ul>
-          <li><b>Anklicken</b> wählt einen Teil der Seite aus (rot umrandet). Rechts kannst du ihn dann bearbeiten.</li>
-          <li><b>Doppelklick</b> auf einen Text: direkt auf der Seite tippen. <b>Enter</b> = fertig, <b>Shift+Enter</b> = neue Zeile, <b>Esc</b> = abbrechen.</li>
-          <li><b>↑ / ↓</b> verschiebt den ausgewählten Teil, <b>Ausblenden</b> versteckt ihn (im Editor blass, auf der Website unsichtbar).</li>
-          <li><b>„Übergeordnet“</b> wählt den ganzen Bereich drumherum – so verschiebst du komplette Abschnitte.</li>
-          <li><b>Neuer Block</b> fügt unter dem ausgewählten Teil eine Überschrift, einen Text, einen Knopf, ein Bild oder eine Linie ein.</li>
-          <li>Erst <b>Speichern</b> macht die Änderungen auf der echten Website sichtbar. Links und Knöpfe funktionieren im Editor absichtlich nicht.</li>
-          <li>Bereiche, die automatisch gefüllt werden (Songs, Preise, Konto), kannst du verschieben oder ausblenden – ihren Inhalt änderst du unter „Musik“ bzw. mit dem Song-Skript.</li>
-        </ul>
-      </details>
-      <p class="err" id="wErr" role="alert"></p>
-      <div class="web">
-        <div class="web-frame" id="wFrameBox"><iframe id="wFrame" title="Seitenvorschau zum Bearbeiten"></iframe></div>
-        <aside class="web-side" aria-label="Bearbeiten">
-          <div id="wNone"><h3>Auswahl</h3><p class="hint">Klicke links auf einen Teil der Seite, um ihn zu bearbeiten.</p></div>
-          <div id="wSel" hidden>
-            <div class="crumbs" id="wCrumbs"></div>
-            <div class="kind" id="wKind"></div>
-            <div class="snip" id="wSnip"></div>
-            <p class="hint" id="wDyn" hidden>Dieser Bereich wird automatisch gefüllt. Du kannst ihn verschieben oder ausblenden; den Inhalt änderst du an seiner Quelle (z. B. Admin „Musik“ oder Song-Skript).</p>
-            <div id="wTextBox" hidden><label class="small" for="wText">Text</label><textarea id="wText"></textarea></div>
-            <p class="hint" id="wInlineHint" hidden>Dieser Text enthält Formatierungen (fett, Links …). <b>Doppelklick</b> darauf, um ihn direkt auf der Seite zu bearbeiten.</p>
-            <div id="wHrefBox" hidden><label class="small" for="wHref">Link-Ziel (Adresse)</label><input type="text" id="wHref" placeholder="https://… oder musik/"></div>
-            <div id="wSrcBox" hidden>
-              <label class="small" for="wSrc">Bild-Adresse</label><input type="text" id="wSrc" placeholder="https://… oder bilder/foto.jpg">
-              <label class="small" for="wAlt">Bildbeschreibung (für Blinde und Google)</label><input type="text" id="wAlt">
-            </div>
-            <div class="btn-row">
-              <button class="btn btn-ghost" id="wUp" title="Nach oben">↑ Hoch</button>
-              <button class="btn btn-ghost" id="wDown" title="Nach unten">↓ Runter</button>
-              <button class="btn btn-ghost" id="wHide">Ausblenden</button>
-              <button class="btn btn-ghost" id="wParent">Übergeordnet</button>
-            </div>
-            <div class="btn-row"><button class="btn btn-red" id="wDel" hidden>Block löschen</button></div>
-            <h3>Neuer Block darunter</h3>
-            <div class="btn-row" id="wAdd">
-              <button class="btn btn-ghost" data-add="heading">Überschrift</button>
-              <button class="btn btn-ghost" data-add="text">Text</button>
-              <button class="btn btn-ghost" data-add="button">Knopf</button>
-              <button class="btn btn-ghost" data-add="image">Bild</button>
-              <button class="btn btn-ghost" data-add="line">Linie</button>
-            </div>
-            <h3>Auf dieser Ebene</h3>
-            <ol class="level" id="wLevel"></ol>
-          </div>
-          <h3>Änderungen</h3>
-          <p class="hint" id="wCount"></p>
-          <p class="hint" id="wSkip" hidden></p>
-          <div class="btn-row">
-            <button class="btn btn-ghost" id="wDiscard" disabled>Ungespeichertes verwerfen</button>
-            <button class="btn btn-red" id="wReset">Seite auf Original</button>
-          </div>
-          <p class="ok" id="wOk"></p>
-        </aside>
-      </div>
-    </div>
+  <div class="main">
+    <header class="top">
+      <button class="ic-btn" id="menuBtn" type="button" aria-label="Menü"><i data-ic="menu"></i></button>
+      <b id="topTitle">Übersicht</b>
+      <button class="ic-btn" id="searchBtn2" type="button" aria-label="Suchen"><i data-ic="search"></i></button>
+    </header>
+    <main class="content">
 
-    <!-- ===================== MUSIK ===================== -->
-    <div data-view="musik" class="hidden">
-      <div class="stats">
-        <div class="stat"><b id="mNew">0</b><span>neue Aufträge</span></div>
-        <div class="stat"><b id="mWork">0</b><span>in Arbeit</span></div>
-        <div class="stat"><b id="mDone">0</b><span>fertig</span></div>
-        <div class="stat"><b id="mSum">0 €</b><span>Umsatz gesamt (brutto)</span></div>
-      </div>
-
-      <h2>Aufträge</h2>
-      <p class="small" style="margin-top:-6px">Gebuchte und bezahlte Leistungen von der Musikseite. Den Status sieht die Kundin oder der Kunde unter „Mein Konto“. Erstattungen machst du im Stripe-Dashboard.</p>
-      <div class="tools">
-        <input type="search" id="mq" placeholder="Suchen: E-Mail, Projekt, Leistung …">
-        <select id="mfilter" class="btn btn-ghost btn-s"><option value="offen">Offen</option><option value="all">Alle</option><option value="fertig">Fertig</option></select>
-        <button class="btn btn-ghost btn-s" id="mreload">Neu laden</button>
-      </div>
-      <p class="err" id="mErr" role="alert"></p>
-      <div class="list" id="orders"></div>
-
-      <div class="box" style="margin-top:28px">
-        <h2 style="margin-top:0">Leistungen & Preise</h2>
-        <p>So erscheinen sie auf der Musikseite. Preis in ganzen Euro – <b>0 = „Preis auf Anfrage“</b> (dann gibt es statt „Buchen“ einen Knopf zu Instagram). Ohne Haken bei „sichtbar“ wird die Leistung versteckt.</p>
-        <label class="small" style="display:flex;gap:8px;align-items:center;margin:4px 0 14px"><input type="checkbox" id="mAccept"> Neue Buchungen annehmen (aus = Pause, z. B. im Urlaub)</label>
-        <div id="svcList"></div>
-        <div class="row" style="margin-top:6px">
-          <button class="btn btn-ghost btn-s" id="svcAdd">+ Leistung hinzufügen</button>
-          <button class="btn btn-go" id="svcSave">Speichern</button>
+      <!-- ===== ÜBERSICHT ===== -->
+      <section class="page" data-page="home">
+        <div class="ph">
+          <div><p class="eyebrow" id="hello">Hallo</p><h1>Übersicht</h1><p class="lead">Das Wichtigste auf einen Blick. Klick auf eine Zahl oder Aufgabe, um direkt dorthin zu springen.</p></div>
+          <div class="ph-acts"><button class="btn btn-ghost btn-s" id="reloadAll">Alles neu laden</button></div>
         </div>
-        <p class="err" id="svcErr" role="alert"></p>
-        <p class="ok" id="svcOk"></p>
-      </div>
-    </div>
+        <div class="kpis" id="kpis"></div>
+        <div class="cols">
+          <div class="card"><h2>Zu erledigen</h2><div id="todo"></div></div>
+          <div class="card"><h2>Schnell erledigt</h2>
+            <div class="quick">
+              <button type="button" data-q="grant"><i data-ic="gift"></i>Schlüssel verschenken</button>
+              <button type="button" data-q="mail"><i data-ic="mail"></i>Rundmail schreiben</button>
+              <button type="button" data-q="orders"><i data-ic="music"></i>Offene Aufträge</button>
+              <button type="button" data-q="services"><i data-ic="price"></i>Preise ändern</button>
+              <button type="button" data-q="web"><i data-ic="edit"></i>Website bearbeiten</button>
+              <button type="button" data-q="search"><i data-ic="search"></i>Jemanden suchen</button>
+            </div>
+          </div>
+        </div>
+        <div class="cols">
+          <div class="card"><div class="card-h"><h2>Zuletzt angemeldet</h2><a data-go="accounts">Alle Konten ›</a></div><div class="mini" id="recentAcc"></div></div>
+          <div class="card"><div class="card-h"><h2>Zuletzt aktive Geräte</h2><a data-go="devices">Alle Geräte ›</a></div><div class="mini" id="recentDev"></div></div>
+        </div>
+      </section>
 
-    <!-- ===================== APPS ===================== -->
-    <div data-view="apps">
-    <div class="stats">
-      <div class="stat"><b id="sActive">0</b><span>zahlende Abos aktiv</span></div>
-      <div class="stat"><b id="sFree">0</b><span>kostenlos freigeschaltet</span></div>
-      <div class="stat"><b id="sMonth">0 €</b><span>pro Monat (brutto)</span></div>
-      <div class="stat"><b id="sEnded">0</b><span>beendet oder gesperrt</span></div>
-    </div>
+      <!-- ===== ABOS & SCHLÜSSEL ===== -->
+      <section class="page" data-page="keys">
+        <div class="ph">
+          <div><p class="eyebrow">Newcall Apps</p><h1>Abos &amp; Schlüssel</h1><p class="lead">Zahlende Abos und kostenlose Schlüssel für WinClean, Pebble und iDock. Klick auf einen Eintrag für alle Aktionen (kopieren, verlängern, PCs zurücksetzen, sperren …).</p></div>
+          <div class="ph-acts"><button class="btn btn-go btn-s" id="grantOpen">+ Schlüssel verschenken</button></div>
+        </div>
+        <div class="kpis" id="keyKpis"></div>
+        <div class="bar">
+          <input type="search" id="q" placeholder="Suchen: Name, E-Mail, Schlüssel …">
+          <div class="chips" id="filter"><button data-v="all" class="on">Alle</button><button data-v="active">Aktiv</button><button data-v="abo">Zahlende</button><button data-v="frei">Kostenlos</button><button data-v="off">Beendet</button></div>
+          <select id="prod" aria-label="Programm"><option value="all">Alle Programme</option><option value="kehrwerk">WinClean</option><option value="pebble">Pebble</option><option value="idock">iDock</option></select>
+          <button class="btn btn-ghost btn-s" id="keysCsv" title="Liste als Tabelle herunterladen">CSV</button>
+          <button class="btn btn-ghost btn-s" id="reload">Neu laden</button>
+        </div>
+        <p class="count" id="keysCount"></p>
+        <div class="list" id="list"></div>
+      </section>
 
-    <div class="box">
-      <h2 style="margin-top:0">Kostenlos freischalten</h2>
-      <p>Für dich selbst, Tester oder Freunde. Es entsteht ein Schlüssel ohne Abo – es wird nie etwas abgebucht. Gilt wie ein Abo für bis zu 3 PCs.</p>
+      <!-- ===== GERÄTE ===== -->
+      <section class="page" data-page="devices">
+        <div class="ph"><div><p class="eyebrow">Newcall Launcher</p><h1>Geräte</h1><p class="lead">Alle PCs, auf denen der Newcall Launcher läuft – mit freiwilligem Namen und Geräte-Code. Gratis-Freischaltungen gelten beim nächsten Start des Launchers.</p></div></div>
+        <div class="bar">
+          <input type="search" id="iq" placeholder="Suchen: Name, Geräte-Code, Konto …">
+          <div class="chips" id="ifilter"><button data-v="all" class="on">Alle</button><button data-v="week">Aktiv (7 Tage)</button><button data-v="free">Mit Gratis</button><button data-v="acc">Mit Konto</button></div>
+          <span class="grow"></span>
+          <button class="btn btn-ghost btn-s" id="devCsv">CSV</button>
+          <button class="btn btn-ghost btn-s" id="ireload">Neu laden</button>
+        </div>
+        <p class="count" id="devCount"></p>
+        <div class="list" id="installs"></div>
+      </section>
+
+      <!-- ===== KONTEN ===== -->
+      <section class="page" data-page="accounts">
+        <div class="ph"><div><p class="eyebrow">Newcall-Konten</p><h1>Konten</h1><p class="lead">Konten aus dem Launcher und von der Musikseite. Abos mit derselben E-Mail gelten automatisch. Passwort vergessen, Löschanfrage oder Datenauskunft? Eintrag anklicken.</p></div></div>
+        <div class="bar">
+          <input type="search" id="aq" placeholder="Suchen: E-Mail oder Name …">
+          <div class="chips" id="afilter"><button data-v="all" class="on">Alle</button><button data-v="news">Newsletter</button><button data-v="blocked">Gesperrt</button></div>
+          <span class="grow"></span>
+          <button class="btn btn-ghost btn-s" id="accCsv">CSV</button>
+          <button class="btn btn-ghost btn-s" id="areload">Neu laden</button>
+        </div>
+        <p class="count" id="accCount"></p>
+        <div class="list" id="accounts"></div>
+      </section>
+
+      <!-- ===== MUSIK: AUFTRÄGE ===== -->
+      <section class="page" data-page="orders">
+        <div class="ph"><div><p class="eyebrow">Newcall Musik</p><h1>Aufträge</h1><p class="lead">Gebuchte und bezahlte Leistungen von der Musikseite. Den Status sieht die Kundin oder der Kunde unter „Mein Konto“. Erstattungen machst du im Stripe-Dashboard.</p></div></div>
+        <div class="kpis" id="orderKpis"></div>
+        <div class="bar">
+          <input type="search" id="mq" placeholder="Suchen: E-Mail, Projekt, Leistung …">
+          <div class="chips" id="mfilter"><button data-v="offen" class="on">Offen</button><button data-v="neu">Neu</button><button data-v="fertig">Fertig</button><button data-v="all">Alle</button></div>
+          <span class="grow"></span>
+          <button class="btn btn-ghost btn-s" id="ordCsv">CSV</button>
+          <button class="btn btn-ghost btn-s" id="mreload">Neu laden</button>
+        </div>
+        <p class="count" id="ordCount"></p>
+        <div class="list" id="orders"></div>
+      </section>
+
+      <!-- ===== MUSIK: LEISTUNGEN ===== -->
+      <section class="page" data-page="services">
+        <div class="ph"><div><p class="eyebrow">Newcall Musik</p><h1>Leistungen &amp; Preise</h1><p class="lead">So erscheinen sie auf der Musikseite. Preis in ganzen Euro – <b>0 = „Preis auf Anfrage“</b> (dann gibt es statt „Buchen“ einen Knopf zu Instagram). Ohne Haken bei „sichtbar“ wird die Leistung versteckt.</p></div></div>
+        <div class="card">
+          <label class="small" style="display:flex;gap:8px;align-items:center;margin:0 0 16px"><input type="checkbox" id="mAccept"> Neue Buchungen annehmen (aus = Pause, z. B. im Urlaub)</label>
+          <div id="svcList"></div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn btn-ghost btn-s" id="svcAdd">+ Leistung hinzufügen</button>
+            <span class="grow"></span>
+            <button class="btn btn-go" id="svcSave">Speichern</button>
+          </div>
+          <p class="err" id="svcErr" role="alert"></p>
+          <p class="ok" id="svcOk"></p>
+        </div>
+      </section>
+
+      <!-- ===== RUNDMAIL & VERTEILER ===== -->
+      <section class="page" data-page="mail">
+        <div class="ph">
+          <div><p class="eyebrow">Kommunikation</p><h1>Rundmail &amp; Verteiler</h1><p class="lead" id="nIntro"></p></div>
+          <div class="ph-acts"><div class="chips" id="nList"><button data-v="apps" class="on">Apps-Verteiler</button><button data-v="musik">Musik-Verteiler</button></div></div>
+        </div>
+        <div class="kpis" id="nKpis"></div>
+        <div class="cols wide-left">
+          <div class="card">
+            <div class="card-h"><h2>Rundmail schreiben</h2></div>
+            <div class="row" style="margin-bottom:6px" id="nNotesRow">
+              <select id="nApp" class="field" style="width:auto;margin:0"><option value="kehrwerk">WinClean</option><option value="pebble">Pebble</option><option value="idock">iDock</option><option value="launcher">Newcall Launcher</option></select>
+              <button class="btn btn-ghost btn-s" id="nNotes">Neueste Patch Notes übernehmen</button>
+            </div>
+            <label class="small" for="nSubject">Betreff</label>
+            <input id="nSubject" class="field" maxlength="150">
+            <label class="small" for="nText">Text – „Hallo Name,“ und der Abbestell-Link kommen automatisch dazu. Zeilen mit „- “ werden Aufzählungen, „# “ Überschriften, **so** fett.</label>
+            <textarea id="nText"></textarea>
+            <div class="row">
+              <button class="btn btn-ghost btn-s" id="nPreview">Vorschau ansehen</button>
+              <span class="grow"></span>
+              <button class="btn btn-go" id="nSend">An alle senden</button>
+            </div>
+            <div class="row" style="margin-top:10px">
+              <input id="nTestTo" type="email" placeholder="Testmail an … (deine Adresse)">
+              <button class="btn btn-ghost btn-s" id="nTest">Testmail senden</button>
+            </div>
+            <p class="err" id="newsErr" role="alert" style="margin-top:10px"></p>
+            <p class="ok" id="newsOk" style="margin-top:10px"></p>
+          </div>
+          <div class="card">
+            <div class="card-h"><h2>Empfänger</h2><a id="nCsv">CSV ↓</a></div>
+            <div class="bar">
+              <input type="search" id="nq" placeholder="Suchen …">
+              <div class="chips" id="nfilter"><button data-v="all" class="on">Alle</button><button data-v="an">Bestätigt</button><button data-v="wartet">Wartet</button></div>
+            </div>
+            <div class="mini" id="newsList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== WEBSITES BEARBEITEN ===== -->
+      <section class="page" data-page="web">
+        <div class="web-bar">
+          <select id="wPage" aria-label="Seite"></select>
+          <input type="text" id="wPath" placeholder="/seite.html" hidden aria-label="Andere Seite (Pfad)">
+          <div class="seg" role="group" aria-label="Ansicht"><button type="button" data-vp="desk" class="on">Computer</button><button type="button" data-vp="mob">Handy</button></div>
+          <span class="grow"></span>
+          <button class="btn btn-ghost btn-s" id="wUndo" disabled title="Strg+Z">↶ Rückgängig</button>
+          <button class="btn btn-ghost btn-s" id="wOpen">Seite öffnen ↗</button>
+          <span class="tag ok" id="wState">Gespeichert</span>
+          <button class="btn btn-go btn-s" id="wSave" disabled>Speichern</button>
+        </div>
+        <details class="web-help">
+          <summary>So funktioniert's</summary>
+          <ul>
+            <li><b>Anklicken</b> wählt einen Teil der Seite aus (rot umrandet). Rechts kannst du ihn dann bearbeiten.</li>
+            <li><b>Doppelklick</b> auf einen Text: direkt auf der Seite tippen. <b>Enter</b> = fertig, <b>Shift+Enter</b> = neue Zeile, <b>Esc</b> = abbrechen.</li>
+            <li><b>↑ / ↓</b> verschiebt den ausgewählten Teil, <b>Ausblenden</b> versteckt ihn (im Editor blass, auf der Website unsichtbar).</li>
+            <li><b>„Übergeordnet“</b> wählt den ganzen Bereich drumherum – so verschiebst du komplette Abschnitte.</li>
+            <li><b>Neuer Block</b> fügt unter dem ausgewählten Teil eine Überschrift, einen Text, einen Knopf, ein Bild oder eine Linie ein.</li>
+            <li>Erst <b>Speichern</b> macht die Änderungen auf der echten Website sichtbar. Links und Knöpfe funktionieren im Editor absichtlich nicht.</li>
+            <li>Bereiche, die automatisch gefüllt werden (Songs, Preise, Konto), kannst du verschieben oder ausblenden – ihren Inhalt änderst du unter „Musik“ bzw. mit dem Song-Skript.</li>
+          </ul>
+        </details>
+        <p class="err" id="wErr" role="alert"></p>
+        <div class="web">
+          <div class="web-frame" id="wFrameBox"><iframe id="wFrame" title="Seitenvorschau zum Bearbeiten"></iframe></div>
+          <aside class="web-side" aria-label="Bearbeiten">
+            <div id="wNone"><h3>Auswahl</h3><p class="hint">Klicke links auf einen Teil der Seite, um ihn zu bearbeiten.</p></div>
+            <div id="wSel" hidden>
+              <div class="crumbs" id="wCrumbs"></div>
+              <div class="kind" id="wKind"></div>
+              <div class="snip" id="wSnip"></div>
+              <p class="hint" id="wDyn" hidden>Dieser Bereich wird automatisch gefüllt. Du kannst ihn verschieben oder ausblenden; den Inhalt änderst du an seiner Quelle (z. B. Admin „Musik“ oder Song-Skript).</p>
+              <div id="wTextBox" hidden><label class="small" for="wText">Text</label><textarea id="wText"></textarea></div>
+              <p class="hint" id="wInlineHint" hidden>Dieser Text enthält Formatierungen (fett, Links …). <b>Doppelklick</b> darauf, um ihn direkt auf der Seite zu bearbeiten.</p>
+              <div id="wHrefBox" hidden><label class="small" for="wHref">Link-Ziel (Adresse)</label><input type="text" id="wHref" placeholder="https://… oder musik/"></div>
+              <div id="wSrcBox" hidden>
+                <label class="small" for="wSrc">Bild-Adresse</label><input type="text" id="wSrc" placeholder="https://… oder bilder/foto.jpg">
+                <label class="small" for="wAlt">Bildbeschreibung (für Blinde und Google)</label><input type="text" id="wAlt">
+              </div>
+              <div class="btn-row">
+                <button class="btn btn-ghost" id="wUp" title="Nach oben">↑ Hoch</button>
+                <button class="btn btn-ghost" id="wDown" title="Nach unten">↓ Runter</button>
+                <button class="btn btn-ghost" id="wHide">Ausblenden</button>
+                <button class="btn btn-ghost" id="wParent">Übergeordnet</button>
+              </div>
+              <div class="btn-row"><button class="btn btn-red" id="wDel" hidden>Block löschen</button></div>
+              <h3>Neuer Block darunter</h3>
+              <div class="btn-row" id="wAdd">
+                <button class="btn btn-ghost" data-add="heading">Überschrift</button>
+                <button class="btn btn-ghost" data-add="text">Text</button>
+                <button class="btn btn-ghost" data-add="button">Knopf</button>
+                <button class="btn btn-ghost" data-add="image">Bild</button>
+                <button class="btn btn-ghost" data-add="line">Linie</button>
+              </div>
+              <h3>Auf dieser Ebene</h3>
+              <ol class="level" id="wLevel"></ol>
+            </div>
+            <h3>Änderungen</h3>
+            <p class="hint" id="wCount"></p>
+            <p class="hint" id="wSkip" hidden></p>
+            <div class="btn-row">
+              <button class="btn btn-ghost" id="wDiscard" disabled>Ungespeichertes verwerfen</button>
+              <button class="btn btn-red" id="wReset">Seite auf Original</button>
+            </div>
+            <p class="ok" id="wOk"></p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ===== SICHERHEIT ===== -->
+      <section class="page" data-page="security">
+        <div class="ph">
+          <div><p class="eyebrow">System</p><h1>Sicherheit</h1><p class="lead">Der Lizenz-Dienst bremst automatisch, wenn jemand die Seiten überladen will. Hier siehst du, wie voll die Grenzen gerade sind. Ist eine Grenze erreicht, wartet der Dienst bis zum nächsten Zeitfenster – mit „Zurücksetzen“ geht es sofort weiter.</p></div>
+          <div class="ph-acts"><button class="btn btn-ghost btn-s" id="secReload">Neu laden</button></div>
+        </div>
+        <div class="cols">
+          <div class="card"><h2>Grenzen für alle</h2><div id="secList"></div></div>
+          <div class="card"><h2>Was sonst noch schützt</h2>
+            <ul class="plain">
+              <li>Pro Absender nur wenige Anfragen pro Minute (Anmelden, Konto erstellen, Kaufen).</li>
+              <li>Nach 8 falschen Passwörtern ist ein Konto 15 Minuten gesperrt – lösbar unter <a data-go="accounts">Konten</a>.</li>
+              <li>Nach 10 falschen Admin-Passwörtern ist der Absender gesperrt.</li>
+              <li>Zu große Anfragen werden abgelehnt.</li>
+              <li>Adressen von Besuchern werden nur verschlüsselt (als Prüfsumme) gezählt, nie gespeichert.</li>
+              <li>Passwörter liegen nur als sicherer Hash vor – auch du kannst sie nicht lesen.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== ADMIN-PASSWORT ===== -->
+      <section class="page" data-page="settings">
+        <div class="ph"><div><p class="eyebrow">System</p><h1>Admin-Passwort</h1><p class="lead">Danach gilt nur noch das neue Passwort – auch auf anderen Geräten musst du dich neu anmelden. Mindestens 12 Zeichen.</p></div></div>
+        <div class="card" style="max-width:640px">
+          <div class="grid2">
+            <div><label class="small" for="pw1">Neues Passwort</label><input id="pw1" type="password" autocomplete="new-password"></div>
+            <div><label class="small" for="pw2">Neues Passwort wiederholen</label><input id="pw2" type="password" autocomplete="new-password"></div>
+          </div>
+          <button class="btn btn-go" id="pwBtn">Passwort ändern</button>
+          <p class="err" id="pwErr" role="alert" style="margin-top:10px"></p>
+          <p class="ok" id="pwOk" style="margin-top:10px"></p>
+        </div>
+        <p class="stand">Zahlungen, Rückerstattungen und Rechnungen verwaltest du im Stripe-Dashboard. Das Admin-Passwort gilt für alle Bereiche.</p>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- Detail-Fenster -->
+<div class="overlay" id="dScrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true" role="dialog" aria-labelledby="dTitle">
+  <div class="d-head"><div style="min-width:0"><h2 id="dTitle"></h2><div class="d-sub" id="dSub"></div></div><button class="ic-btn" id="dClose" type="button" aria-label="Schließen"><i data-ic="x"></i></button></div>
+  <div class="d-body" id="dBody"></div>
+</aside>
+
+<!-- Dialog (Nachfrage, Eingabe, Vorschau) -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="m-card" id="mCard">
+    <h3 id="mTitle"></h3>
+    <p id="mText"></p>
+    <div id="mExtra"></div>
+    <input class="field" id="mInput">
+    <p class="err" id="mErr"></p>
+    <div class="m-acts"><button class="btn btn-ghost btn-s" id="mCancel" type="button">Abbrechen</button><button class="btn btn-go btn-s" id="mOk" type="button">OK</button></div>
+  </div>
+</div>
+
+<!-- Schlüssel verschenken -->
+<div class="modal" id="grantModal" role="dialog" aria-modal="true" aria-labelledby="gTitle">
+  <div class="m-card wide">
+    <h3 id="gTitle">Schlüssel verschenken</h3>
+    <p>Für dich selbst, Tester oder Freunde. Es entsteht ein Schlüssel ohne Abo – es wird nie etwas abgebucht. Gilt wie ein Abo für bis zu 3 PCs.</p>
+    <div id="grantFormBox">
       <div class="grid2">
         <div><label class="small" for="gProduct">Programm</label>
           <select id="gProduct"><option value="kehrwerk">WinClean</option><option value="pebble">Pebble</option><option value="idock">iDock</option></select></div>
-        <div><label class="small" for="gName">Name</label><input id="gName" placeholder="z. B. Deniz"></div>
-        <div><label class="small" for="gMail">E-Mail (optional)</label><input id="gMail" type="email" placeholder="name@beispiel.de"></div>
-        <div><label class="small" for="gNote">Notiz (optional)</label><input id="gNote" placeholder="z. B. Entwickler, Tester"></div>
         <div><label class="small" for="gUntil">Gültig</label>
           <select id="gUntil"><option value="0">unbegrenzt</option><option value="30">30 Tage</option><option value="90">90 Tage</option><option value="365">1 Jahr</option></select></div>
+        <div><label class="small" for="gName">Name</label><input id="gName" placeholder="z. B. Alex"></div>
+        <div><label class="small" for="gMail">E-Mail (optional)</label><input id="gMail" type="email" placeholder="name@beispiel.de"></div>
       </div>
-      <button class="btn btn-go" id="grantBtn">Schlüssel erstellen</button>
-      <p class="err" id="grantErr" role="alert"></p>
-      <div id="newKey">
-        <p class="ok" id="newKeyHint">Fertig. Schlüssel (im Programm unter „Abo“ eintragen):</p>
-        <div class="key" id="newKeyText"></div>
-        <button class="btn btn-ghost btn-s" data-copy="newKeyText">Kopieren</button>
-      </div>
+      <label class="small" for="gNote">Notiz (optional, nur für dich)</label><input id="gNote" class="field" placeholder="z. B. Tester">
     </div>
-
-    <h2>Installationen</h2>
-    <p class="small" style="margin-top:-6px">Alle PCs, auf denen der Newcall Launcher läuft – mit freiwilligem Namen und Geräte-Code. „Gratis freischalten“ gilt beim nächsten Start des Launchers.</p>
-    <div class="tools">
-      <input type="search" id="iq" placeholder="Suchen: Name oder Geräte-Code …">
-      <button class="btn btn-ghost btn-s" id="ireload">Neu laden</button>
+    <div id="newKey" class="hidden">
+      <p class="ok" id="newKeyHint">Fertig.</p>
+      <div class="key" id="newKeyText"></div>
     </div>
-    <p class="err" id="instErr" role="alert"></p>
-    <div class="list" id="installs"></div>
-
-    </div><!-- Ende Apps (oberer Teil) -->
-
-    <h2>Konten</h2>
-    <p class="small" style="margin-top:-6px">Newcall-Konten aus dem Launcher. Abos mit derselben E-Mail gelten automatisch. Hat jemand sein Passwort vergessen, setzt du hier ein neues und sagst es der Person.</p>
-    <div class="tools">
-      <input type="search" id="aq" placeholder="Suchen: E-Mail oder Name …">
-      <button class="btn btn-ghost btn-s" id="areload">Neu laden</button>
+    <p class="err" id="grantErr" role="alert"></p>
+    <div class="m-acts">
+      <button class="btn btn-ghost btn-s" id="grantClose" type="button">Schließen</button>
+      <button class="btn btn-ghost btn-s hidden" id="grantCopy" type="button">Schlüssel kopieren</button>
+      <button class="btn btn-ghost btn-s hidden" id="grantMore" type="button">Noch einen</button>
+      <button class="btn btn-go btn-s" id="grantBtn" type="button">Schlüssel erstellen</button>
     </div>
-    <p class="err" id="accErr" role="alert"></p>
-    <div class="list" id="accounts"></div>
-
-    <h2 id="nHead">E-Mail-Verteiler</h2>
-    <p class="small" style="margin-top:-6px" id="nIntro">Wer beim Konto-Erstellen oder im Launcher „Neuigkeiten per E-Mail“ einschaltet, bekommt erst eine Bestätigungs-Mail. Nur bestätigte Adressen erhalten deine Rundmails – jede mit einem Abbestell-Link.</p>
-    <div class="stats">
-      <div class="stat"><b id="nActive">0</b><span>bestätigt (bekommen Mails)</span></div>
-      <div class="stat"><b id="nWait">0</b><span>warten auf Bestätigung</span></div>
-      <div class="stat"><b id="nAcc">0</b><span>Konten insgesamt</span></div>
-      <div class="stat"><b id="nReady" style="font-size:18px;padding:7px 0 6px">…</b><span id="nSender">Versand</span></div>
-    </div>
-    <div class="box">
-      <h2 style="margin-top:0">Rundmail schreiben</h2>
-      <div class="row" style="margin-bottom:10px" id="nNotesRow">
-        <select id="nApp" class="btn btn-ghost btn-s"><option value="kehrwerk">WinClean</option><option value="pebble">Pebble</option><option value="idock">iDock</option><option value="launcher">Newcall Launcher</option></select>
-        <button class="btn btn-ghost btn-s" id="nNotes">Neueste Patch Notes übernehmen</button>
-      </div>
-      <div class="grid2" style="grid-template-columns:minmax(0,1fr)"><div><label class="small" for="nSubject">Betreff</label><input id="nSubject" maxlength="150" placeholder="z. B. WinClean 1.4.0 ist da"></div></div>
-      <label class="small" for="nText">Text – „Hallo Name,“ und der Abbestell-Link kommen automatisch dazu. Zeilen mit „- “ werden Aufzählungen, „# “ Überschriften, **so** fett.</label>
-      <textarea id="nText" placeholder="Was ist neu? …"></textarea>
-      <div class="row">
-        <input id="nTestTo" type="email" placeholder="Testmail an … (deine Adresse)">
-        <button class="btn btn-ghost btn-s" id="nTest">Testmail senden</button>
-        <button class="btn btn-go" id="nSend">An alle senden</button>
-      </div>
-      <p class="err" id="newsErr" role="alert"></p>
-      <p class="ok" id="newsOk"></p>
-    </div>
-    <div class="tools"><b style="color:var(--fg)">Empfänger</b><button class="btn btn-ghost btn-s" id="nreload">Neu laden</button></div>
-    <div class="list" id="newsList"></div>
-
-    <div data-view="apps">
-    <h2>Kunden</h2>
-    <div class="tools">
-      <input type="search" id="q" placeholder="Suchen: Name, E-Mail, Schlüssel …">
-      <select id="filter" class="btn btn-ghost btn-s">
-        <option value="all">Alle</option><option value="active">Aktiv</option><option value="abo">Zahlende</option>
-        <option value="frei">Kostenlos</option><option value="off">Beendet/gesperrt</option>
-      </select>
-      <select id="prod" class="btn btn-ghost btn-s">
-        <option value="all">Alle Programme</option><option value="kehrwerk">WinClean</option><option value="pebble">Pebble</option><option value="idock">iDock</option>
-      </select>
-      <button class="btn btn-ghost btn-s" id="reload">Neu laden</button>
-    </div>
-    <p class="err" id="listErr" role="alert"></p>
-    <div class="list" id="list"></div>
-    </div><!-- Ende Apps (Kunden) -->
-    <div class="box" style="margin-top:28px">
-      <h2 style="margin-top:0">Admin-Passwort ändern</h2>
-      <p>Danach gilt nur noch das neue Passwort – auch auf anderen Geräten musst du dich neu anmelden. Mindestens 12 Zeichen.</p>
-      <div class="grid2">
-        <div><label class="small" for="pw1">Neues Passwort</label><input id="pw1" type="password" autocomplete="new-password"></div>
-        <div><label class="small" for="pw2">Neues Passwort wiederholen</label><input id="pw2" type="password" autocomplete="new-password"></div>
-      </div>
-      <button class="btn btn-go" id="pwBtn">Passwort ändern</button>
-      <p class="err" id="pwErr" role="alert"></p>
-      <p class="ok" id="pwOk"></p>
-    </div>
-
-    <p class="stand">Zahlungen, Rückerstattungen und Rechnungen verwaltest du im Stripe-Dashboard. Konten und das Admin-Passwort gelten für beide Bereiche.</p>
   </div>
-</main>
+</div>
+
+<!-- Suche über alles -->
+<div class="palette" id="palette" role="dialog" aria-modal="true" aria-label="Suchen">
+  <div class="p-card">
+    <input id="pInput" type="search" placeholder="Name, E-Mail, Schlüssel, Geräte-Code, Projekt oder Bereich …" autocomplete="off" spellcheck="false">
+    <div class="p-res" id="pRes"></div>
+  </div>
+</div>
+
+<div id="toasts" aria-live="polite"></div>
 
 <script>
 (function () {
   var API = location.hostname === '127.0.0.1' ? 'http://127.0.0.1:8787/' : 'https://snafgyzhegwkxmunmxje.supabase.co/functions/v1/kehrwerk-license';  // lokal: server/dev_server.mjs
   var token = '';
   try { token = sessionStorage.getItem('kwAdmin') || ''; } catch (e) {}
-  var rows = [];
   var $ = function (id) { return document.getElementById(id); };
+  var NAMES = { kehrwerk: 'WinClean', pebble: 'Pebble', idock: 'iDock' };
+  var DAY = 86400;
+
+  // Alle Daten liegen nur im Speicher dieses Tabs (nichts im Browser gespeichert).
+  var D = { test: false, rows: null, installs: null, accounts: null, music: null, news: { apps: null, musik: null }, sec: null };
+  var ERR = {};
 
   function call(payload) {
     payload.token = token;
@@ -351,42 +628,235 @@ main.wide.web-wide { max-width: 1680px; }
       .catch(function (e) { throw new Error(e.message === 'Failed to fetch' ? 'Keine Verbindung zum Lizenz-Dienst.' : e.message); });
   }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function now() { return Math.floor(Date.now() / 1000); }
   function date(ts) { return ts ? new Date(ts * 1000).toLocaleDateString('de-DE') : ''; }
-
-  // ---------- Bereich: Newcall Apps oder Musik (gemerkt in diesem Browser, auch über #musik / #apps)
-  var view = 'apps';
-  try { view = localStorage.getItem('ncAdminView') || 'apps'; } catch (e) {}
-  if (location.hash === '#musik' || location.hash === '#apps' || location.hash === '#web') view = location.hash.slice(1);
-  var loaded = {};
-  function setView(v) {
-    view = v === 'musik' || v === 'web' ? v : 'apps';
-    try { localStorage.setItem('ncAdminView', view); } catch (e) {}
-    history.replaceState(null, '', '#' + view);
-    document.querySelectorAll('.switch button').forEach(function (b) { b.classList.toggle('on', b.dataset.view === view); });
-    document.querySelectorAll('div[data-view]').forEach(function (d) { d.classList.toggle('hidden', d.dataset.view !== view); });
-    document.title = ({ musik: 'Newcall Musik', web: 'Websites', apps: 'Newcall Apps' })[view] + ' · Admin';
-    $('panel').classList.toggle('web-mode', view === 'web');
-    document.querySelector('main').classList.toggle('web-wide', view === 'web');
-    $('nHead').textContent = view === 'musik' ? 'E-Mail-Verteiler – Musik' : 'E-Mail-Verteiler – Apps';
-    $('nIntro').textContent = view === 'musik'
-      ? 'Wer auf der Musikseite den Newsletter abonniert, bekommt erst eine Bestätigungs-Mail. Nur bestätigte Adressen erhalten deine Rundmails zu neuer Musik – jede mit einem Abbestell-Link. Getrennt vom Apps-Verteiler.'
-      : 'Wer beim Konto-Erstellen oder im Launcher „Neuigkeiten per E-Mail“ einschaltet, bekommt erst eine Bestätigungs-Mail. Nur bestätigte Adressen erhalten deine Rundmails – jede mit einem Abbestell-Link.';
-    $('nNotesRow').classList.toggle('hidden', view === 'musik');
-    $('nSubject').placeholder = view === 'musik' ? 'z. B. Neuer Song: Pille ist draußen' : 'z. B. WinClean 1.4.0 ist da';
-    $('nText').placeholder = view === 'musik' ? 'Was gibt es Neues? Link zum Song …' : 'Was ist neu? …';
-    if ($('panel').classList.contains('hidden')) return;
-    if (view === 'apps' && !loaded.apps) { loaded.apps = true; load(); loadInstalls(); }
-    if (view === 'musik' && !loaded.musik) { loaded.musik = true; loadMusic(); }
-    if (view === 'web') { if (!loaded.web) { loaded.web = true; webInit(); } return; }
-    loadNews();
+  function dateTime(ts) { return ts ? new Date(ts * 1000).toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'short' }) : ''; }
+  function ago(ts) {
+    if (!ts) return '';
+    var d = Math.floor((now() - ts) / DAY);
+    return d <= 0 ? 'heute' : d === 1 ? 'gestern' : 'vor ' + d + ' Tagen';
   }
-  document.querySelectorAll('.switch button').forEach(function (b) { b.addEventListener('click', function () { setView(b.dataset.view); }); });
+  function eur(n) { return Number(n || 0).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
+  function tag(cls, t) { return '<span class="tag ' + cls + '">' + esc(t) + '</span>'; }
+  function lower(s) { return String(s || '').toLowerCase(); }
 
+  // ---------- Symbole (einfache Linien, färben sich mit dem Text)
+  var IC = {
+    home: '<path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>',
+    key: '<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/>',
+    device: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+    music: '<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+    price: '<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
+    mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+    edit: '<path d="M4 20h4L20 8l-4-4L4 16zM14 6l4 4"/>',
+    shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',
+    lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+    search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
+    card: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/>',
+    out: '<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/>',
+    menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+    x: '<path d="M6 6l12 12M18 6L6 18"/>',
+    gift: '<rect x="3" y="9" width="18" height="12" rx="2"/><path d="M12 9v12M3 13h18M12 9c-2-4-6-4-6-1s4 1 6 1c2 0 6 2 6-1s-4-3-6 1"/>'
+  };
+  function icon(n) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (IC[n] || '') + '</svg>'; }
+  document.querySelectorAll('i[data-ic]').forEach(function (i) { i.outerHTML = icon(i.dataset.ic); });
+
+  // ---------- Meldungen unten
+  function toast(msg, bad) {
+    var t = document.createElement('div'); t.className = 'toast' + (bad ? ' bad' : ''); t.textContent = msg;
+    $('toasts').appendChild(t);
+    setTimeout(function () { t.style.transition = 'opacity .3s'; t.style.opacity = '0'; setTimeout(function () { t.remove(); }, 320); }, bad ? 5200 : 3200);
+  }
+
+  // ---------- Dialog statt confirm/prompt: ask({ title, text, ok, danger, input, value, type, placeholder, match, frame, check })
+  var modalDone = null;
+  function ask(o) {
+    return new Promise(function (resolve) {
+      var inp = $('mInput');
+      $('mTitle').textContent = o.title || '';
+      $('mText').textContent = o.text || ''; $('mText').hidden = !o.text;
+      $('mExtra').innerHTML = '';
+      if (o.frame != null) { var f = document.createElement('iframe'); f.setAttribute('sandbox', ''); f.srcdoc = o.frame; $('mExtra').appendChild(f); }
+      $('mCard').classList.toggle('wide', o.frame != null);
+      $('mErr').textContent = '';
+      var hasInput = !!(o.input || o.match);
+      inp.classList.toggle('hidden', !hasInput);
+      inp.type = o.type || 'text'; inp.value = o.value || ''; inp.placeholder = o.placeholder || (o.match ? o.match : '');
+      inp.style.webkitTextSecurity = o.secret ? 'disc' : '';
+      $('mOk').textContent = o.ok || 'OK';
+      $('mOk').className = 'btn btn-s ' + (o.danger ? 'btn-red' : 'btn-go');
+      $('mOk').classList.toggle('hidden', !!o.only);
+      $('mCancel').textContent = o.only ? 'Schließen' : 'Abbrechen';
+      var check = function () { if (o.match) $('mOk').disabled = lower(inp.value.trim()) !== lower(o.match); };
+      inp.oninput = check; check();
+      $('modal').classList.add('on');
+      modalDone = function (ok) {
+        if (ok) {
+          var v = hasInput ? inp.value : true;
+          if (o.check) { var bad = o.check(v); if (bad) { $('mErr').textContent = bad; return; } }
+          $('modal').classList.remove('on'); modalDone = null; $('mOk').disabled = false; resolve(v);
+        } else { $('modal').classList.remove('on'); modalDone = null; $('mOk').disabled = false; resolve(null); }
+      };
+      setTimeout(function () { (hasInput ? inp : $('mOk')).focus(); }, 30);
+    });
+  }
+  $('mOk').addEventListener('click', function () { if (modalDone) modalDone(true); });
+  $('mCancel').addEventListener('click', function () { if (modalDone) modalDone(false); });
+  $('mInput').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !$('mOk').disabled && modalDone) modalDone(true); });
+  $('modal').addEventListener('mousedown', function (e) { if (e.target === $('modal') && modalDone) modalDone(false); });
+
+  // ---------- Herunterladen (CSV für Excel: Semikolon, UTF-8 mit BOM; JSON für Auskünfte)
+  function download(blob, name) {
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+  }
+  function stamp() { return new Date().toISOString().slice(0, 10); }
+  function csv(name, head, data) {
+    var cell = function (v) { v = v == null ? '' : String(v); if (/^[=+\-@\t\r]/.test(v)) v = "'" + v; return '"' + v.replace(/"/g, '""') + '"'; };
+    var text = [head].concat(data).map(function (r) { return r.map(cell).join(';'); }).join('\r\n');
+    download(new Blob(['﻿' + text], { type: 'text/csv;charset=utf-8' }), name + '-' + stamp() + '.csv');
+    toast(data.length + ' Zeilen heruntergeladen.');
+  }
+  function copy(text, label) {
+    if (!navigator.clipboard) return toast('Kopieren geht in diesem Browser nicht.', true);
+    navigator.clipboard.writeText(text).then(function () { toast((label || 'Text') + ' kopiert.'); }, function () { toast('Kopieren hat nicht geklappt.', true); });
+  }
+
+  // ---------- Filter-Chips
+  function chips(id, onChange) {
+    var box = $(id);
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      box.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); });
+      onChange(b.dataset.v);
+    });
+  }
+  function chipVal(id) { var b = $(id).querySelector('button.on'); return b ? b.dataset.v : 'all'; }
+  function setChip(id, v) { $(id).querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x.dataset.v === v); }); }
+
+  // ---------- Listen-Einträge
+  function item(i, title, meta, side) {
+    return '<button type="button" class="item" data-i="' + i + '"><span class="it-main"><span class="it-title">' + title + '</span><span class="it-meta">' + meta + '</span></span>' +
+      '<span class="it-side">' + (side || '') + '</span><span class="chev">›</span></button>';
+  }
+  function bindItems(box, list, open) {
+    box.querySelectorAll('.item, .mini button[data-i]').forEach(function (b) { b.addEventListener('click', function () { open(list[+b.dataset.i]); }); });
+  }
+  function empty(text) { return '<div class="empty">' + esc(text) + '</div>'; }
+  function loading(key, text) { return ERR[key] ? '<div class="empty" style="color:var(--red)">' + esc(ERR[key]) + '</div>' : empty(text || 'Lädt …'); }
+
+  // =====================================================================
+  // Seiten (Navigation links, Adresse #seite)
+  // =====================================================================
+  var PAGES = { home: 'Übersicht', keys: 'Abos & Schlüssel', devices: 'Geräte', accounts: 'Konten', orders: 'Musik-Aufträge', services: 'Leistungen & Preise',
+    mail: 'Rundmail & Verteiler', web: 'Websites bearbeiten', security: 'Sicherheit', settings: 'Admin-Passwort' };
+  var OLD = { apps: 'home', musik: 'orders' };
+  var view = 'home';                      // der Website-Editor fragt das ab (Strg+Z nur dort)
+  var loaded = {};
+  function startPage() {
+    var h = location.hash.slice(1);
+    if (OLD[h]) h = OLD[h];
+    if (!PAGES[h]) { try { h = localStorage.getItem('ncAdminPage') || 'home'; } catch (e) { h = 'home'; } }
+    return PAGES[h] ? h : 'home';
+  }
+  function go(p) {
+    if (!PAGES[p]) p = 'home';
+    if (view === 'web' && p !== 'web') { try { if (dirty() && !confirm('Auf der Website gibt es ungespeicherte Änderungen. Trotzdem wechseln?')) return; } catch (e) {} }
+    view = p;
+    try { localStorage.setItem('ncAdminPage', p); } catch (e) {}
+    if (location.hash !== '#' + p) history.replaceState(null, '', '#' + p);
+    document.querySelectorAll('section.page').forEach(function (s) { s.classList.toggle('hidden', s.dataset.page !== p); });
+    document.querySelectorAll('#nav a').forEach(function (a) { a.classList.toggle('on', a.dataset.page === p); });
+    $('topTitle').textContent = PAGES[p];
+    document.title = PAGES[p] + ' · Admin';
+    document.body.classList.toggle('is-web', p === 'web');
+    document.body.classList.remove('menu'); $('scrim').classList.remove('on');
+    closeDrawer();
+    window.scrollTo(0, 0);
+    if (p === 'web' && !loaded.web) { loaded.web = true; webInit(); }
+    if (p === 'mail' && !D.news[nList]) loadNews(nList);
+    if (p === 'security') loadSecurity();
+    renderPage();
+  }
+  document.querySelectorAll('#nav a').forEach(function (a) { a.href = '#' + a.dataset.page; a.addEventListener('click', function (e) { e.preventDefault(); go(a.dataset.page); }); });
+  document.addEventListener('click', function (e) { var a = e.target.closest('[data-go]'); if (a) { e.preventDefault(); go(a.dataset.go); } });
+  window.addEventListener('hashchange', function () { var h = location.hash.slice(1); if (OLD[h]) h = OLD[h]; if (PAGES[h] && h !== view) go(h); });
+  $('menuBtn').addEventListener('click', function () { document.body.classList.add('menu'); $('scrim').classList.add('on'); });
+  $('scrim').addEventListener('click', function () { document.body.classList.remove('menu'); $('scrim').classList.remove('on'); });
+
+  function renderPage() {
+    renderCounts();
+    if (view === 'home') renderHome();
+    if (view === 'keys') renderKeys();
+    if (view === 'devices') renderInstalls();
+    if (view === 'accounts') renderAccounts();
+    if (view === 'orders') renderOrders();
+    if (view === 'services') renderServices();
+    if (view === 'mail') renderMail();
+    if (view === 'security') renderSecurity();
+  }
+  function setCnt(id, n, cls) { var b = $(id); b.textContent = n ? n : ''; b.className = 'cnt' + (n && cls ? ' ' + cls : ''); }
+  function renderCounts() {
+    setCnt('cKeys', D.rows ? D.rows.filter(on).length : 0);
+    setCnt('cDevices', D.installs ? D.installs.length : 0);
+    setCnt('cAccounts', D.accounts ? D.accounts.length : 0);
+    var nNew = D.music ? (D.music.orders || []).filter(function (x) { return x.state === 'neu' && !x.refunded; }).length : 0;
+    setCnt('cOrders', nNew, 'hot');
+    setCnt('cMail', D.news.apps ? D.news.apps.active : 0);
+    var hot = (D.sec || []).filter(function (s) { return s.n >= s.max * 0.8; }).length;
+    setCnt('cSec', hot ? '!' : '', 'alarm');
+  }
+
+  // =====================================================================
+  // Laden
+  // =====================================================================
+  function setMode(test) {
+    D.test = !!test;
+    var m = $('mode'); m.className = 'mode ' + (test ? 'test' : 'live'); m.textContent = test ? 'TEST' : 'LIVE';
+    $('stripeLink').href = 'https://dashboard.stripe.com/' + (test ? 'test/' : '');
+  }
+  function loader(key, action, take) {
+    return function (quiet) {
+      delete ERR[key];
+      return call(action()).then(function (j) { take(j); renderPage(); refreshDrawer(); })
+        .catch(function (e) { ERR[key] = e.message; if (!quiet) toast(e.message, true); renderPage(); });
+    };
+  }
+  var loadKeys = loader('keys', function () { return { action: 'admin_list' }; }, function (j) { D.rows = j.rows || []; setMode(j.test); });
+  var loadInstalls = loader('devices', function () { return { action: 'admin_installs' }; }, function (j) { D.installs = j.rows || []; });
+  var loadAccounts = loader('accounts', function () { return { action: 'admin_accounts' }; }, function (j) { D.accounts = j.rows || []; });
+  var loadMusic = loader('music', function () { return { action: 'admin_music' }; }, function (j) { D.music = j; if (view !== 'services') svcDirty = false; });
+  var loadSecurity = loader('sec', function () { return { action: 'admin_security' }; }, function (j) { D.sec = j.rows || []; });
+  function loadNews(l) {
+    delete ERR['news_' + l];
+    return call({ action: 'admin_news', list: l }).then(function (j) { D.news[l] = j; renderPage(); })
+      .catch(function (e) { ERR['news_' + l] = e.message; renderPage(); });
+  }
+  function loadAll() {
+    return Promise.all([loadKeys(true), loadInstalls(true), loadAccounts(true), loadMusic(true), loadNews('apps'), loadSecurity(true)]).then(function () {
+      var bad = Object.keys(ERR);
+      if (bad.length) toast('Nicht alles konnte geladen werden: ' + ERR[bad[0]], true);
+    });
+  }
+  $('reloadAll').addEventListener('click', function () { var b = this; b.disabled = true; loadAll().then(function () { b.disabled = false; toast('Alles neu geladen.'); }); });
+  $('reload').addEventListener('click', function () { loadKeys(); });
+  $('ireload').addEventListener('click', function () { loadInstalls(); });
+  $('areload').addEventListener('click', function () { loadAccounts(); });
+  $('mreload').addEventListener('click', function () { loadMusic(); });
+  $('secReload').addEventListener('click', function () { loadSecurity(); });
+
+  // =====================================================================
+  // Anmelden / Abmelden
+  // =====================================================================
   function showPanel(test) {
-    $('login').classList.add('hidden'); $('panel').classList.remove('hidden'); $('logout').hidden = false;
-    var m = $('mode'); m.hidden = false; m.className = 'mode ' + (test ? 'test' : 'live'); m.textContent = test ? 'TESTMODUS' : 'LIVE';
-    loadAccounts();
-    setView(view);
+    $('login').classList.add('hidden'); $('app').classList.remove('hidden');
+    setMode(test);
+    var h = new Date().getHours();
+    $('hello').textContent = h < 11 ? 'Guten Morgen' : h < 18 ? 'Hallo' : 'Guten Abend';
+    go(startPage());
+    loadAll();
   }
   function login() {
     token = $('token').value.trim();
@@ -399,125 +869,586 @@ main.wide.web-wide { max-width: 1680px; }
   }
   $('loginBtn').addEventListener('click', login);
   $('token').addEventListener('keydown', function (e) { if (e.key === 'Enter') login(); });
-  $('logout').addEventListener('click', function (e) {
-    e.preventDefault(); token = ''; try { sessionStorage.removeItem('kwAdmin'); } catch (x) {} location.reload();
+  $('logout').addEventListener('click', function () {
+    try { if (dirty() && !confirm('Auf der Website gibt es ungespeicherte Änderungen. Trotzdem abmelden?')) return; } catch (e) {}
+    token = ''; try { sessionStorage.removeItem('kwAdmin'); } catch (x) {}
+    location.hash = ''; location.reload();
   });
 
-  function load() {
-    $('listErr').textContent = ''; $('reload').disabled = true;
-    call({ action: 'admin_list' }).then(function (j) {
-      rows = j.rows || [];
-      var m = $('mode'); m.className = 'mode ' + (j.test ? 'test' : 'live'); m.textContent = j.test ? 'TESTMODUS' : 'LIVE';
-      render();
-    }).catch(function (e) { $('listErr').textContent = e.message; }).then(function () { $('reload').disabled = false; });
+  // =====================================================================
+  // Detail-Fenster rechts
+  // =====================================================================
+  var drawerCur = null;   // { open: fn, find: fn } – nach dem Neuladen wird es mit frischen Daten neu gezeichnet
+  function fields(list) {
+    return '<dl class="fields">' + list.filter(function (f) { return f && f[1] !== '' && f[1] != null; }).map(function (f) {
+      return '<dt>' + esc(f[0]) + '</dt><dd' + (f[2] ? ' class="mono"' : '') + '>' + f[1] + '</dd>';
+    }).join('') + '</dl>';
   }
-  $('reload').addEventListener('click', load);
+  // acts: [{ label, cls, fn(btn) , href }]
+  function drawer(o) {
+    $('dTitle').innerHTML = o.title;
+    $('dSub').innerHTML = o.sub || '';
+    var body = $('dBody'); body.innerHTML = '';
+    (o.blocks || []).forEach(function (bl) {
+      if (!bl) return;
+      if (typeof bl === 'string') { body.insertAdjacentHTML('beforeend', bl); return; }
+      if (bl.h) body.insertAdjacentHTML('beforeend', '<h3>' + esc(bl.h) + '</h3>');
+      if (bl.html) body.insertAdjacentHTML('beforeend', bl.html);
+      if (bl.node) body.appendChild(bl.node);
+      if (bl.acts) {
+        var row = document.createElement('div'); row.className = 'd-acts';
+        bl.acts.filter(Boolean).forEach(function (a) {
+          var b = document.createElement(a.href ? 'a' : 'button');
+          b.className = 'btn btn-s ' + (a.cls || 'btn-ghost'); b.textContent = a.label;
+          if (a.href) { b.href = a.href; if (!/^mailto:/.test(a.href)) { b.target = '_blank'; b.rel = 'noopener'; } }
+          else { b.type = 'button'; b.addEventListener('click', function () { a.fn(b); }); }
+          row.appendChild(b);
+        });
+        body.appendChild(row);
+      }
+      if (bl.hint) body.insertAdjacentHTML('beforeend', '<p class="d-hint">' + bl.hint + '</p>');
+      if (bl.bind) bl.bind(body);
+    });
+    $('drawer').classList.add('open'); $('drawer').setAttribute('aria-hidden', 'false'); $('dScrim').classList.add('on');
+  }
+  function closeDrawer() { drawerCur = null; $('drawer').classList.remove('open'); $('drawer').setAttribute('aria-hidden', 'true'); $('dScrim').classList.remove('on'); }
+  function refreshDrawer() {
+    if (!drawerCur) return;
+    var x = drawerCur.find();
+    if (x) drawerCur.open(x, true); else closeDrawer();
+  }
+  $('dClose').addEventListener('click', closeDrawer);
+  $('dScrim').addEventListener('click', closeDrawer);
+  // Aktion ausführen: Knopf sperren, Fehler als Meldung, danach neu laden
+  function run(btn, payload, okMsg, after) {
+    if (btn) btn.disabled = true;
+    return call(payload).then(function (j) { if (okMsg) toast(okMsg); if (after) return after(j); })
+      .catch(function (e) { toast(e.message, true); }).then(function () { if (btn) btn.disabled = false; });
+  }
+  function miniList(list, label, open) {
+    if (!list.length) return null;
+    var box = document.createElement('div'); box.className = 'mini';
+    box.innerHTML = list.map(function (x, i) { var l = label(x); return '<button type="button" data-i="' + i + '"><span>' + l[0] + '</span><small>' + l[1] + '</small></button>'; }).join('');
+    box.querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { open(list[+b.dataset.i]); }); });
+    return box;
+  }
 
-  // ---------- Installationen (Newcall Launcher)
-  var installs = [];
-  function loadInstalls() {
-    $('instErr').textContent = ''; $('ireload').disabled = true;
-    call({ action: 'admin_installs' }).then(function (j) { installs = j.rows || []; renderInstalls(); })
-      .catch(function (e) { $('instErr').textContent = e.message; }).then(function () { $('ireload').disabled = false; });
+  // =====================================================================
+  // ÜBERSICHT
+  // =====================================================================
+  function on(r) { return r.active && !r.blocked; }
+  function kpi(value, label, sub, page) {
+    return '<' + (page ? 'button type="button" data-go="' + page + '"' : 'div') + ' class="kpi"><b>' + value + '</b><span>' + esc(label) + '</span>' + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</' + (page ? 'button' : 'div') + '>';
   }
-  function ago(ts) {
-    if (!ts) return '';
-    var d = Math.floor((Date.now() / 1000 - ts) / 86400);
-    return d <= 0 ? 'heute' : d === 1 ? 'gestern' : 'vor ' + d + ' Tagen';
+  function dash(v) { return v == null ? '–' : v; }
+  function renderHome() {
+    var rows = D.rows, inst = D.installs, acc = D.accounts, mus = D.music, nws = D.news.apps;
+    var paid = rows ? rows.filter(function (r) { return r.type === 'abo' && on(r); }).length : null;
+    var free = rows ? rows.filter(function (r) { return r.type === 'frei' && on(r); }).length : null;
+    var week = inst ? inst.filter(function (r) { return r.last_seen && now() - r.last_seen < 7 * DAY; }).length : null;
+    var accNew = acc ? acc.filter(function (a) { return a.created && now() - a.created < 30 * DAY; }).length : null;
+    var orders = mus ? mus.orders || [] : null;
+    var open = orders ? orders.filter(function (x) { return x.state !== 'fertig' && !x.refunded; }).length : null;
+    var sum = orders ? orders.filter(function (x) { return !x.refunded; }).reduce(function (s, x) { return s + x.amount; }, 0) : null;
+    $('kpis').innerHTML =
+      kpi(dash(paid), 'zahlende Abos aktiv', paid == null ? '' : (paid * 3.99).toFixed(2).replace('.', ',') + ' € pro Monat (brutto)', 'keys') +
+      kpi(dash(free), 'kostenlose Schlüssel aktiv', '', 'keys') +
+      kpi(dash(inst && inst.length), 'Geräte mit Launcher', week == null ? '' : week + ' in den letzten 7 Tagen aktiv', 'devices') +
+      kpi(dash(acc && acc.length), 'Konten', accNew == null ? '' : accNew + ' neu in den letzten 30 Tagen', 'accounts') +
+      kpi(dash(open), 'offene Musik-Aufträge', sum == null ? '' : eur(sum) + ' Umsatz gesamt', 'orders') +
+      kpi(dash(nws && nws.active), 'bestätigte Newsletter-Leser (Apps)', D.news.musik ? D.news.musik.active + ' beim Musik-Verteiler' : '', 'mail');
+
+    // Zu erledigen
+    var todo = [];
+    if (orders) { var n = orders.filter(function (x) { return x.state === 'neu' && !x.refunded; }).length; if (n) todo.push(['warn', n === 1 ? '1 neuer Musik-Auftrag' : n + ' neue Musik-Aufträge', 'ansehen', function () { go('orders'); setChip('mfilter', 'neu'); renderOrders(); }]); }
+    if (rows) {
+      var due = rows.filter(function (r) { return r.status === 'past_due' && !r.blocked; });
+      if (due.length) todo.push(['bad', 'Zahlung offen bei ' + due.length + (due.length === 1 ? ' Abo' : ' Abos'), 'prüfen', function () { go('keys'); $('q').value = ''; setChip('filter', 'abo'); renderKeys(); }]);
+      var canc = rows.filter(function (r) { return r.cancelled && on(r); });
+      if (canc.length) todo.push(['info', canc.length + (canc.length === 1 ? ' Abo gekündigt' : ' Abos gekündigt') + ' (läuft noch aus)', 'ansehen', function () { go('keys'); setChip('filter', 'abo'); renderKeys(); }]);
+      var soon = rows.filter(function (r) { return r.type === 'frei' && on(r) && r.until && r.until - now() < 14 * DAY; });
+      if (soon.length) todo.push(['info', soon.length + ' Gratis-Schlüssel ' + (soon.length === 1 ? 'läuft' : 'laufen') + ' in weniger als 14 Tagen ab', 'verlängern', function () { go('keys'); setChip('filter', 'frei'); renderKeys(); }]);
+    }
+    if (acc) { var lk = acc.filter(function (a) { return a.locked; }).length; if (lk) todo.push(['warn', lk + (lk === 1 ? ' Konto ist' : ' Konten sind') + ' nach falschen Passwörtern kurz gesperrt', 'ansehen', function () { go('accounts'); setChip('afilter', 'blocked'); renderAccounts(); }]); }
+    if (nws && !nws.ready) todo.push(['warn', 'E-Mail-Versand ist nicht eingerichtet', 'mail-zugang-einrichten.bat', function () { go('mail'); }]);
+    if (D.sec) { var hot = D.sec.filter(function (s) { return s.n >= s.max * 0.8; }); if (hot.length) todo.push(['bad', 'Schutzgrenze fast erreicht: ' + hot[0].label, 'ansehen', function () { go('security'); }]); }
+    var errs = Object.keys(ERR);
+    if (errs.length) todo.push(['bad', 'Fehler beim Laden: ' + ERR[errs[0]], 'neu laden', function () { loadAll(); }]);
+    var box = $('todo');
+    var ready = rows && inst && acc && mus;
+    box.innerHTML = todo.length ? todo.map(function (t, i) { return '<button type="button" class="todo" data-i="' + i + '"><i class="dot ' + t[0] + '"></i><span>' + esc(t[1]) + '</span><em>' + esc(t[2]) + ' ›</em></button>'; }).join('')
+      : (ready || errs.length ? '<div class="todo" style="cursor:default"><i class="dot ok"></i><span>Alles erledigt – gerade gibt es nichts zu tun.</span></div>' : empty('Lädt …'));
+    box.querySelectorAll('button.todo').forEach(function (b) { b.addEventListener('click', function () { todo[+b.dataset.i][3](); }); });
+
+    // Zuletzt
+    var ra = acc ? acc.slice().sort(function (a, b) { return (b.last_login || b.created || 0) - (a.last_login || a.created || 0); }).slice(0, 6) : null;
+    $('recentAcc').innerHTML = !ra ? loading('accounts') : ra.length ? ra.map(function (a, i) { return '<button type="button" data-i="' + i + '"><span>' + esc(a.name || a.email) + '</span><small>' + (a.last_login ? ago(a.last_login) : 'neu ' + ago(a.created)) + '</small></button>'; }).join('') : empty('Noch keine Konten.');
+    if (ra) bindItems($('recentAcc'), ra, openAccount);
+    var rd = inst ? inst.slice(0, 6) : null;
+    $('recentDev').innerHTML = !rd ? loading('devices') : rd.length ? rd.map(function (r, i) { return '<button type="button" data-i="' + i + '"><span>' + esc(r.name || 'Gerät ' + r.code) + '</span><small>' + ago(r.last_seen) + '</small></button>'; }).join('') : empty('Noch keine Geräte.');
+    if (rd) bindItems($('recentDev'), rd, openDevice);
   }
+  document.querySelectorAll('[data-q]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var q = b.dataset.q;
+      if (q === 'grant') return openGrant();
+      if (q === 'search') return openPalette();
+      if (q === 'orders') { go('orders'); setChip('mfilter', 'offen'); return renderOrders(); }
+      go(q);
+    });
+  });
+
+  // =====================================================================
+  // ABOS & SCHLÜSSEL
+  // =====================================================================
+  function status(r) {
+    if (r.blocked) return tag('bad', 'gesperrt');
+    if (r.type === 'frei') return r.active ? tag('free', 'kostenlos') : tag('off', 'abgelaufen');
+    if (!r.active) return tag('off', r.status === 'canceled' ? 'beendet' : r.status);
+    if (r.cancelled) return tag('warn', 'gekündigt');
+    return r.status === 'past_due' ? tag('warn', 'Zahlung offen') : tag('ok', 'aktiv');
+  }
+  function keyMeta(r) {
+    return [r.name && r.email ? esc(r.email) : '', r.type === 'abo' ? 'Abo 3,99 €' : 'Kostenlos' + (r.note ? ' · ' + esc(r.note) : ''), 'seit ' + date(r.created),
+      r.until ? (r.type === 'frei' ? 'bis ' : (r.cancelled ? 'endet ' : 'nächste Zahlung ')) + date(r.until) : (r.type === 'frei' ? 'unbegrenzt' : ''),
+      (r.devices || []).length + '/3 PCs'].filter(Boolean).join(' · ');
+  }
+  function keysShown() {
+    var q = lower($('q').value.trim()), f = chipVal('filter'), pf = $('prod').value;
+    return (D.rows || []).filter(function (r) {
+      var o = on(r);
+      if (pf !== 'all' && (r.product || 'kehrwerk') !== pf) return false;
+      if (f === 'active' && !o) return false;
+      if (f === 'abo' && r.type !== 'abo') return false;
+      if (f === 'frei' && r.type !== 'frei') return false;
+      if (f === 'off' && o) return false;
+      return !q || lower([r.name, r.email, r.key, r.note, r.id].join(' ')).indexOf(q) >= 0;
+    });
+  }
+  function renderKeys() {
+    var rows = D.rows;
+    if (!rows) { $('keyKpis').innerHTML = ''; $('keysCount').textContent = ''; $('list').innerHTML = loading('keys'); return; }
+    var paid = rows.filter(function (r) { return r.type === 'abo' && on(r); }).length;
+    $('keyKpis').innerHTML = kpi(paid, 'zahlende Abos aktiv') + kpi(rows.filter(function (r) { return r.type === 'frei' && on(r); }).length, 'kostenlos freigeschaltet') +
+      kpi((paid * 3.99).toFixed(2).replace('.', ',') + ' €', 'pro Monat (brutto)') + kpi(rows.filter(function (r) { return !on(r); }).length, 'beendet oder gesperrt');
+    var shown = keysShown();
+    $('keysCount').textContent = shown.length === rows.length ? rows.length + ' Einträge' : shown.length + ' von ' + rows.length + ' Einträgen';
+    $('list').innerHTML = shown.length ? shown.map(function (r, i) {
+      return item(i, esc(r.name || r.email || '(ohne Namen)') + ' ' + status(r), keyMeta(r), '<span class="pill">' + NAMES[r.product || 'kehrwerk'] + '</span>');
+    }).join('') : empty(rows.length ? 'Keine Treffer.' : 'Noch keine Abos oder Schlüssel.');
+    bindItems($('list'), shown, openKey);
+  }
+  $('q').addEventListener('input', renderKeys);
+  $('prod').addEventListener('change', renderKeys);
+  chips('filter', renderKeys);
+  $('keysCsv').addEventListener('click', function () {
+    csv('abos-schluessel', ['Programm', 'Art', 'Status', 'Name', 'E-Mail', 'Notiz', 'Seit', 'Bis / nächste Zahlung', 'PCs', 'Schlüssel', 'Nummer'], keysShown().map(function (r) {
+      return [NAMES[r.product || 'kehrwerk'], r.type === 'abo' ? 'Abo' : 'Kostenlos', status(r).replace(/<[^>]+>/g, ''), r.name, r.email, r.note, date(r.created), date(r.until), (r.devices || []).length, r.key, r.id];
+    }));
+  });
+  function stripeUrl(id) { return 'https://dashboard.stripe.com/' + (D.test ? 'test/' : '') + (/^sub_/.test(id) ? 'subscriptions/' : /^cus_/.test(id) ? 'customers/' : 'payments/') + encodeURIComponent(id); }
+  function accountByEmail(email) { email = lower(email); return email && D.accounts ? D.accounts.filter(function (a) { return lower(a.email) === email; })[0] : null; }
+  function openKey(r) {
+    drawerCur = { open: openKey, find: function () { return (D.rows || []).filter(function (x) { return x.id === r.id && x.product === r.product; })[0]; } };
+    var who = r.name || r.email || r.id;
+    var acc = accountByEmail(r.email);
+    var set = function (btn, p, msg) { p.action = 'admin_set'; p.id = r.id; return run(btn, p, msg, function () { return loadKeys(true); }); };
+    var extend = function (days) {
+      return { label: days ? '+' + (days === 365 ? '1 Jahr' : days + ' Tage') : 'Unbegrenzt', fn: function (b) {
+        var base = Math.max(now(), r.until || 0);
+        set(b, { free: true, until: days ? base + days * DAY : 0 }, days ? 'Gültig bis ' + date(base + days * DAY) + '.' : 'Jetzt unbegrenzt gültig.');
+      } };
+    };
+    drawer({
+      title: esc(who) + ' ' + status(r),
+      sub: NAMES[r.product || 'kehrwerk'] + ' · ' + (r.type === 'abo' ? 'Abo 3,99 € im Monat' : 'kostenloser Schlüssel'),
+      blocks: [
+        fields([['Name', esc(r.name)], ['E-Mail', esc(r.email)], ['Notiz', esc(r.note)], ['Seit', date(r.created)],
+          [r.type === 'frei' ? 'Gültig bis' : (r.cancelled ? 'Endet am' : 'Nächste Zahlung'), r.until ? date(r.until) : (r.type === 'frei' ? 'unbegrenzt' : '')],
+          ['PCs', (r.devices || []).length + ' von 3'], ['Schlüssel', esc(r.key), true], ['Nummer (Stripe)', esc(r.id), true]]),
+        { h: 'Schlüssel', acts: [
+          { label: 'Schlüssel kopieren', cls: 'btn-go', fn: function () { copy(r.key, 'Schlüssel'); } },
+          (r.devices || []).length ? { label: 'PCs zurücksetzen', fn: function (b) {
+            ask({ title: 'PCs zurücksetzen?', text: 'Alle PCs von ' + who + ' werden abgemeldet. Der Schlüssel kann danach auf bis zu 3 PCs neu eingetragen werden.', ok: 'Zurücksetzen' })
+              .then(function (ok) { if (ok) set(b, { reset_devices: true }, 'PCs zurückgesetzt.'); });
+          } } : null
+        ] },
+        r.type === 'frei' ? { h: 'Gültigkeit', acts: [extend(30), extend(90), extend(365), r.until ? extend(0) : null,
+          r.active ? { label: 'Freischaltung beenden', cls: 'btn-red', fn: function (b) {
+            ask({ title: 'Freischaltung beenden?', text: 'Der kostenlose Schlüssel von ' + who + ' gilt dann nicht mehr.', ok: 'Beenden', danger: true })
+              .then(function (ok) { if (ok) set(b, { free: false }, 'Freischaltung beendet.'); });
+          } } : { label: 'Wieder freischalten', fn: function (b) { set(b, { free: true, until: 0 }, 'Wieder freigeschaltet (unbegrenzt).'); } }
+        ], hint: 'Verlängern zählt ab dem heutigen Tag oder ab dem bisherigen Ablaufdatum (das spätere von beiden).' } : null,
+        { h: 'Zugang', acts: [
+          r.blocked ? { label: 'Entsperren', fn: function (b) { set(b, { blocked: false }, 'Entsperrt.'); } }
+            : { label: 'Sperren', cls: 'btn-red', fn: function (b) {
+              ask({ title: 'Sperren?', text: who + ' wird bei der nächsten Prüfung im Programm gesperrt.' + (r.type === 'abo' ? ' Zahlungen laufen bei Stripe weiter – kündige dort, falls nötig.' : ''), ok: 'Sperren', danger: true })
+                .then(function (ok) { if (ok) set(b, { blocked: true }, 'Gesperrt.'); });
+            } },
+          { label: 'In Stripe öffnen ↗', href: stripeUrl(r.id) },
+          r.email ? { label: 'E-Mail schreiben', href: 'mailto:' + r.email } : null,
+          acc ? { label: 'Konto öffnen', fn: function () { openAccount(acc); } } : null
+        ] }
+      ]
+    });
+  }
+
+  // ---------- Schlüssel verschenken (Dialog)
+  function openGrant() {
+    $('grantFormBox').classList.remove('hidden'); $('newKey').classList.add('hidden');
+    $('grantBtn').classList.remove('hidden'); $('grantCopy').classList.add('hidden'); $('grantMore').classList.add('hidden');
+    $('grantErr').textContent = '';
+    $('grantModal').classList.add('on');
+    setTimeout(function () { $('gName').focus(); }, 30);
+  }
+  function closeGrant() { $('grantModal').classList.remove('on'); }
+  $('grantOpen').addEventListener('click', openGrant);
+  $('grantClose').addEventListener('click', closeGrant);
+  $('grantMore').addEventListener('click', openGrant);
+  $('grantCopy').addEventListener('click', function () { copy($('newKeyText').textContent, 'Schlüssel'); });
+  $('grantModal').addEventListener('mousedown', function (e) { if (e.target === $('grantModal')) closeGrant(); });
+  $('grantBtn').addEventListener('click', function () {
+    var days = +$('gUntil').value;
+    var p = { action: 'admin_grant', product: $('gProduct').value, name: $('gName').value, email: $('gMail').value, note: $('gNote').value,
+      until: days ? now() + days * DAY : 0 };
+    $('grantBtn').disabled = true; $('grantErr').textContent = '';
+    call(p).then(function (j) {
+      $('newKeyHint').textContent = 'Fertig. Schlüssel für ' + NAMES[j.product || 'kehrwerk'] + ' (im Programm unter „Abo“ eintragen):';
+      $('newKeyText').textContent = j.key;
+      $('grantFormBox').classList.add('hidden'); $('newKey').classList.remove('hidden');
+      $('grantBtn').classList.add('hidden'); $('grantCopy').classList.remove('hidden'); $('grantMore').classList.remove('hidden');
+      $('gName').value = $('gMail').value = $('gNote').value = '';
+      loadKeys(true);
+    }).catch(function (e) { $('grantErr').textContent = e.message; }).then(function () { $('grantBtn').disabled = false; });
+  });
+
+  // =====================================================================
+  // GERÄTE
+  // =====================================================================
+  function devShown() {
+    var q = lower($('iq').value.trim()), f = chipVal('ifilter');
+    return (D.installs || []).filter(function (r) {
+      if (f === 'week' && !(r.last_seen && now() - r.last_seen < 7 * DAY)) return false;
+      if (f === 'free' && !Object.keys(r.keys || {}).length) return false;
+      if (f === 'acc' && !r.account) return false;
+      return !q || lower([r.name, r.code, r.account].join(' ')).indexOf(q) >= 0;
+    });
+  }
+  function devApps(r) { return Object.keys(NAMES).filter(function (p) { return r.apps && r.apps[p]; }).map(function (p) { return NAMES[p] + ' ' + esc(r.apps[p]); }); }
   function renderInstalls() {
-    var q = $('iq').value.trim().toLowerCase();
-    var shown = installs.filter(function (r) { return !q || (r.name + ' ' + r.code).toLowerCase().indexOf(q) >= 0; });
+    var all = D.installs;
+    if (!all) { $('devCount').textContent = ''; $('installs').innerHTML = loading('devices'); return; }
+    var shown = devShown();
+    $('devCount').textContent = shown.length === all.length ? all.length + ' Geräte' : shown.length + ' von ' + all.length + ' Geräten';
     $('installs').innerHTML = shown.length ? shown.map(function (r, i) {
-      var apps = Object.keys(NAMES).filter(function (p) { return r.apps && r.apps[p]; }).map(function (p) { return NAMES[p] + ' ' + esc(r.apps[p]); });
       var keys = r.keys || {};
-      var tags = Object.keys(NAMES).filter(function (p) { return keys[p]; }).map(function (p) { return '<span class="tag free">' + NAMES[p] + ' gratis</span>'; }).join(' ');
-      var missing = Object.keys(NAMES).filter(function (p) { return !keys[p]; });
-      var meta = [apps.length ? apps.join(', ') : 'noch nichts installiert', 'zuerst ' + date(r.first_seen), 'zuletzt ' + ago(r.last_seen),
-        r.launcher ? 'Launcher ' + esc(r.launcher) : ''].filter(Boolean).join(' · ');
-      var acts = missing.length ? '<button class="btn btn-go btn-s" data-iact="all" data-i="' + i + '">' + (missing.length === 3 ? 'Alles gratis freischalten' : 'Rest gratis freischalten') + '</button>' : '';
-      missing.forEach(function (p) { acts += '<button class="btn btn-ghost btn-s" data-iact="' + p + '" data-i="' + i + '">' + NAMES[p] + ' gratis</button>'; });
-      return '<div class="cust"><div class="who"><b>' + esc(r.name || '(ohne Namen)') + ' <span class="tag off">' + esc(r.code) + '</span> ' + tags + '</b>' +
-        '<div class="meta">' + meta + '</div></div><div class="acts">' + acts + '</div></div>';
-    }).join('') : '<p>' + (installs.length ? 'Keine Treffer.' : 'Noch keine Installationen.') + '</p>';
-    $('installs').querySelectorAll('button[data-iact]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var r = shown[+b.dataset.i], a = b.dataset.iact;
-        var what = a === 'all' ? 'alle Programme' : NAMES[a];
-        if (!confirm((r.name || 'Gerät ' + r.code) + ': ' + what + ' kostenlos freischalten?')) return;
-        b.disabled = true;
-        call({ action: 'admin_install_grant', device: r.device, products: a === 'all' ? [] : [a] })
-          .then(function () { loadInstalls(); load(); })
-          .catch(function (e) { $('instErr').textContent = e.message; b.disabled = false; });
-      });
+      var tags = Object.keys(NAMES).filter(function (p) { return keys[p]; }).map(function (p) { return tag('free', NAMES[p] + ' gratis'); }).join(' ');
+      var apps = devApps(r);
+      var meta = [r.account ? esc(r.account) : '', apps.length ? apps.join(', ') : 'noch nichts installiert', r.launcher ? 'Launcher ' + esc(r.launcher) : ''].filter(Boolean).join(' · ');
+      return item(i, esc(r.name || '(ohne Namen)') + ' <span class="tag off">' + esc(r.code) + '</span> ' + tags, meta, 'zuletzt ' + ago(r.last_seen));
+    }).join('') : empty(all.length ? 'Keine Treffer.' : 'Noch keine Installationen.');
+    bindItems($('installs'), shown, openDevice);
+  }
+  $('iq').addEventListener('input', renderInstalls);
+  chips('ifilter', renderInstalls);
+  $('devCsv').addEventListener('click', function () {
+    csv('geraete', ['Name', 'Geräte-Code', 'Konto', 'Programme', 'Gratis', 'Launcher', 'Zuerst gesehen', 'Zuletzt gesehen'], devShown().map(function (r) {
+      return [r.name, r.code, r.account, devApps(r).join(', '), Object.keys(r.keys || {}).map(function (p) { return NAMES[p]; }).join(', '), r.launcher, date(r.first_seen), date(r.last_seen)];
+    }));
+  });
+  function openDevice(r) {
+    drawerCur = { open: openDevice, find: function () { return (D.installs || []).filter(function (x) { return x.device === r.device; })[0]; } };
+    var keys = r.keys || {}, missing = Object.keys(NAMES).filter(function (p) { return !keys[p]; });
+    var name = r.name || 'Gerät ' + r.code;
+    var acc = accountByEmail(r.account);
+    var grant = function (b, list, what) {
+      run(b, { action: 'admin_install_grant', device: r.device, products: list }, what + ' gratis freigeschaltet – gilt beim nächsten Start des Launchers.', function () { return Promise.all([loadInstalls(true), loadKeys(true)]); });
+    };
+    var appsHtml = Object.keys(NAMES).map(function (p) {
+      return '<dt>' + NAMES[p] + '</dt><dd>' + (r.apps && r.apps[p] ? 'Version ' + esc(r.apps[p]) : '<span style="color:var(--dim)">nicht installiert</span>') + (keys[p] ? ' ' + tag('free', 'gratis') : '') + '</dd>';
+    }).join('');
+    drawer({
+      title: esc(name),
+      sub: 'Geräte-Code ' + esc(r.code),
+      blocks: [
+        fields([['Name', esc(r.name || '(keiner angegeben)')], ['Konto', r.account ? esc(r.account) : 'nicht angemeldet'], ['Launcher', esc(r.launcher)],
+          ['Zuerst gesehen', dateTime(r.first_seen)], ['Zuletzt gesehen', dateTime(r.last_seen) + ' (' + ago(r.last_seen) + ')']]),
+        { h: 'Programme', html: '<dl class="fields">' + appsHtml + '</dl>' },
+        missing.length ? { h: 'Gratis freischalten', acts: [{ label: missing.length === 3 ? 'Alles gratis' : 'Rest gratis', cls: 'btn-go', fn: function (b) { grant(b, [], 'Alles'); } }]
+          .concat(missing.map(function (p) { return { label: NAMES[p] + ' gratis', fn: function (b) { grant(b, [p], NAMES[p]); } }; })),
+          hint: 'Es entsteht ein kostenloser Schlüssel ohne Abo, den der Launcher beim nächsten Start einträgt.' } : { h: 'Gratis freischalten', html: '<p class="d-hint">Alle Programme sind auf diesem Gerät schon freigeschaltet.</p>' },
+        { h: 'Weiteres', acts: [
+          acc ? { label: 'Konto öffnen', fn: function () { openAccount(acc); } } : null,
+          { label: 'Code kopieren', fn: function () { copy(r.code, 'Geräte-Code'); } },
+          { label: 'Gerät entfernen', cls: 'btn-red', fn: function (b) {
+            ask({ title: 'Gerät entfernen?', text: '„' + name + '“ wird aus der Liste gelöscht. Läuft der Launcher dort weiter, meldet er sich beim nächsten Start neu an. Schon erstellte Gratis-Schlüssel bleiben gültig.', ok: 'Entfernen', danger: true })
+              .then(function (ok) { if (ok) run(b, { action: 'admin_install_delete', device: r.device }, 'Gerät entfernt.', function () { closeDrawer(); return loadInstalls(true); }); });
+          } }
+        ] }
+      ]
     });
   }
-  // ---------- Newcall-Konten
-  var accounts = [];
-  function loadAccounts() {
-    $('accErr').textContent = ''; $('areload').disabled = true;
-    call({ action: 'admin_accounts' }).then(function (j) { accounts = j.rows || []; renderAccounts(); })
-      .catch(function (e) { $('accErr').textContent = e.message; }).then(function () { $('areload').disabled = false; });
-  }
-  function renderAccounts() {
-    var q = $('aq').value.trim().toLowerCase();
-    var shown = accounts.filter(function (a) { return !q || (a.email + ' ' + a.name).toLowerCase().indexOf(q) >= 0; });
-    $('accounts').innerHTML = shown.length ? shown.map(function (a, i) {
-      var meta = ['erstellt ' + date(a.created), a.last_login ? 'zuletzt angemeldet ' + ago(a.last_login) : '',
-        a.news === 'an' ? 'Apps-Newsletter' : '', a.mnews === 'an' ? 'Musik-Newsletter' : ''].filter(Boolean).join(' · ');
-      return '<div class="cust"><div class="who"><b>' + esc(a.name || a.email) + (a.blocked ? ' <span class="tag bad">gesperrt</span>' : '') + '</b>' +
-        '<div class="meta">' + (a.name ? esc(a.email) + ' · ' : '') + meta + '</div></div><div class="acts">' +
-        '<button class="btn btn-ghost btn-s" data-aact="pw" data-i="' + i + '">Passwort setzen</button>' +
-        '<button class="btn btn-ghost btn-s" data-aact="block" data-i="' + i + '">' + (a.blocked ? 'Entsperren' : 'Sperren') + '</button></div></div>';
-    }).join('') : '<p>' + (accounts.length ? 'Keine Treffer.' : 'Noch keine Konten.') + '</p>';
-    $('accounts').querySelectorAll('button[data-aact]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var a = shown[+b.dataset.i], payload = { action: 'admin_account_set', email: a.email };
-        if (b.dataset.aact === 'pw') {
-          var pw = prompt('Neues Passwort für ' + a.email + ' (mindestens 8 Zeichen). Danach ist die Person auf allen PCs abgemeldet:');
-          if (pw === null) return;
-          if (pw.length < 8) { $('accErr').textContent = 'Das Passwort braucht mindestens 8 Zeichen.'; return; }
-          payload.password = pw;
-        } else {
-          if (!confirm(a.email + (a.blocked ? ' wieder entsperren?' : ' sperren? Die Anmeldung geht dann nicht mehr.'))) return;
-          payload.blocked = !a.blocked;
-        }
-        b.disabled = true; $('accErr').textContent = '';
-        call(payload).then(function () {
-          if (payload.password) alert('Neues Passwort gesetzt. Sag es ' + a.email + ' – damit kann sich die Person wieder anmelden.');
-          loadAccounts();
-        }).catch(function (e) { $('accErr').textContent = e.message; b.disabled = false; });
-      });
-    });
-  }
-  $('areload').addEventListener('click', loadAccounts);
 
-  // ---------- E-Mail-Verteiler (Neuigkeiten)
-  var news = { rows: [], active: 0 };
+  // =====================================================================
+  // KONTEN
+  // =====================================================================
+  var NEWS_TXT = { an: 'bestätigt', wartet: 'wartet auf Bestätigung', aus: 'aus' };
+  function accShown() {
+    var q = lower($('aq').value.trim()), f = chipVal('afilter');
+    return (D.accounts || []).filter(function (a) {
+      if (f === 'news' && a.news !== 'an' && a.mnews !== 'an') return false;
+      if (f === 'blocked' && !a.blocked && !a.locked) return false;
+      return !q || lower(a.email + ' ' + a.name).indexOf(q) >= 0;
+    });
+  }
+  function accTags(a) { return (a.blocked ? tag('bad', 'gesperrt') : '') + (a.locked ? ' ' + tag('warn', 'kurz gesperrt') : ''); }
+  function renderAccounts() {
+    var all = D.accounts;
+    if (!all) { $('accCount').textContent = ''; $('accounts').innerHTML = loading('accounts'); return; }
+    var shown = accShown();
+    $('accCount').textContent = shown.length === all.length ? all.length + ' Konten' : shown.length + ' von ' + all.length + ' Konten';
+    $('accounts').innerHTML = shown.length ? shown.map(function (a, i) {
+      var meta = [a.name ? esc(a.email) : '', 'erstellt ' + date(a.created), a.news === 'an' ? 'Apps-Newsletter' : '', a.mnews === 'an' ? 'Musik-Newsletter' : ''].filter(Boolean).join(' · ');
+      return item(i, esc(a.name || a.email) + ' ' + accTags(a), meta, a.last_login ? 'angemeldet ' + ago(a.last_login) : 'nie angemeldet');
+    }).join('') : empty(all.length ? 'Keine Treffer.' : 'Noch keine Konten.');
+    bindItems($('accounts'), shown, openAccount);
+  }
+  $('aq').addEventListener('input', renderAccounts);
+  chips('afilter', renderAccounts);
+  $('accCsv').addEventListener('click', function () {
+    csv('konten', ['E-Mail', 'Name', 'Erstellt', 'Zuletzt angemeldet', 'Apps-Newsletter', 'Musik-Newsletter', 'Gesperrt'], accShown().map(function (a) {
+      return [a.email, a.name, date(a.created), date(a.last_login), NEWS_TXT[a.news] || a.news, NEWS_TXT[a.mnews] || a.mnews, a.blocked ? 'ja' : ''];
+    }));
+  });
+  function openAccount(a) {
+    drawerCur = { open: openAccount, find: function () { return accountByEmail(a.email); } };
+    var who = a.name || a.email;
+    var set = function (btn, p, msg) { p.action = 'admin_account_set'; p.email = a.email; return run(btn, p, msg, function () { return loadAccounts(true); }); };
+    var keys = (D.rows || []).filter(function (r) { return lower(r.email) === lower(a.email); });
+    var devs = (D.installs || []).filter(function (r) { return lower(r.account) === lower(a.email); });
+    var keyBox = miniList(keys, function (r) { return [NAMES[r.product || 'kehrwerk'] + ' · ' + (r.type === 'abo' ? 'Abo' : 'kostenlos'), status(r)]; }, openKey);
+    var devBox = miniList(devs, function (r) { return [esc(r.name || 'Gerät ' + r.code), 'zuletzt ' + ago(r.last_seen)]; }, openDevice);
+    var newsOff = function (list, label) {
+      return { label: 'Aus ' + label + ' austragen', fn: function (b) {
+        ask({ title: 'Austragen?', text: who + ' bekommt dann keine Rundmails vom ' + label + ' mehr.', ok: 'Austragen' })
+          .then(function (ok) { if (ok) run(b, { action: 'admin_news_remove', email: a.email, list: list }, 'Ausgetragen.', function () { return Promise.all([loadAccounts(true), loadNews(list)]); }); });
+      } };
+    };
+    drawer({
+      title: esc(who) + ' ' + accTags(a),
+      sub: a.name ? esc(a.email) : '',
+      blocks: [
+        fields([['E-Mail', esc(a.email)], ['Name', esc(a.name || '(keiner)')], ['Erstellt', dateTime(a.created)],
+          ['Zuletzt angemeldet', a.last_login ? dateTime(a.last_login) + ' (' + ago(a.last_login) + ')' : 'noch nie'],
+          ['Apps-Newsletter', NEWS_TXT[a.news] || esc(a.news)], ['Musik-Newsletter', NEWS_TXT[a.mnews] || esc(a.mnews)]]),
+        keyBox ? { h: 'Abos & Schlüssel mit dieser E-Mail', node: keyBox } : null,
+        devBox ? { h: 'Angemeldete Geräte', node: devBox } : null,
+        { h: 'Anmeldung', acts: [
+          { label: 'Neues Passwort setzen', cls: 'btn-go', fn: function (b) {
+            ask({ title: 'Neues Passwort', text: 'Für ' + a.email + '. Mindestens 8 Zeichen. Danach ist die Person auf allen Geräten abgemeldet – sag ihr das neue Passwort.', input: true, secret: false, placeholder: 'Neues Passwort', ok: 'Setzen',
+              check: function (v) { return v.length < 8 ? 'Das Passwort braucht mindestens 8 Zeichen.' : ''; } })
+              .then(function (pw) { if (pw) set(b, { password: pw }, 'Neues Passwort gesetzt.'); });
+          } },
+          a.locked ? { label: 'Sperre lösen', fn: function (b) { set(b, { unlock: true }, 'Sperre gelöst – Anmelden geht wieder.'); } } : null,
+          { label: 'Überall abmelden', fn: function (b) {
+            ask({ title: 'Überall abmelden?', text: who + ' wird auf allen PCs und Browsern abgemeldet. Das Passwort bleibt gleich.', ok: 'Abmelden' })
+              .then(function (ok) { if (ok) set(b, { logout: true }, 'Überall abgemeldet.'); });
+          } },
+          { label: 'Name ändern', fn: function (b) {
+            ask({ title: 'Name ändern', input: true, value: a.name || '', placeholder: 'Name', ok: 'Speichern' })
+              .then(function (v) { if (v !== null) set(b, { name: v }, 'Name gespeichert.'); });
+          } },
+          a.blocked ? { label: 'Entsperren', fn: function (b) { set(b, { blocked: false }, 'Entsperrt.'); } }
+            : { label: 'Sperren', cls: 'btn-red', fn: function (b) {
+              ask({ title: 'Konto sperren?', text: 'Die Anmeldung mit ' + a.email + ' geht dann nicht mehr.', ok: 'Sperren', danger: true })
+                .then(function (ok) { if (ok) set(b, { blocked: true }, 'Gesperrt.'); });
+            } }
+        ] },
+        { h: 'Verteiler', acts: [
+          a.news !== 'aus' ? newsOff('apps', 'Apps-Verteiler') : null,
+          a.mnews !== 'aus' ? newsOff('musik', 'Musik-Verteiler') : null,
+          { label: 'E-Mail schreiben', href: 'mailto:' + a.email }
+        ], hint: a.news === 'aus' && a.mnews === 'aus' ? 'In keinem Verteiler eingetragen.' : '' },
+        { h: 'Datenschutz', acts: [
+          { label: 'Datenauskunft herunterladen', fn: function (b) {
+            run(b, { action: 'admin_account_export', email: a.email }, 'Auskunft heruntergeladen.', function (j) {
+              delete j.token;
+              download(new Blob([JSON.stringify(j, null, 2)], { type: 'application/json' }), 'auskunft-' + a.email.replace(/[^a-z0-9]+/gi, '_') + '-' + stamp() + '.json');
+            });
+          } },
+          { label: 'Konto löschen', cls: 'btn-red', fn: function (b) {
+            ask({ title: 'Konto endgültig löschen?', text: 'Das Konto ' + a.email + ' wird gelöscht und von allen Geräten getrennt. Das lässt sich nicht rückgängig machen.\n\nAbos und Zahlungen bei Stripe bleiben bestehen (Aufbewahrungspflicht) – kündige sie dort, falls gewünscht.\n\nZum Bestätigen die E-Mail-Adresse eintippen:', match: a.email, ok: 'Endgültig löschen', danger: true })
+              .then(function (ok) { if (ok) run(b, { action: 'admin_account_delete', email: a.email }, 'Konto gelöscht.', function () { closeDrawer(); return Promise.all([loadAccounts(true), loadInstalls(true)]); }); });
+          } }
+        ], hint: 'Für Anfragen nach der DSGVO: Auskunft (Art. 15) als Datei, Löschen (Art. 17) mit einem Klick.' }
+      ]
+    });
+  }
+
+  // =====================================================================
+  // MUSIK: AUFTRÄGE
+  // =====================================================================
+  var STATES = { neu: ['neu', 'warn'], in_arbeit: ['in Arbeit', 'free'], fertig: ['fertig', 'ok'] };
+  function orderTag(x) { var st = STATES[x.state] || STATES.neu; return x.refunded ? tag('off', 'erstattet') : tag(st[1], st[0]); }
+  function ordShown() {
+    var q = lower($('mq').value.trim()), f = chipVal('mfilter');
+    return ((D.music && D.music.orders) || []).filter(function (x) {
+      if (f === 'offen' && (x.state === 'fertig' || x.refunded)) return false;
+      if (f === 'neu' && (x.state !== 'neu' || x.refunded)) return false;
+      if (f === 'fertig' && x.state !== 'fertig') return false;
+      return !q || lower([x.email, x.project, x.service, x.note, x.admin_note].join(' ')).indexOf(q) >= 0;
+    });
+  }
+  function renderOrders() {
+    if (!D.music) { $('orderKpis').innerHTML = ''; $('ordCount').textContent = ''; $('orders').innerHTML = loading('music'); return; }
+    var o = D.music.orders || [];
+    var cnt = function (fn) { return o.filter(fn).length; };
+    $('orderKpis').innerHTML = kpi(cnt(function (x) { return x.state === 'neu' && !x.refunded; }), 'neue Aufträge') +
+      kpi(cnt(function (x) { return x.state === 'in_arbeit' && !x.refunded; }), 'in Arbeit') + kpi(cnt(function (x) { return x.state === 'fertig'; }), 'fertig') +
+      kpi(eur(o.filter(function (x) { return !x.refunded; }).reduce(function (s, x) { return s + x.amount; }, 0)), 'Umsatz gesamt (brutto)');
+    var shown = ordShown();
+    $('ordCount').textContent = shown.length === o.length ? o.length + ' Aufträge' : shown.length + ' von ' + o.length + ' Aufträgen';
+    $('orders').innerHTML = shown.length ? shown.map(function (x, i) {
+      return item(i, esc(x.service) + ' – ' + esc(x.project) + ' ' + orderTag(x), esc(x.email) + ' · ' + date(x.created) + (x.admin_note ? ' · 📝 ' + esc(x.admin_note) : ''), eur(x.amount));
+    }).join('') : empty(o.length ? 'Keine Aufträge in dieser Ansicht.' : 'Noch keine Aufträge.');
+    bindItems($('orders'), shown, openOrder);
+  }
+  $('mq').addEventListener('input', renderOrders);
+  chips('mfilter', renderOrders);
+  $('ordCsv').addEventListener('click', function () {
+    csv('musik-auftraege', ['Datum', 'Leistung', 'Projekt', 'E-Mail', 'Betrag', 'Status', 'Nachricht', 'Interne Notiz', 'Nummer'], ordShown().map(function (x) {
+      return [date(x.created), x.service, x.project, x.email, String(x.amount).replace('.', ','), x.refunded ? 'erstattet' : (STATES[x.state] || STATES.neu)[0], x.note, x.admin_note, x.id];
+    }));
+  });
+  function openOrder(x) {
+    drawerCur = { open: openOrder, find: function () { return ((D.music && D.music.orders) || []).filter(function (o) { return o.id === x.id; })[0]; } };
+    var acc = accountByEmail(x.email);
+    var note = document.createElement('div');
+    note.innerHTML = '<textarea maxlength="450" placeholder="z. B. Stems angefragt, Abgabe Freitag …"></textarea><button type="button" class="btn btn-ghost btn-s">Notiz speichern</button>';
+    note.querySelector('textarea').value = x.admin_note || '';
+    note.querySelector('button').addEventListener('click', function () {
+      var b = this;
+      run(b, { action: 'admin_music_order', id: x.id, admin_note: note.querySelector('textarea').value }, 'Notiz gespeichert.', function (j) { x.admin_note = j.order.admin_note; renderOrders(); });
+    });
+    var stateAct = function (k, label) {
+      return k === x.state ? null : { label: label, cls: k === 'fertig' ? 'btn-go' : 'btn-ghost', fn: function (b) {
+        run(b, { action: 'admin_music_order', id: x.id, state: k }, 'Status: ' + STATES[k][0] + '.', function (j) { x.state = j.order.state; renderPage(); openOrder(x); });
+      } };
+    };
+    drawer({
+      title: esc(x.service) + ' – ' + esc(x.project) + ' ' + orderTag(x),
+      sub: eur(x.amount) + ' · gebucht am ' + dateTime(x.created),
+      blocks: [
+        fields([['Leistung', esc(x.service)], ['Projekt', esc(x.project)], ['E-Mail', esc(x.email)], ['Betrag', eur(x.amount)], ['Gebucht', dateTime(x.created)], ['Nummer', esc(x.id), true]]),
+        x.note ? { h: 'Nachricht der Kundin / des Kunden', html: '<div class="d-msg">' + esc(x.note) + '</div>' } : null,
+        { h: 'Status', acts: [stateAct('neu', 'Zurück auf neu'), stateAct('in_arbeit', 'In Arbeit'), stateAct('fertig', 'Fertig')], hint: 'Den Status sieht die Person unter „Mein Konto“ auf der Musikseite.' },
+        { h: 'Interne Notiz (nur für dich)', node: note },
+        { h: 'Weiteres', acts: [
+          { label: 'E-Mail schreiben', href: 'mailto:' + x.email + '?subject=' + encodeURIComponent('Dein Auftrag: ' + x.service + ' – ' + x.project) },
+          { label: 'In Stripe öffnen ↗', href: stripeUrl(x.id) },
+          acc ? { label: 'Konto öffnen', fn: function () { openAccount(acc); } } : null
+        ], hint: 'Erstattungen machst du in Stripe.' }
+      ]
+    });
+  }
+
+  // =====================================================================
+  // MUSIK: LEISTUNGEN & PREISE
+  // =====================================================================
+  var svcDirty = false;
+  function svcRow(sv) {
+    var d = document.createElement('div'); d.className = 'svc';
+    d.innerHTML = '<input type="text" class="svc-title" maxlength="60" placeholder="Name, z. B. Mixing">' +
+      '<input type="text" class="svc-text" maxlength="300" placeholder="Kurze Beschreibung">' +
+      '<input type="number" class="svc-price" min="0" max="5000" step="1" placeholder="Preis €">' +
+      '<label><input type="checkbox" class="svc-active"> sichtbar</label>' +
+      '<button class="btn btn-red btn-s svc-del" type="button" title="Entfernen">✕</button>';
+    d.querySelector('.svc-title').value = sv.title || '';
+    d.querySelector('.svc-text').value = sv.text || '';
+    d.querySelector('.svc-price').value = sv.price || 0;
+    d.querySelector('.svc-active').checked = sv.active !== false;
+    d.dataset.id = sv.id || '';
+    d.querySelector('.svc-del').addEventListener('click', function () { d.remove(); svcDirty = true; });
+    return d;
+  }
+  function renderServices() {
+    if (svcDirty) return;                       // nichts überschreiben, was gerade getippt wird
+    if (!D.music) { $('svcList').innerHTML = loading('music'); return; }
+    var c = D.music.config || { accepting: true, services: [] };
+    $('mAccept').checked = c.accepting !== false;
+    var box = $('svcList'); box.innerHTML = '';
+    (c.services || []).forEach(function (sv) { box.appendChild(svcRow(sv)); });
+  }
+  $('svcList').addEventListener('input', function () { svcDirty = true; });
+  $('mAccept').addEventListener('change', function () { svcDirty = true; });
+  $('svcAdd').addEventListener('click', function () { svcDirty = true; $('svcList').appendChild(svcRow({ price: 0, active: true })); });
+  $('svcSave').addEventListener('click', function () {
+    var services = [].map.call($('svcList').children, function (d) {
+      return { id: d.dataset.id, title: d.querySelector('.svc-title').value, text: d.querySelector('.svc-text').value,
+        price: Math.round(+d.querySelector('.svc-price').value || 0), active: d.querySelector('.svc-active').checked };
+    });
+    $('svcErr').textContent = ''; $('svcOk').textContent = ''; $('svcSave').disabled = true;
+    call({ action: 'admin_music_set', accepting: $('mAccept').checked, services: services }).then(function (j) {
+      D.music.config = j.config; svcDirty = false; renderServices();
+      $('svcOk').textContent = 'Gespeichert – die Musikseite zeigt es sofort (Seite neu laden).';
+      toast('Leistungen gespeichert.');
+    }).catch(function (e) { $('svcErr').textContent = e.message; }).then(function () { $('svcSave').disabled = false; });
+  });
+
+  // =====================================================================
+  // RUNDMAIL & VERTEILER
+  // =====================================================================
+  var nList = 'apps';
   var REPOS = { kehrwerk: ['Newxcall/kehrwerk', 'WinClean', 'winclean/'], pebble: ['Newxcall/pebble', 'Pebble', 'pebble/'], idock: ['Newxcall/idock-app', 'iDock', 'idock/'], launcher: ['Newxcall/launcher', 'Newcall Launcher', ''] };
-  function loadNews() {
-    $('newsErr').textContent = ''; $('nreload').disabled = true;
-    var forView = view;
-    call({ action: 'admin_news', list: view }).then(function (j) { if (forView === view) { news = j; renderNews(); } })
-      .catch(function (e) { $('newsErr').textContent = e.message; }).then(function () { $('nreload').disabled = false; });
+  chips('nList', function (v) {
+    nList = v; $('newsErr').textContent = ''; $('newsOk').textContent = '';
+    if (!D.news[v]) loadNews(v);
+    renderMail();
+  });
+  chips('nfilter', function () { renderMail(); });
+  $('nq').addEventListener('input', function () { renderMail(); });
+  function newsShown() {
+    var n = D.news[nList], q = lower($('nq').value.trim()), f = chipVal('nfilter');
+    return ((n && n.rows) || []).filter(function (r) {
+      if (f !== 'all' && r.news !== f) return false;
+      return !q || lower(r.email + ' ' + r.name).indexOf(q) >= 0;
+    });
   }
-  function renderNews() {
-    var rows = news.rows || [];
-    $('nActive').textContent = news.active || 0;
-    $('nWait').textContent = rows.filter(function (r) { return r.news === 'wartet'; }).length;
-    $('nAcc').textContent = news.accounts || 0;
-    $('nReady').textContent = news.ready ? 'eingerichtet' : 'nicht eingerichtet';
-    $('nReady').style.color = news.ready ? 'var(--mint)' : '#ff9f0a';
-    $('nSender').textContent = news.ready ? 'Absender: ' + news.sender : 'Gmail-Zugang fehlt (mail-zugang-einrichten.bat)';
-    $('nSend').textContent = 'An alle senden (' + (news.active || 0) + ')';
-    $('nSend').disabled = !news.ready || !news.active;
-    $('nTest').disabled = !news.ready;
-    $('newsList').innerHTML = rows.length ? rows.map(function (r) {
-      var tag = r.blocked ? '<span class="tag bad">gesperrt</span>' : r.news === 'an' ? '<span class="tag ok">bestätigt</span>' : '<span class="tag warn">wartet</span>';
-      return '<div class="cust"><div class="who"><b>' + esc(r.name || r.email) + ' ' + tag + '</b><div class="meta">' + (r.name ? esc(r.email) + ' · ' : '') +
-        (r.news === 'an' ? 'seit ' : 'angefragt ') + date(r.since) + '</div></div><div></div></div>';
-    }).join('') : '<p>' + (view === 'musik' ? 'Noch niemand hat den Musik-Newsletter bestellt.' : 'Noch niemand hat Neuigkeiten bestellt.') + '</p>';
+  function renderMail() {
+    var m = nList === 'musik', n = D.news[nList];
+    $('nIntro').textContent = m
+      ? 'Wer auf der Musikseite den Newsletter abonniert, bekommt erst eine Bestätigungs-Mail. Nur bestätigte Adressen erhalten deine Rundmails zu neuer Musik – jede mit Abbestell-Link.'
+      : 'Wer beim Konto-Erstellen oder im Launcher „Neuigkeiten per E-Mail“ einschaltet, bekommt erst eine Bestätigungs-Mail. Nur bestätigte Adressen erhalten deine Rundmails – jede mit Abbestell-Link.';
+    $('nNotesRow').classList.toggle('hidden', m);
+    $('nSubject').placeholder = m ? 'z. B. Neuer Song ist draußen' : 'z. B. WinClean 1.4.0 ist da';
+    $('nText').placeholder = m ? 'Was gibt es Neues? Link zum Song …' : 'Was ist neu? …';
+    if (!n) {
+      $('nKpis').innerHTML = ''; $('newsList').innerHTML = loading('news_' + nList);
+      $('nSend').disabled = $('nTest').disabled = true; return;
+    }
+    var rows = n.rows || [];
+    $('nKpis').innerHTML = kpi(n.active || 0, 'bestätigt (bekommen Mails)') + kpi(rows.filter(function (r) { return r.news === 'wartet'; }).length, 'warten auf Bestätigung') +
+      kpi(n.accounts || 0, 'Konten insgesamt') +
+      '<div class="kpi"><b style="font-size:18px;padding:6px 0 5px;color:' + (n.ready ? 'var(--mint)' : '#ff9f0a') + '">' + (n.ready ? 'eingerichtet' : 'nicht eingerichtet') + '</b><span>' +
+      (n.ready ? 'Versand über ' + esc(n.sender) : 'Gmail-Zugang fehlt (mail-zugang-einrichten.bat)') + '</span></div>';
+    $('nSend').textContent = 'An alle senden (' + (n.active || 0) + ')';
+    $('nSend').disabled = !n.ready || !n.active;
+    $('nTest').disabled = !n.ready;
+    var shown = newsShown();
+    $('newsList').innerHTML = shown.length ? shown.map(function (r, i) {
+      var t = r.blocked ? tag('bad', 'gesperrt') : r.news === 'an' ? tag('ok', 'bestätigt') : tag('warn', 'wartet');
+      return '<button type="button" data-i="' + i + '"><span>' + esc(r.name || r.email) + ' ' + t + '</span><small>' + (r.news === 'an' ? 'seit ' : 'angefragt ') + date(r.since) + '</small></button>';
+    }).join('') : empty(rows.length ? 'Keine Treffer.' : (m ? 'Noch niemand hat den Musik-Newsletter bestellt.' : 'Noch niemand hat Neuigkeiten bestellt.'));
+    bindItems($('newsList'), shown, function (r) {
+      var a = accountByEmail(r.email);
+      if (a) return openAccount(a);
+      ask({ title: r.email, text: 'Dieses Konto ist gerade nicht in der Liste. Aus dem Verteiler austragen?', ok: 'Austragen' })
+        .then(function (ok) { if (ok) run(null, { action: 'admin_news_remove', email: r.email, list: nList }, 'Ausgetragen.', function () { return loadNews(nList); }); });
+    });
   }
+  $('nCsv').addEventListener('click', function () {
+    csv('verteiler-' + nList, ['E-Mail', 'Name', 'Status', 'Seit'], newsShown().map(function (r) { return [r.email, r.name, NEWS_TXT[r.news] || r.news, date(r.since)]; }));
+  });
   // Markdown der GitHub-Release-Notes in den einfachen Mailtext umwandeln
   function notesToText(md) {
     return String(md || '').replace(/\r/g, '').split('\n').map(function (l) {
@@ -540,110 +1471,71 @@ main.wide.web-wide { max-width: 1680px; }
       }).catch(function (e) { $('newsErr').textContent = e.message === 'Failed to fetch' ? 'Keine Verbindung zu GitHub.' : e.message; })
       .then(function () { b.disabled = false; });
   });
-  function sendNews(test) {
+  function mailInput(test) {
     var subject = $('nSubject').value.trim(), text = $('nText').value.trim();
     $('newsErr').textContent = ''; $('newsOk').textContent = '';
-    if (test && !subject) subject = view === 'musik' ? 'Testmail von Newcall Musik' : 'Testmail von Newcall Apps';
+    if (test && !subject) subject = nList === 'musik' ? 'Testmail von Newcall Musik' : 'Testmail von Newcall Apps';
     if (test && text.length < 10) text = 'das ist eine Testmail aus der Admin-Seite. Wenn du sie liest, funktioniert der Versand.\n\nSo sieht eine Aufzählung aus:\n- erster Punkt\n- zweiter Punkt';
-    if (!test && subject.length < 3) { $('newsErr').textContent = 'Bitte einen Betreff eingeben (oder „Neueste Patch Notes übernehmen“).'; return; }
-    if (!test && text.length < 10) { $('newsErr').textContent = 'Bitte einen Text eingeben (oder „Neueste Patch Notes übernehmen“).'; return; }
-    var p = { action: 'admin_news_send', subject: subject, text: text, list: view };
+    if (subject.length < 3) { $('newsErr').textContent = 'Bitte einen Betreff eingeben' + (nList === 'apps' ? ' (oder „Neueste Patch Notes übernehmen“).' : '.'); return null; }
+    if (text.length < 10) { $('newsErr').textContent = 'Bitte einen Text eingeben' + (nList === 'apps' ? ' (oder „Neueste Patch Notes übernehmen“).' : '.'); return null; }
+    return { action: 'admin_news_send', subject: subject, text: text, list: nList };
+  }
+  $('nPreview').addEventListener('click', function () {
+    var p = mailInput(true); if (!p) return;
+    p.preview = true;
+    var b = this; b.disabled = true;
+    call(p).then(function (j) { ask({ title: 'Vorschau: ' + j.subject, frame: j.html, only: true }); })
+      .catch(function (e) { $('newsErr').textContent = e.message; }).then(function () { b.disabled = false; });
+  });
+  function sendNews(test) {
+    var p = mailInput(test); if (!p) return;
+    var n = D.news[nList] || {};
+    var go2 = function () {
+      var b = test ? $('nTest') : $('nSend');
+      b.disabled = true;
+      call(p).then(function (j) {
+        $('newsOk').textContent = test ? 'Testmail an ' + p.test + ' verschickt – schau in dein Postfach.'
+          : 'Verschickt an ' + j.sent + ' von ' + j.total + (j.failed && j.failed.length ? ' (fehlgeschlagen: ' + j.failed.join(', ') + ')' : '') + '.';
+        toast(test ? 'Testmail verschickt.' : 'Rundmail verschickt.');
+        if (!test) loadNews(nList);
+      }).catch(function (e) { $('newsErr').textContent = e.message; }).then(function () { renderMail(); });
+    };
     if (test) {
       var to = $('nTestTo').value.trim();
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(to)) { $('newsErr').textContent = 'Bitte eine Adresse für die Testmail eingeben.'; return; }
-      p.test = to;
-    } else if (!confirm('Diese E-Mail jetzt an ' + news.active + ' bestätigte Empfänger senden?\n\nBetreff: ' + subject)) return;
-    var b = test ? $('nTest') : $('nSend');
-    b.disabled = true;
-    call(p).then(function (j) {
-      $('newsOk').textContent = test ? 'Testmail an ' + p.test + ' verschickt – schau in dein Postfach.'
-        : 'Verschickt an ' + j.sent + ' von ' + j.total + (j.failed && j.failed.length ? ' (fehlgeschlagen: ' + j.failed.join(', ') + ')' : '') + '.';
-      if (!test) loadNews();
-    }).catch(function (e) { $('newsErr').textContent = e.message; }).then(function () { renderNews(); });
+      p.test = to; return go2();
+    }
+    ask({ title: 'Rundmail senden?', text: 'An ' + (n.active || 0) + ' bestätigte Empfänger im ' + (nList === 'musik' ? 'Musik' : 'Apps') + '-Verteiler.\n\nBetreff: ' + p.subject + '\n\nTipp: Vorher „Vorschau ansehen“ oder eine Testmail an dich schicken.', ok: 'Jetzt senden' })
+      .then(function (ok) { if (ok) go2(); });
   }
   $('nTest').addEventListener('click', function () { sendNews(true); });
   $('nSend').addEventListener('click', function () { sendNews(false); });
-  $('nreload').addEventListener('click', loadNews);
 
-
-  // ---------- Musik: Aufträge, Leistungen & Preise
-  var music = { orders: [], config: { accepting: true, services: [] } };
-  var STATES = { neu: ['neu', 'warn'], in_arbeit: ['in Arbeit', 'free'], fertig: ['fertig', 'ok'] };
-  function eur(n) { return Number(n || 0).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
-  function loadMusic() {
-    $('mErr').textContent = ''; $('mreload').disabled = true;
-    call({ action: 'admin_music' }).then(function (j) { music = j; renderOrders(); renderServices(); })
-      .catch(function (e) { $('mErr').textContent = e.message; }).then(function () { $('mreload').disabled = false; });
-  }
-  function renderOrders() {
-    var o = music.orders || [];
-    $('mNew').textContent = o.filter(function (x) { return x.state === 'neu' && !x.refunded; }).length;
-    $('mWork').textContent = o.filter(function (x) { return x.state === 'in_arbeit' && !x.refunded; }).length;
-    $('mDone').textContent = o.filter(function (x) { return x.state === 'fertig'; }).length;
-    $('mSum').textContent = eur(o.filter(function (x) { return !x.refunded; }).reduce(function (s, x) { return s + x.amount; }, 0));
-    var q = $('mq').value.trim().toLowerCase(), f = $('mfilter').value;
-    var shown = o.filter(function (x) {
-      if (f === 'offen' && (x.state === 'fertig' || x.refunded)) return false;
-      if (f === 'fertig' && x.state !== 'fertig') return false;
-      return !q || [x.email, x.project, x.service, x.note].join(' ').toLowerCase().indexOf(q) >= 0;
-    });
-    $('orders').innerHTML = shown.length ? shown.map(function (x, i) {
-      var st = STATES[x.state] || STATES.neu;
-      var tag = x.refunded ? '<span class="tag off">erstattet</span>' : '<span class="tag ' + st[1] + '">' + st[0] + '</span>';
-      var acts = Object.keys(STATES).filter(function (k) { return k !== x.state; }).map(function (k) {
-        return '<button class="btn btn-ghost btn-s" data-mact="' + k + '" data-i="' + i + '">' + (k === 'neu' ? 'Zurück auf neu' : k === 'in_arbeit' ? 'In Arbeit' : 'Fertig') + '</button>';
-      }).join('') + '<a class="btn btn-ghost btn-s" href="mailto:' + esc(x.email) + '?subject=' + encodeURIComponent('Dein Auftrag: ' + x.service + ' – ' + x.project) + '">E-Mail</a>';
-      return '<div class="cust"><div class="who"><b>' + esc(x.service) + ' – ' + esc(x.project) + ' ' + tag + '</b>' +
-        '<div class="meta">' + esc(x.email) + ' · ' + eur(x.amount) + ' · ' + date(x.created) + '</div>' +
-        (x.note ? '<div class="note">' + esc(x.note) + '</div>' : '') + '</div><div class="acts">' + acts + '</div></div>';
-    }).join('') : '<p>' + (o.length ? 'Keine Aufträge in dieser Ansicht.' : 'Noch keine Aufträge.') + '</p>';
-    $('orders').querySelectorAll('button[data-mact]').forEach(function (b) {
+  // =====================================================================
+  // SICHERHEIT
+  // =====================================================================
+  function renderSecurity() {
+    if (!D.sec) { $('secList').innerHTML = loading('sec'); return; }
+    $('secList').innerHTML = D.sec.map(function (s, i) {
+      var pct = Math.min(100, Math.round(s.n / Math.max(1, s.max) * 100));
+      var cls = pct >= 100 ? 'bad' : pct >= 80 ? 'warn' : '';
+      return '<div class="meter"><div><b>' + esc(s.label) + '</b><small>' + s.n + ' von ' + s.max + ' · neues Zeitfenster um ' +
+        new Date(s.resets_at * 1000).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr</small></div>' +
+        '<button class="btn btn-ghost btn-s" data-i="' + i + '"' + (s.n ? '' : ' disabled') + '>Zurücksetzen</button>' +
+        '<div class="track"><div class="fill ' + cls + '" style="width:' + pct + '%"></div></div></div>';
+    }).join('');
+    $('secList').querySelectorAll('button[data-i]').forEach(function (b) {
       b.addEventListener('click', function () {
-        var x = shown[+b.dataset.i]; b.disabled = true; $('mErr').textContent = '';
-        call({ action: 'admin_music_order', id: x.id, state: b.dataset.mact }).then(function (j) {
-          x.state = j.order.state; renderOrders();
-        }).catch(function (e) { $('mErr').textContent = e.message; b.disabled = false; });
+        var s = D.sec[+b.dataset.i];
+        ask({ title: 'Zähler zurücksetzen?', text: '„' + s.label + '“ fängt wieder bei 0 an. Mach das nur, wenn du sicher bist, dass gerade kein Angriff läuft.', ok: 'Zurücksetzen' })
+          .then(function (ok) { if (ok) run(b, { action: 'admin_security_reset', kind: s.kind }, 'Zurückgesetzt.', function (j) { D.sec = j.rows || []; renderPage(); }); });
       });
     });
   }
-  function svcRow(sv) {
-    var d = document.createElement('div'); d.className = 'svc';
-    d.innerHTML = '<input type="text" class="svc-title" maxlength="60" placeholder="Name, z. B. Mixing">' +
-      '<input type="text" class="svc-text" maxlength="300" placeholder="Kurze Beschreibung">' +
-      '<input type="number" class="svc-price" min="0" max="5000" step="1" placeholder="Preis €">' +
-      '<label><input type="checkbox" class="svc-active"> sichtbar</label>' +
-      '<button class="btn btn-red btn-s svc-del" type="button" title="Entfernen">✕</button>';
-    d.querySelector('.svc-title').value = sv.title || '';
-    d.querySelector('.svc-text').value = sv.text || '';
-    d.querySelector('.svc-price').value = sv.price || 0;
-    d.querySelector('.svc-active').checked = sv.active !== false;
-    d.dataset.id = sv.id || '';
-    d.querySelector('.svc-del').addEventListener('click', function () { d.remove(); });
-    return d;
-  }
-  function renderServices() {
-    var c = music.config || { accepting: true, services: [] };
-    $('mAccept').checked = c.accepting !== false;
-    var box = $('svcList'); box.innerHTML = '';
-    (c.services || []).forEach(function (sv) { box.appendChild(svcRow(sv)); });
-  }
-  $('svcAdd').addEventListener('click', function () { $('svcList').appendChild(svcRow({ price: 0, active: true })); });
-  $('svcSave').addEventListener('click', function () {
-    var services = [].map.call($('svcList').children, function (d) {
-      return { id: d.dataset.id, title: d.querySelector('.svc-title').value, text: d.querySelector('.svc-text').value,
-        price: Math.round(+d.querySelector('.svc-price').value || 0), active: d.querySelector('.svc-active').checked };
-    });
-    $('svcErr').textContent = ''; $('svcOk').textContent = ''; $('svcSave').disabled = true;
-    call({ action: 'admin_music_set', accepting: $('mAccept').checked, services: services }).then(function (j) {
-      music.config = j.config; renderServices();
-      $('svcOk').textContent = 'Gespeichert – die Musikseite zeigt es sofort (Seite neu laden).';
-    }).catch(function (e) { $('svcErr').textContent = e.message; }).then(function () { $('svcSave').disabled = false; });
-  });
-  $('mreload').addEventListener('click', loadMusic);
-  $('mq').addEventListener('input', renderOrders);
-  $('mfilter').addEventListener('change', renderOrders);
 
-  // ---------- Admin-Passwort ändern
+  // =====================================================================
+  // ADMIN-PASSWORT
+  // =====================================================================
   $('pwBtn').addEventListener('click', function () {
     var a = $('pw1').value, b = $('pw2').value;
     $('pwErr').textContent = ''; $('pwOk').textContent = '';
@@ -658,94 +1550,62 @@ main.wide.web-wide { max-width: 1680px; }
       $('pwOk').textContent = 'Fertig. Ab jetzt meldest du dich mit dem neuen Passwort an.';
     }).catch(function (e) { $('pwErr').textContent = e.message; }).then(function () { $('pwBtn').disabled = false; });
   });
-  $('aq').addEventListener('input', renderAccounts);
 
-  $('ireload').addEventListener('click', loadInstalls);
-  $('iq').addEventListener('input', renderInstalls);
-  $('q').addEventListener('input', render);
-  $('filter').addEventListener('change', render);
-  $('prod').addEventListener('change', render);
-  var NAMES = { kehrwerk: 'WinClean', pebble: 'Pebble', idock: 'iDock' };
-
-  function status(r) {
-    if (r.blocked) return '<span class="tag bad">gesperrt</span>';
-    if (r.type === 'frei') return r.active ? '<span class="tag free">kostenlos</span>' : '<span class="tag off">abgelaufen</span>';
-    if (!r.active) return '<span class="tag off">' + (r.status === 'canceled' ? 'beendet' : esc(r.status)) + '</span>';
-    if (r.cancelled) return '<span class="tag warn">gekündigt</span>';
-    return r.status === 'past_due' ? '<span class="tag warn">Zahlung offen</span>' : '<span class="tag ok">aktiv</span>';
+  // =====================================================================
+  // SUCHE ÜBER ALLES (Strg+K oder /)
+  // =====================================================================
+  var pSel = 0, pItems = [];
+  function openPalette() {
+    $('palette').classList.add('on'); $('pInput').value = ''; renderPalette();
+    setTimeout(function () { $('pInput').focus(); }, 20);
   }
-  function render() {
-    var active = rows.filter(function (r) { return r.type === 'abo' && r.active && !r.blocked; }).length;
-    $('sActive').textContent = active;
-    $('sFree').textContent = rows.filter(function (r) { return r.type === 'frei' && r.active && !r.blocked; }).length;
-    $('sMonth').textContent = (active * 3.99).toFixed(2).replace('.', ',') + ' €';
-    $('sEnded').textContent = rows.filter(function (r) { return !r.active || r.blocked; }).length;
-    var q = $('q').value.trim().toLowerCase(), f = $('filter').value, pf = $('prod').value;
-    var shown = rows.filter(function (r) {
-      var on = r.active && !r.blocked;
-      if (pf !== 'all' && (r.product || 'kehrwerk') !== pf) return false;
-      if (f === 'active' && !on) return false;
-      if (f === 'abo' && r.type !== 'abo') return false;
-      if (f === 'frei' && r.type !== 'frei') return false;
-      if (f === 'off' && on) return false;
-      return !q || [r.name, r.email, r.key, r.note, r.id].join(' ').toLowerCase().indexOf(q) >= 0;
+  function closePalette() { $('palette').classList.remove('on'); }
+  function renderPalette() {
+    var q = lower($('pInput').value.trim());
+    var groups = [];
+    var add = function (title, list, max) { if (list.length) groups.push([title, list.slice(0, max || 6)]); };
+    var hit = function (s) { return lower(s).indexOf(q) >= 0; };
+    add('Bereiche', Object.keys(PAGES).filter(function (p) { return !q || hit(PAGES[p]); }).map(function (p) { return { t: PAGES[p], s: 'öffnen', fn: function () { go(p); } }; }), q ? 6 : 10);
+    if (q) {
+      add('Konten', (D.accounts || []).filter(function (a) { return hit(a.email + ' ' + a.name); }).map(function (a) { return { t: a.name || a.email, s: a.name ? a.email : 'Konto', fn: function () { go('accounts'); openAccount(a); } }; }));
+      add('Abos & Schlüssel', (D.rows || []).filter(function (r) { return hit([r.name, r.email, r.key, r.note, r.id].join(' ')); }).map(function (r) { return { t: (r.name || r.email || r.id), s: NAMES[r.product || 'kehrwerk'] + ' · ' + (r.type === 'abo' ? 'Abo' : 'kostenlos'), fn: function () { go('keys'); openKey(r); } }; }));
+      add('Geräte', (D.installs || []).filter(function (r) { return hit([r.name, r.code, r.account].join(' ')); }).map(function (r) { return { t: r.name || 'Gerät ' + r.code, s: r.code, fn: function () { go('devices'); openDevice(r); } }; }));
+      add('Musik-Aufträge', ((D.music && D.music.orders) || []).filter(function (x) { return hit([x.email, x.project, x.service, x.note, x.admin_note].join(' ')); }).map(function (x) { return { t: x.service + ' – ' + x.project, s: x.email, fn: function () { go('orders'); openOrder(x); } }; }));
+    }
+    pItems = []; pSel = 0;
+    $('pRes').innerHTML = groups.length ? groups.map(function (g) {
+      return '<div class="p-h">' + esc(g[0]) + '</div>' + g[1].map(function (it) { pItems.push(it); var i = pItems.length - 1; return '<button type="button" class="p-it" data-i="' + i + '"><span>' + esc(it.t) + '</span><small>' + esc(it.s) + '</small></button>'; }).join('');
+    }).join('') : '<div class="p-none">Nichts gefunden.</div>';
+    $('pRes').querySelectorAll('.p-it').forEach(function (b) {
+      b.addEventListener('click', function () { var it = pItems[+b.dataset.i]; closePalette(); it.fn(); });
+      b.addEventListener('mousemove', function () { pSel = +b.dataset.i; markPalette(); });
     });
-    $('list').innerHTML = shown.length ? shown.map(function (r, i) {
-      var meta = [NAMES[r.product || 'kehrwerk'], r.type === 'abo' ? 'Abo 3,99 €' : 'Kostenlos' + (r.note ? ' · ' + esc(r.note) : ''),
-        'seit ' + date(r.created),
-        r.until ? (r.type === 'frei' ? 'gültig bis ' : (r.cancelled ? 'endet ' : 'nächste Zahlung ')) + date(r.until) : (r.type === 'frei' ? 'unbegrenzt' : ''),
-        r.devices.length + ' von 3 PCs'].filter(Boolean).join(' · ');
-      var acts = '<button class="btn btn-ghost btn-s" data-act="copy" data-i="' + i + '">Schlüssel kopieren</button>';
-      if (r.devices.length) acts += '<button class="btn btn-ghost btn-s" data-act="reset" data-i="' + i + '">PCs zurücksetzen</button>';
-      if (r.type === 'frei') acts += r.active
-        ? '<button class="btn btn-red btn-s" data-act="unfree" data-i="' + i + '">Freischaltung beenden</button>'
-        : '<button class="btn btn-ghost btn-s" data-act="refree" data-i="' + i + '">Wieder freischalten</button>';
-      acts += r.blocked
-        ? '<button class="btn btn-ghost btn-s" data-act="unblock" data-i="' + i + '">Entsperren</button>'
-        : '<button class="btn btn-red btn-s" data-act="block" data-i="' + i + '">Sperren</button>';
-      return '<div class="cust"><div class="who"><b>' + esc(r.name || r.email || '(ohne Namen)') + ' ' + status(r) + '</b>' +
-        '<div class="meta">' + (r.name && r.email ? esc(r.email) + ' · ' : '') + meta + '</div>' +
-        '<div class="k">' + esc(r.key) + '</div></div><div class="acts">' + acts + '</div></div>';
-    }).join('') : '<p>Keine Einträge.</p>';
-    $('list').querySelectorAll('button[data-act]').forEach(function (b) {
-      b.addEventListener('click', function () { act(b, b.dataset.act, shown[+b.dataset.i]); });
-    });
+    markPalette();
   }
-
-  function copy(text, btn) {
-    var done = function () { var o = btn.textContent; btn.textContent = 'Kopiert'; setTimeout(function () { btn.textContent = o; }, 1500); };
-    if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () {});
+  function markPalette() {
+    $('pRes').querySelectorAll('.p-it').forEach(function (b) { var o = +b.dataset.i === pSel; b.classList.toggle('on', o); if (o) b.scrollIntoView({ block: 'nearest' }); });
   }
-  function act(btn, a, r) {
-    if (a === 'copy') return copy(r.key, btn);
-    var who = r.name || r.email || r.id;
-    var ask = { block: who + ' sperren? Das Programm wird bei der nächsten Prüfung gesperrt (Zahlungen laufen bei Stripe weiter).',
-      unfree: 'Kostenlose Freischaltung von ' + who + ' beenden?', reset: 'Alle PCs von ' + who + ' abmelden? Der Schlüssel kann danach neu eingetragen werden.' }[a];
-    if (ask && !confirm(ask)) return;
-    var p = { action: 'admin_set', id: r.id };
-    if (a === 'block') p.blocked = true;
-    if (a === 'unblock') p.blocked = false;
-    if (a === 'reset') p.reset_devices = true;
-    if (a === 'unfree') p.free = false;
-    if (a === 'refree') { p.free = true; p.until = 0; }
-    btn.disabled = true;
-    call(p).then(load).catch(function (e) { $('listErr').textContent = e.message; btn.disabled = false; });
-  }
-
-  $('grantBtn').addEventListener('click', function () {
-    var days = +$('gUntil').value;
-    var p = { action: 'admin_grant', product: $('gProduct').value, name: $('gName').value, email: $('gMail').value, note: $('gNote').value,
-      until: days ? Math.floor(Date.now() / 1000) + days * 86400 : 0 };
-    $('grantBtn').disabled = true; $('grantErr').textContent = ''; $('newKey').style.display = 'none';
-    call(p).then(function (j) {
-      $('newKeyHint').textContent = 'Fertig. Schlüssel (in ' + NAMES[j.product || 'kehrwerk'] + ' unter „Abo“ eintragen):';
-      $('newKeyText').textContent = j.key; $('newKey').style.display = 'block';
-      $('gName').value = $('gMail').value = $('gNote').value = '';
-      load();
-    }).catch(function (e) { $('grantErr').textContent = e.message; }).then(function () { $('grantBtn').disabled = false; });
+  $('pInput').addEventListener('input', renderPalette);
+  $('pInput').addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown') { e.preventDefault(); pSel = Math.min(pItems.length - 1, pSel + 1); markPalette(); }
+    if (e.key === 'ArrowUp') { e.preventDefault(); pSel = Math.max(0, pSel - 1); markPalette(); }
+    if (e.key === 'Enter' && pItems[pSel]) { e.preventDefault(); var it = pItems[pSel]; closePalette(); it.fn(); }
   });
-  document.querySelectorAll('[data-copy]').forEach(function (b) {
-    b.addEventListener('click', function () { copy($(b.dataset.copy).textContent, b); });
+  $('palette').addEventListener('mousedown', function (e) { if (e.target === $('palette')) closePalette(); });
+  $('searchBtn').addEventListener('click', openPalette);
+  $('searchBtn2').addEventListener('click', openPalette);
+  document.addEventListener('keydown', function (e) {
+    if ($('app').classList.contains('hidden')) return;
+    var typing = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable;
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openPalette(); return; }
+    if (e.key === '/' && !typing && view !== 'web') { e.preventDefault(); openPalette(); return; }
+    if (e.key === 'Escape') {
+      if (modalDone) return modalDone(false);
+      if ($('palette').classList.contains('on')) return closePalette();
+      if ($('grantModal').classList.contains('on')) return closeGrant();
+      if ($('drawer').classList.contains('open')) return closeDrawer();
+      if (document.body.classList.contains('menu')) { document.body.classList.remove('menu'); $('scrim').classList.remove('on'); }
+    }
   });
 
   // =====================================================================
@@ -1154,7 +2014,8 @@ main.wide.web-wide { max-width: 1680px; }
     });
   }
 
-  if (token) call({ action: 'admin_login' }).then(function (j) { showPanel(j.test); }).catch(function () { token = ''; });
+
+  if (token) call({ action: 'admin_login' }).then(function (j) { showPanel(j.test); }).catch(function () { token = ''; try { sessionStorage.removeItem('kwAdmin'); } catch (e) {} });
 })();
 </script>
 </body>
