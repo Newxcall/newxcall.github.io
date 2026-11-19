@@ -56,6 +56,8 @@ h1, h2, h3 { font-family: var(--display); letter-spacing: -0.03em; margin: 0; }
 .app ul { list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-wrap: wrap; gap: 8px; position: relative; }
 .app li { font-size: 13px; color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; }
 .app .side { display: grid; gap: 12px; justify-items: stretch; min-width: 220px; position: relative; }
+.app-soon .price { background: var(--grad, linear-gradient(100deg,#63e6be,#64d2ff 35%,#bf5af2 70%,#ff5e8a)); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 30px; }
+.btn-soon { opacity: .55; cursor: default; pointer-events: none; }
 .price { font: 700 40px var(--display); letter-spacing: -0.03em; text-align: center; color: var(--green); line-height: 1.05; }
 .price small { display: block; font: 500 14px var(--body); color: var(--fg); letter-spacing: 0; margin-top: 4px; }
 .upsell { font-size: 12.5px; color: var(--dim); text-align: center; margin: 0; }
@@ -245,6 +247,18 @@ footer nav a:hover { color: var(--fg); }
         <a class="btn btn-free" href="https://github.com/Newxcall/launcher/releases/latest/download/NewcallLauncher.exe"><svg><use href="#i-down"/></svg>Gratis laden</a>
         <a class="btn btn-ghost" href="idock-app/">Mehr erfahren</a>
         <p class="upsell">Alle Funktionen 7 Tage testen, danach 3,99&nbsp;€/Monat</p>
+      </div>
+    </article>
+    <article class="app app-soon" style="--tint: var(--violet)">
+      <div>
+        <div class="head"><img src="reelstudio.png" alt=""><div><h2>ReelStudio</h2><p class="tag">Erklär-Reels mit KI · Vorschau</p></div></div>
+        <p class="desc">Ein Satz genügt: ReelStudio recherchiert, schreibt, vertont, animiert und prüft kurze Erklär-Videos für Instagram und TikTok – fertig im Hochformat, mit Quellen und Untertiteln.</p>
+        <ul><li>Recherche mit Quellen</li><li>Natürliche Stimme</li><li>Animationen</li><li>Qualitätsprüfung</li></ul>
+      </div>
+      <div class="side">
+        <div class="price">Bald verfügbar<small>Wird gerade fertig gemacht</small></div>
+        <span class="btn btn-ghost btn-soon" aria-disabled="true">Noch nicht zum Laden</span>
+        <p class="upsell">Kommt später über den Newcall Launcher</p>
       </div>
     </article>
   </section>
