@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<script src="/site-edit.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#050507">
+<title>Wichteln · Meine Seite</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="nav"><div class="wrap"><a class="brand" href="./"><span class="logo">🎁</span>Wichteln</a></div></header>
+
+<main><div class="wrap" id="main">
+  <div class="spinner" aria-label="Lädt"></div>
+</div></main>
+
+<footer><div class="wrap"><span>Wichteln · ein kostenloses Werkzeug von Newcall</span><nav aria-label="Rechtliches"><a href="../#apps">Alle Programme</a><a href="../#unterstuetzen">Unterstützen</a><a href="../impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a></nav></div></footer>
+
+<script src="app.js"></script>
+<script>
+const main = W.$("#main");
+const token = W.hash();
+
+function initial(name) { return (name.trim()[0] || "?").toUpperCase(); }
+
+async function load() {
+  if (!token) return W.fail(main, "Kein persönlicher Link", "Öffne den Link aus deiner E-Mail vollständig – er endet mit # und einer langen Zeichenfolge.");
+  let d;
+  try {
+    d = await W.api("me", { token });
+  } catch (e) {
+    return W.fail(main, "Link ungültig", e.message);
+  }
+  const g = d.group, drawn = g.status === "drawn";
+  document.title = "Wichteln · " + g.name;
+  const parts = [];
+
+  const flash = W.flash("joined");
+  if (flash) parts.push(W.el("div", { class: "note" }, W.el("p", {}, flash === "mailed"
+    ? "Du bist dabei! Wir haben dir diesen Link auch per Mail geschickt."
+    : "Du bist dabei! Die Mail konnte gerade nicht verschickt werden – speichere dir diese Seite als Lesezeichen.")));
+
+  parts.push(W.el("section", {},
+    W.el("p", { class: "eyebrow" }, "Hallo " + d.me.name),
+    W.el("h1", {}, g.name),
+    W.facts(g, [drawn ? W.el("span", { class: "chip done" }, "Ausgelost") : W.el("span", { class: "chip live" }, "Warte auf Auslosung")])));
+
+  parts.push(W.el("div", { class: "warn" }, W.el("span", {}, "🔒"),
+    W.el("p", {}, W.el("strong", { style: "color:inherit" }, "Diesen Link nicht weiterschicken. "),
+      "Er ist dein persönlicher Schlüssel. Tipp: Speichere die Seite als Lesezeichen.")));
+
+  // ---- Zuordnung (erst nach Tippen auf "Aufdecken")
+  if (drawn) {
+    const box = W.el("div", { class: "card reveal" });
+    const hidden = () => {
+      const btn = W.el("button", { class: "btn go", style: "margin-top:16px" }, "Aufdecken");
+      box.replaceChildren(
+        W.el("div", { class: "gift" }, "🎁"),
+        W.el("h2", { style: "margin-top:12px" }, "Es wurde ausgelost!"),
+        W.el("p", {}, "Tippe auf „Aufdecken“, um zu sehen, wen du beschenkst. Achte darauf, dass niemand mitschaut."),
+        btn);
+      btn.addEventListener("click", async () => {
+        try {
+          const r = await W.busy(btn, "Einen Moment …", () => W.api("reveal", { token }));
+          const wl = W.el("div", { class: "wishes" });
+          W.richText(wl, r.wishlist, r.name + " hat noch keine Wünsche eingetragen.");
+          box.replaceChildren(
+            W.el("p", { class: "eyebrow" }, "Du beschenkst"),
+            W.el("div", { class: "who" }, r.name),
+            W.el("p", { style: "margin-top:16px;text-align:left" }, W.el("strong", {}, "Wunschliste")),
+            wl,
+            W.el("button", { class: "btn ghost", style: "margin-top:18px", onclick: hidden }, "Wieder verdecken"));
+        } catch (e) {
+          box.append(W.el("p", { class: "msg err" }, e.message));
+        }
+      });
+    };
+    hidden();
+    parts.push(box);
+  }
+
+  // ---- Eigene Wunschliste
+  const ta = W.el("textarea", { id: "wl", maxlength: "2000", placeholder: "Was wünschst du dir? Links zu Produkten sind erlaubt." });
+  ta.value = d.me.wishlist;
+  const save = W.el("button", { class: "btn", type: "submit" }, "Speichern");
+  const msg = W.el("p", { class: "msg", role: "status" });
+  const form = W.el("form", { class: "card" },
+    W.el("h2", {}, "Meine Wunschliste"),
+    W.el("p", { class: "fine" }, drawn
+      ? "Nur die Person, die dich beschenkt, sieht deine Wünsche. Änderungen sieht sie sofort."
+      : "Sieht erst nach der Auslosung die Person, die dich beschenkt – sonst niemand."),
+    ta, W.el("div", { class: "row" }, save), msg);
+  ta.addEventListener("input", () => W.say(msg, ""));
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try {
+      const r = await W.busy(save, "Speichert …", () => W.api("wish", { token, wishlist: ta.value }));
+      ta.value = r.wishlist;
+      W.say(msg, "Gespeichert ✓", "ok");
+    } catch (err) { W.say(msg, err.message); }
+  });
+  parts.push(form);
+
+  // ---- Gruppe
+  const list = W.el("ul", { class: "people" }, d.members.map((m) =>
+    W.el("li", {}, W.el("span", { class: "avatar" }, initial(m.name)), m.name,
+      m.you ? W.el("span", { class: "tag" }, "· du") : null,
+      m.admin ? W.el("span", { class: "tag" }, "· organisiert") : null)));
+  parts.push(W.el("div", { class: "card" },
+    W.el("h2", {}, `Dabei (${d.members.length})`),
+    drawn ? null : W.el("p", { class: "fine" }, "Sobald alle drin sind, startet der Admin die Auslosung. Du bekommst dann eine Mail."),
+    list));
+
+  parts.push(W.el("p", { class: "fine center" }, `Eingetragen als ${d.me.name} · ${d.me.email}`));
+  main.replaceChildren(...parts);
+}
+load();
+window.addEventListener("hashchange", () => location.reload());
+</script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<script src="/site-edit.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#050507">
+<title>Wichteln · Link verloren?</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="nav"><div class="wrap"><a class="brand" href="./"><span class="logo">🎁</span>Wichteln</a></div></header>
+
+<main><div class="wrap" id="main">
+  <p class="eyebrow">Kein Problem</p>
+  <h1>Link verloren?</h1>
+  <p class="lead">Gib die E-Mail-Adresse ein, mit der du dich eingetragen hast. Wir schicken dir deine Links nochmal zu.</p>
+  <form class="card" id="form" novalidate>
+    <label for="email" style="margin-top:0">Deine E-Mail-Adresse</label>
+    <input type="email" id="email" maxlength="200" autocomplete="email" inputmode="email" required>
+    <button class="btn go wide" id="go" type="submit" style="margin-top:16px">Link zuschicken</button>
+    <p class="msg" id="msg" role="alert"></p>
+  </form>
+  <div class="card center" id="done" hidden>
+    <div style="font-size:44px">📬</div>
+    <h2>Schau in dein Postfach</h2>
+    <p>Wenn diese Adresse in einer Wichtelgruppe eingetragen ist, haben wir dir gerade eine Mail mit deinen Links geschickt. Schau auch im Spam-Ordner nach.</p>
+    <p class="fine">Nichts angekommen? Prüfe die Schreibweise der Adresse oder frag den Admin deiner Gruppe.</p>
+  </div>
+</div></main>
+
+<footer><div class="wrap"><span>Wichteln · ein kostenloses Werkzeug von Newcall</span><nav aria-label="Rechtliches"><a href="../#apps">Alle Programme</a><a href="../#unterstuetzen">Unterstützen</a><a href="../impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a></nav></div></footer>
+
+<script src="app.js"></script>
+<script>
+const msg = W.$("#msg"), go = W.$("#go"), email = W.$("#email");
+W.$("#form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  W.say(msg, "");
+  if (!/^\S+@\S+\.\S+$/.test(email.value.trim())) return W.say(msg, "Bitte gib eine gültige E-Mail-Adresse an.");
+  try {
+    await W.busy(go, "Wird gesendet …", () => W.api("lost", { email: email.value }));
+    W.$("#form").hidden = true;
+    W.$("#done").hidden = false;
+  } catch (err) { W.say(msg, err.message); }
+});
+</script>
+</body>
+</html>

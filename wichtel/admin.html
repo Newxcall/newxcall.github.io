@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<script src="/site-edit.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#050507">
+<title>Wichteln · Gruppe verwalten</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="nav"><div class="wrap"><a class="brand" href="./"><span class="logo">🎁</span>Wichteln</a><span class="side">Admin</span></div></header>
+
+<main><div class="wrap" id="main">
+  <div class="spinner" aria-label="Lädt"></div>
+</div></main>
+
+<footer><div class="wrap"><span>Wichteln · ein kostenloses Werkzeug von Newcall</span><nav aria-label="Rechtliches"><a href="../#apps">Alle Programme</a><a href="../#unterstuetzen">Unterstützen</a><a href="../impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a></nav></div></footer>
+
+<script src="app.js"></script>
+<script>
+const main = W.$("#main");
+const token = W.hash();
+let fresh = W.flash("new");
+const MODES = {
+  paare: ["Paare", "Je zwei beschenken sich gegenseitig. Bei ungerader Zahl gibt es eine Dreiergruppe im Kreis (A → B → C → A). Ab 2 Personen."],
+  kreis: ["Kreis", "Klassisch: Jeder beschenkt genau eine Person und wird von einer anderen beschenkt. Ab 3 Personen."],
+};
+const minFor = (mode) => (mode === "paare" ? 2 : 3);
+
+function initial(name) { return (name.trim()[0] || "?").toUpperCase(); }
+
+async function load() {
+  if (!token) return W.fail(main, "Kein Admin-Link", "Öffne den Admin-Link aus deiner E-Mail vollständig.");
+  let d;
+  try {
+    d = await W.api("admin", { token });
+  } catch (e) {
+    return W.fail(main, "Admin-Link ungültig", e.message);
+  }
+  render(d);
+}
+
+function render(d) {
+  const g = d.group, drawn = g.status === "drawn";
+  document.title = "Wichteln · " + g.name + " (Admin)";
+  const parts = [];
+
+  if (fresh) parts.push(W.el("div", { class: "note" }, W.el("p", {}, fresh === "mailed"
+    ? "Deine Gruppe steht! Wir haben dir den Admin-Link und deinen Teilnehmer-Link auch per Mail geschickt."
+    : "Deine Gruppe steht! Die Mail konnte gerade nicht verschickt werden – speichere dir diese Seite unbedingt als Lesezeichen.")));
+  fresh = null;
+
+  parts.push(W.el("section", {},
+    W.el("p", { class: "eyebrow" }, "Gruppe verwalten"),
+    W.el("h1", {}, g.name),
+    W.facts(g, [drawn ? W.el("span", { class: "chip done" }, "Ausgelost") : W.el("span", { class: "chip live" }, "Offen für Anmeldungen")])));
+
+  parts.push(W.el("div", { class: "warn" }, W.el("span", {}, "🔑"),
+    W.el("p", {}, W.el("strong", { style: "color:inherit" }, "Das ist dein Admin-Link – nicht weiterschicken. "),
+      drawn ? "Wer ihn hat, kann die Gruppe verwalten." : "Zum Einladen nimm den Einladungslink unten.")));
+
+  // ---- Einladen
+  if (!drawn) {
+    const url = W.link.invite(d.invite);
+    const input = W.el("input", { type: "text", readonly: true, value: url, "aria-label": "Einladungslink", onfocus: (e) => e.target.select() });
+    const copyBtn = W.el("button", { class: "btn", type: "button" }, "Kopieren");
+    copyBtn.addEventListener("click", () => W.copy(url, copyBtn));
+    const row = W.el("div", { class: "row" }, copyBtn);
+    if (W.canShare()) row.append(W.el("button", { class: "btn ghost", type: "button",
+      onclick: () => W.share(url, "Wichteln: " + g.name, `Wir wichteln! Trag dich hier für „${g.name}“ ein:`) }, "Teilen"));
+    parts.push(W.el("div", { class: "card" },
+      W.el("h2", {}, "Leute einladen"),
+      W.el("p", { class: "fine" }, "Schick diesen Link in euren Gruppenchat (z. B. WhatsApp). Jeder trägt sich damit selbst ein."),
+      W.el("div", { class: "linkbox" }, input), row));
+  }
+
+  // ---- Teilnehmer
+  const list = W.el("ul", { class: "people" });
+  for (const m of d.members) {
+    const li = W.el("li", {}, W.el("span", { class: "avatar" }, initial(m.name)), m.name, m.admin ? W.el("span", { class: "tag" }, "· du") : null);
+    if (!drawn && !m.admin) {
+      li.append(W.el("button", { class: "x", type: "button", "aria-label": m.name + " entfernen", onclick: async (e) => {
+        if (!(await W.ask(`${m.name} entfernen?`, "Die Person ist danach nicht mehr in der Gruppe und ihr Link funktioniert nicht mehr. Sie kann sich aber neu eintragen.", "Entfernen", true))) return;
+        try { render(await W.busy(e.target, "…", () => W.api("admin_remove", { token, id: m.id }))); }
+        catch (err) { alert(err.message); }
+      } }, "Entfernen"));
+    }
+    list.append(li);
+  }
+  const refresh = W.el("button", { class: "btn ghost", type: "button" }, "Aktualisieren");
+  refresh.addEventListener("click", () => W.busy(refresh, "Lädt …", load));
+  parts.push(W.el("div", { class: "card" },
+    W.el("h2", {}, `Dabei (${d.members.length})`),
+    W.el("p", { class: "fine" }, "Du siehst nur die Namen. E-Mail-Adressen und Wunschlisten bleiben privat."),
+    list, drawn ? null : W.el("div", { class: "row" }, refresh)));
+
+  // ---- Einstellungen + Auslosung
+  if (!drawn) {
+    const modes = W.el("div", { class: "modes" });
+    for (const [key, [title, text]] of Object.entries(MODES)) {
+      modes.append(W.el("label", { class: "mode" },
+        W.el("input", { type: "radio", name: "mode", value: key, checked: g.mode === key }),
+        W.el("div", {}, W.el("b", {}, title), W.el("span", {}, text))));
+    }
+    const budget = W.el("input", { type: "text", id: "budget", maxlength: "40", value: g.budget, placeholder: "z. B. 20 €" });
+    const date = W.el("input", { type: "date", id: "date", value: g.date || "" });
+    const name = W.el("input", { type: "text", id: "gname", maxlength: "80", value: g.name });
+    const smsg = W.el("p", { class: "msg", role: "status" });
+    const save = W.el("button", { class: "btn ghost", type: "submit" }, "Einstellungen speichern");
+    const sform = W.el("form", { class: "card" },
+      W.el("h2", {}, "Einstellungen"),
+      W.el("label", { style: "margin-top:4px" }, "Auslosungsmodus"), modes,
+      W.el("label", { for: "gname" }, "Name der Gruppe"), name,
+      W.el("div", { class: "grid2" },
+        W.el("div", {}, W.el("label", { for: "budget" }, "Budget ", W.el("span", { class: "opt" }, "(optional)")), budget),
+        W.el("div", {}, W.el("label", { for: "date" }, "Bescherung ", W.el("span", { class: "opt" }, "(optional)")), date)),
+      W.el("div", { class: "row" }, save), smsg);
+    sform.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      try {
+        const mode = sform.querySelector("input[name=mode]:checked")?.value;
+        const r = await W.busy(save, "Speichert …", () => W.api("admin_settings", { token, mode, group: name.value, budget: budget.value, date: date.value }));
+        render(r);
+        const done = W.el("p", { class: "msg ok" }, "Einstellungen gespeichert ✓");
+        main.querySelector("form.card")?.append(done);
+      } catch (err) { W.say(smsg, err.message); }
+    });
+    // Modus sofort speichern, damit der Auflösen-Knopf passt
+    modes.addEventListener("change", async () => {
+      const mode = sform.querySelector("input[name=mode]:checked").value;
+      try { render(await W.api("admin_settings", { token, mode })); } catch (err) { W.say(smsg, err.message); }
+    });
+    parts.push(sform);
+
+    const need = minFor(g.mode) - d.members.length;
+    const drawBtn = W.el("button", { class: "btn go wide", type: "button", disabled: need > 0 }, "Auflösen");
+    const dmsg = W.el("p", { class: "msg", role: "alert" });
+    drawBtn.addEventListener("click", async () => {
+      const ok = await W.ask("Jetzt auslosen?",
+        `${d.members.length} Personen, Modus „${MODES[g.mode][0]}“. Alle bekommen sofort eine E-Mail. Danach kann niemand mehr beitreten und es gibt keine neue Auslosung.`,
+        "Ja, auslosen");
+      if (!ok) return;
+      try {
+        const r = await W.busy(drawBtn, "Lost aus und verschickt Mails …", () => W.api("admin_draw", { token }));
+        await load();
+        const banner = W.el("div", { class: "note" }, W.el("p", {}, r.failed
+          ? `Ausgelost! ${r.sent} von ${r.count} Mails sind raus – ${r.failed} konnte${r.failed === 1 ? "" : "n"} nicht zugestellt werden (siehe unten).`
+          : `Ausgelost! Alle ${r.count} haben eine Mail bekommen.`));
+        main.prepend(banner);
+        scrollTo({ top: 0, behavior: "smooth" });
+      } catch (err) { W.say(dmsg, err.message); }
+    });
+    parts.push(W.el("div", { class: "card" },
+      W.el("h2", {}, "Auslosung"),
+      W.el("p", {}, "Wenn alle eingetragen sind, tippe auf „Auflösen“. Der Server lost zufällig aus – niemand zieht sich selbst. Auch du siehst danach nur, wen du selbst beschenkst."),
+      need > 0 ? W.el("p", { class: "fine" }, `Für den Modus „${MODES[g.mode][0]}“ fehl${need === 1 ? "t noch 1 Person" : "en noch " + need + " Personen"}.`) : null,
+      drawBtn, dmsg));
+  } else {
+    const box = W.el("div", { class: "card" },
+      W.el("h2", {}, "Ausgelost ✓"),
+      W.el("p", {}, `Modus „${MODES[g.mode][0]}“. Alle haben eine Mail mit ihrer Zuordnung bekommen. Die Gruppe ist jetzt geschlossen.`),
+      W.el("p", { class: "fine" }, "Wer seine Mail nicht findet, kann sich den Link über „Link verloren?“ selbst neu schicken lassen."));
+    if (d.failed > 0) {
+      const again = W.el("button", { class: "btn", type: "button" }, "Mails erneut senden");
+      const amsg = W.el("p", { class: "msg", role: "status" });
+      again.addEventListener("click", async () => {
+        try {
+          const r = await W.busy(again, "Sendet …", () => W.api("admin_resend", { token }));
+          if (r.failed) W.say(amsg, `${r.sent} zugestellt, ${r.failed} weiterhin nicht. Vielleicht ist die Adresse falsch geschrieben.`);
+          else { await load(); }
+        } catch (err) { W.say(amsg, err.message); }
+      });
+      box.append(W.el("div", { class: "warn" }, W.el("span", {}, "⚠️"),
+        W.el("p", {}, `${d.failed} Mail${d.failed === 1 ? "" : "s"} konnte${d.failed === 1 ? "" : "n"} nicht zugestellt werden. Aus Datenschutzgründen zeigen wir nicht, an wen.`)),
+        again, amsg);
+    }
+    parts.push(box);
+  }
+
+  if (d.token) parts.push(W.el("div", { class: "card" },
+    W.el("h2", {}, "Deine eigene Wichtel-Seite"),
+    W.el("p", { class: "fine" }, drawn ? "Dort deckst du auf, wen du beschenkst." : "Dort trägst du deine eigene Wunschliste ein."),
+    W.el("a", { class: "btn ghost", href: W.link.me(d.token) }, "Zu meiner Wichtel-Seite")));
+
+  main.replaceChildren(...parts);
+}
+
+load();
+window.addEventListener("hashchange", () => location.reload());
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && token) load().catch(() => {}); });
+</script>
+</body>
+</html>

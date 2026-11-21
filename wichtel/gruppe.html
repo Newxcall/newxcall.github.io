@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<script src="/site-edit.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#050507">
+<title>Wichteln · Einladung</title>
+<meta name="description" content="Du bist zum Wichteln eingeladen – trag dich ein.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="nav"><div class="wrap"><a class="brand" href="./"><span class="logo">🎁</span>Wichteln</a><a class="side" href="link.html">Link verloren?</a></div></header>
+
+<main><div class="wrap" id="main">
+  <div class="spinner" aria-label="Lädt"></div>
+</div></main>
+
+<footer><div class="wrap"><span>Wichteln · ein kostenloses Werkzeug von Newcall</span><nav aria-label="Rechtliches"><a href="../#apps">Alle Programme</a><a href="../#unterstuetzen">Unterstützen</a><a href="../impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a></nav></div></footer>
+
+<script src="app.js"></script>
+<script>
+const main = W.$("#main");
+const code = W.hash();
+
+async function load() {
+  if (!code) return W.fail(main, "Kein Einladungslink", "Öffne den Link, den du bekommen hast, vollständig – er endet mit # und einer Zeichenfolge.");
+  let info;
+  try {
+    info = await W.api("invite_info", { code });
+  } catch (e) {
+    return W.fail(main, "Einladung nicht gefunden", e.message);
+  }
+  const g = info.group;
+  document.title = "Wichteln · " + g.name;
+  const head = W.el("section", {},
+    W.el("p", { class: "eyebrow" }, "Du bist eingeladen"),
+    W.el("h1", {}, g.name),
+    W.facts(g, [W.el("span", { class: "chip" }, `👥 ${info.count} ${info.count === 1 ? "Person" : "Personen"} dabei`)]));
+
+  if (g.status === "drawn") {
+    main.replaceChildren(head, W.el("div", { class: "card" },
+      W.el("h2", {}, "Schon ausgelost"),
+      W.el("p", {}, "In dieser Gruppe wurde bereits ausgelost – man kann nicht mehr beitreten. Wenn du dabei bist, findest du deine Zuordnung über deinen persönlichen Link."),
+      W.el("a", { class: "btn", href: "link.html" }, "Meinen Link anfordern")));
+    return;
+  }
+
+  const msg = W.el("p", { class: "msg", role: "alert" });
+  const name = W.el("input", { type: "text", id: "name", maxlength: "60", autocomplete: "given-name", required: true });
+  const email = W.el("input", { type: "email", id: "email", maxlength: "200", autocomplete: "email", inputmode: "email", required: true });
+  const wishes = W.el("textarea", { id: "wishes", maxlength: "2000", placeholder: "Was wünschst du dir? Links zu Produkten sind erlaubt.\nDu kannst das später noch ändern." });
+  const go = W.el("button", { class: "btn go wide", type: "submit", style: "margin-top:16px" }, "Mitmachen");
+  const form = W.el("form", { class: "card", novalidate: true },
+    W.el("h2", {}, "Trag dich ein"),
+    W.el("label", { for: "name" }, "Dein Name"), name,
+    W.el("p", { class: "fine", style: "margin:6px 0 0" }, "So sehen dich die anderen in der Gruppe."),
+    W.el("label", { for: "email" }, "Deine E-Mail-Adresse"), email,
+    W.el("p", { class: "fine", style: "margin:6px 0 0" }, "Nur für die Mail mit deiner Zuordnung. Niemand sonst sieht sie – auch der Admin nicht."),
+    W.el("label", { for: "wishes" }, "Wunschliste ", W.el("span", { class: "opt" }, "(optional)")), wishes,
+    go, msg,
+    W.el("p", { class: "fine", style: "margin-top:12px" }, "Gespeichert werden nur Name, E-Mail und Wunschliste, bis 60 Tage nach der Bescherung. ",
+      W.el("a", { href: "datenschutz.html" }, "Datenschutz")));
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    W.say(msg, "");
+    if (!name.value.trim()) return W.say(msg, "Bitte gib deinen Namen an.");
+    if (!/^\S+@\S+\.\S+$/.test(email.value.trim())) return W.say(msg, "Bitte gib eine gültige E-Mail-Adresse an.");
+    try {
+      const r = await W.busy(go, "Wird eingetragen …", () => W.api("join", { code, name: name.value, email: email.value, wishlist: wishes.value }));
+      if (r.already) {
+        main.replaceChildren(head, W.el("div", { class: "card center" },
+          W.el("div", { style: "font-size:44px" }, "📬"),
+          W.el("h2", {}, "Du bist schon dabei"),
+          W.el("p", {}, "Mit dieser E-Mail-Adresse ist schon jemand eingetragen. Wir haben deinen persönlichen Link nochmal an diese Adresse geschickt – schau in dein Postfach (auch in den Spam-Ordner).")));
+        return;
+      }
+      W.flash("joined", r.mailed ? "mailed" : "nomail");
+      location.href = "ich.html#" + r.token;
+    } catch (err) {
+      W.say(msg, err.message);
+    }
+  });
+  main.replaceChildren(head, form);
+}
+load();
+window.addEventListener("hashchange", () => location.reload());
+</script>
+</body>
+</html>

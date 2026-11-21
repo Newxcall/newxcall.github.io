@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<script src="/site-edit.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#050507">
+<title>Wichteln · Gruppe erstellen</title>
+<meta name="description" content="Wichtelgruppe erstellen, Link verschicken, auslosen – kostenlos und ohne Anmeldung.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
+<link rel="stylesheet" href="style.css">
+<style>.all-apps{font-size:13px;color:var(--muted);text-decoration:none;padding:4px 11px;border:1px solid var(--line);border-radius:999px;white-space:nowrap}.all-apps:hover{color:var(--fg)}</style>
+</head>
+<body>
+<header class="nav"><div class="wrap"><a class="all-apps" href="../#apps" title="Alle Programme">‹ Alle</a>
+    <a class="brand" href="./"><span class="logo">🎁</span>Wichteln</a><a class="side" href="link.html">Link verloren?</a></div></header>
+
+<main><div class="wrap">
+  <section id="start">
+    <p class="eyebrow">Kostenlos · ohne Anmeldung</p>
+    <h1>Wichteln, ganz einfach.</h1>
+    <p class="lead">Gruppe erstellen, Link in den Gruppenchat schicken, auslosen. Jeder bekommt eine E-Mail, wen er beschenkt – und niemand sonst erfährt es.</p>
+
+    <form class="card" id="form" novalidate>
+      <h2>Neue Gruppe</h2>
+      <label for="group">Name der Gruppe</label>
+      <input type="text" id="group" maxlength="80" placeholder="z. B. Familie Weihnachten 2026" required>
+      <div class="grid2">
+        <div><label for="budget">Budget <span class="opt">(optional)</span></label>
+          <input type="text" id="budget" maxlength="40" placeholder="z. B. 20 €"></div>
+        <div><label for="date">Bescherung <span class="opt">(optional)</span></label>
+          <input type="date" id="date"></div>
+      </div>
+      <label for="name">Dein Name</label>
+      <input type="text" id="name" maxlength="60" autocomplete="given-name" required>
+      <label for="email">Deine E-Mail-Adresse</label>
+      <input type="email" id="email" maxlength="200" autocomplete="email" inputmode="email" required>
+      <p class="fine" style="margin-top:8px">Du bist Admin der Gruppe und machst selbst auch mit. Deine Links bekommst du zusätzlich per Mail.</p>
+      <button class="btn go wide" id="go" type="submit" style="margin-top:8px">Gruppe erstellen</button>
+      <p class="msg" id="msg" role="alert"></p>
+    </form>
+
+    <div class="card">
+      <h2>So funktioniert's</h2>
+      <ol class="steps">
+        <li><strong>Gruppe erstellen</strong> – du bekommst einen Einladungslink.</li>
+        <li><strong>Link teilen</strong> – alle tragen Namen, E-Mail und Wunschliste ein.</li>
+        <li><strong>Auflösen</strong> – du startest die Auslosung, alle bekommen eine E-Mail.</li>
+        <li><strong>Aufdecken</strong> – jeder sieht nur, wen er selbst beschenkt.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2>Datenschutz</h2>
+      <p>Gespeichert werden nur Name, E-Mail-Adresse und Wunschliste – nur zum Auslosen und für die Mails. Niemand sieht fremde E-Mail-Adressen, auch der Admin nicht. Die komplette Zuordnung wird nirgends angezeigt.</p>
+      <p class="fine">Die Gruppe wird 60 Tage nach der Bescherung automatisch gelöscht (ohne Datum nach 180 Tagen). Mehr in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>
+    </div>
+  </section>
+</div></main>
+
+<footer><div class="wrap"><span>Wichteln · ein kostenloses Werkzeug von Newcall</span><nav aria-label="Rechtliches"><a href="../#apps">Alle Programme</a><a href="../#unterstuetzen">Unterstützen</a><a href="../impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a></nav></div></footer>
+
+<script src="app.js"></script>
+<script>
+const f = W.$("#form"), msg = W.$("#msg"), go = W.$("#go");
+f.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  W.say(msg, "");
+  const data = {
+    group: W.$("#group").value, budget: W.$("#budget").value, date: W.$("#date").value,
+    name: W.$("#name").value, email: W.$("#email").value,
+  };
+  if (!data.group.trim()) return W.say(msg, "Bitte gib einen Namen für die Gruppe an.");
+  if (!data.name.trim()) return W.say(msg, "Bitte gib deinen Namen an.");
+  if (!/^\S+@\S+\.\S+$/.test(data.email.trim())) return W.say(msg, "Bitte gib eine gültige E-Mail-Adresse an.");
+  try {
+    const r = await W.busy(go, "Wird erstellt …", () => W.api("create", data));
+    W.flash("new", r.mailed ? "mailed" : "nomail");
+    location.href = "admin.html#" + r.admin;
+  } catch (err) {
+    W.say(msg, err.message);
+  }
+});
+</script>
+</body>
+</html>
