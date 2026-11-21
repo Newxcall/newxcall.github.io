@@ -47,6 +47,13 @@ input[type=text], input[type=email], input[type=date], textarea {
   border-radius: 12px; padding: 12px 14px; margin: 0; appearance: none; -webkit-appearance: none;
 }
 input[type=date] { min-height: 48px; color-scheme: dark; }
+select {
+  width: 100%; font: 400 16px var(--body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: 12px; padding: 12px 40px 12px 14px; min-height: 48px; color-scheme: dark; appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a1a1a6' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+}
+select:focus { outline: none; border-color: var(--blue); }
 textarea { min-height: 120px; resize: vertical; line-height: 1.5; }
 input:focus, textarea:focus { outline: none; border-color: var(--blue); }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }

@@ -158,6 +158,7 @@ function render(d) {
       W.el("h2", {}, "Auslosung"),
       W.el("p", {}, "Wenn alle eingetragen sind, tippe auf „Auflösen“. Der Server lost zufällig aus – niemand zieht sich selbst. Auch du siehst danach nur, wen du selbst beschenkst."),
       need > 0 ? W.el("p", { class: "fine" }, `Für den Modus „${MODES[g.mode][0]}“ fehl${need === 1 ? "t noch 1 Person" : "en noch " + need + " Personen"}.`) : null,
+      d.excludes > 0 ? W.el("p", { class: "fine" }, `${d.excludes === 1 ? "1 Person hat" : d.excludes + " Personen haben"} jemanden ausgeschlossen (z. B. den Partner). Das wird bei der Auslosung beachtet – wer wen ausgeschlossen hat, bleibt privat.`) : null,
       drawBtn, dmsg));
   } else {
     const box = W.el("div", { class: "card" },

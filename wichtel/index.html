@@ -36,6 +36,8 @@
       <input type="text" id="name" maxlength="60" autocomplete="given-name" required>
       <label for="email">Deine E-Mail-Adresse</label>
       <input type="email" id="email" maxlength="200" autocomplete="email" inputmode="email" required>
+      <label for="wishes">Deine Wunschliste <span class="opt">(optional)</span></label>
+      <textarea id="wishes" maxlength="2000" placeholder="Was wünschst du dir? Links zu Produkten sind erlaubt.&#10;Du kannst das später noch ändern."></textarea>
       <p class="fine" style="margin-top:8px">Du bist Admin der Gruppe und machst selbst auch mit. Deine Links bekommst du zusätzlich per Mail.</p>
       <button class="btn go wide" id="go" type="submit" style="margin-top:8px">Gruppe erstellen</button>
       <p class="msg" id="msg" role="alert"></p>
@@ -45,7 +47,7 @@
       <h2>So funktioniert's</h2>
       <ol class="steps">
         <li><strong>Gruppe erstellen</strong> – du bekommst einen Einladungslink.</li>
-        <li><strong>Link teilen</strong> – alle tragen Namen, E-Mail und Wunschliste ein.</li>
+        <li><strong>Link teilen</strong> – alle tragen Namen, E-Mail und Wunschliste ein. Wer möchte, schließt eine Person aus (z. B. den Partner).</li>
         <li><strong>Auflösen</strong> – du startest die Auslosung, alle bekommen eine E-Mail.</li>
         <li><strong>Aufdecken</strong> – jeder sieht nur, wen er selbst beschenkt.</li>
       </ol>
@@ -69,7 +71,7 @@ f.addEventListener("submit", async (e) => {
   W.say(msg, "");
   const data = {
     group: W.$("#group").value, budget: W.$("#budget").value, date: W.$("#date").value,
-    name: W.$("#name").value, email: W.$("#email").value,
+    name: W.$("#name").value, email: W.$("#email").value, wishlist: W.$("#wishes").value,
   };
   if (!data.group.trim()) return W.say(msg, "Bitte gib einen Namen für die Gruppe an.");
   if (!data.name.trim()) return W.say(msg, "Bitte gib deinen Namen an.");

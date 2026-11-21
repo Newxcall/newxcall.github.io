@@ -105,6 +105,30 @@ async function load() {
   });
   parts.push(form);
 
+  // ---- Eine Person nicht ziehen (nur vor der Auslosung)
+  const others = d.members.filter((m) => !m.you);
+  if (!drawn && others.length) {
+    const sel = W.el("select", { id: "ex" },
+      W.el("option", { value: "" }, "— niemand —"),
+      others.map((m) => W.el("option", { value: m.id, selected: m.id === d.me.exclude }, m.name)));
+    const exSave = W.el("button", { class: "btn ghost", type: "submit" }, "Speichern");
+    const exMsg = W.el("p", { class: "msg", role: "status" });
+    const exForm = W.el("form", { class: "card" },
+      W.el("h2", {}, "Nicht ziehen"),
+      W.el("p", { class: "fine" }, "Gibt es jemanden, den du nicht beschenken möchtest – zum Beispiel deinen Partner oder deine Partnerin? Dann zieht ihr euch gegenseitig nicht. Nur du siehst diese Auswahl, auch der Admin nicht."),
+      W.el("label", { for: "ex" }, "Diese Person möchte ich nicht ziehen"), sel,
+      W.el("div", { class: "row" }, exSave), exMsg);
+    sel.addEventListener("change", () => W.say(exMsg, ""));
+    exForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      try {
+        const r = await W.busy(exSave, "Speichert …", () => W.api("exclude", { token, id: sel.value || null }));
+        W.say(exMsg, r.exclude ? "Gespeichert ✓ Ihr zieht euch nicht gegenseitig." : "Gespeichert ✓ Du kannst jeden ziehen.", "ok");
+      } catch (err) { W.say(exMsg, err.message); }
+    });
+    parts.push(exForm);
+  }
+
   // ---- Gruppe
   const list = W.el("ul", { class: "people" }, d.members.map((m) =>
     W.el("li", {}, W.el("span", { class: "avatar" }, initial(m.name)), m.name,
