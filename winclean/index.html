@@ -321,6 +321,7 @@ body::before { background: var(--bg) !important; }
 .phone { box-shadow: 0 30px 80px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.06) !important; }
 .bezel { box-shadow: 0 30px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.06) !important; }
 </style>
+<script src="/nc-embed.js"></script>
 <style>.all-apps{font-size:13px;color:var(--muted);text-decoration:none;padding:4px 11px;border:1px solid var(--line);border-radius:999px;white-space:nowrap}.all-apps:hover{color:var(--fg)}</style>
 </head>
 <body>
@@ -694,7 +695,7 @@ body::before { background: var(--bg) !important; }
     fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'checkout' }) })
       .then(function (r) { return r.json(); })
       .then(function (j) {
-        if (j.url && j.url.indexOf('https://checkout.stripe.com/') === 0) { location.href = j.url; return; }
+        if (j.url && j.url.indexOf('https://checkout.stripe.com/') === 0) { (window.top || window).location.href = j.url; return; }
         throw new Error(j.error || 'Die Bezahlseite ließ sich nicht öffnen.');
       })
       .catch(function (e) {

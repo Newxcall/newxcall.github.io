@@ -65,6 +65,12 @@ h1, h2, h3 { font-family: var(--display); letter-spacing: -0.025em; margin: 0; f
 .btn-free:hover { background: #4ade72; }
 .btn-main { background: var(--fg); color: #000; }
 .btn-ghost { border: 1px solid rgba(255,255,255,.18); color: var(--fg); background: transparent; }
+.app-more { padding: 0 0 34px; }
+.app-more[hidden] { display: none; }
+.app-more iframe { display: block; width: 100%; height: 0; border: 0; background: transparent; transition: height .35s ease; }
+.app-more .loading { margin: 0; padding: 24px 0; color: var(--muted); font-size: 14px; }
+.app-more .less { margin-top: 8px; }
+@media (prefers-reduced-motion: reduce) { .app-more iframe { transition: none; } }
 .btn-ghost:hover { border-color: rgba(255,255,255,.4); }
 .btn svg { width: 18px; height: 18px; }
 
@@ -299,6 +305,54 @@ footer nav a:hover { color: var(--fg); }
     <nav aria-label="Rechtliches"><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="winclean/kuendigen.html">Verträge hier kündigen</a><a href="#unterstuetzen">Unterstützen</a></nav>
   </div>
 </footer>
+<script>
+// „Mehr erfahren“ klappt die ganze App-Seite direkt unter der App auf (statt wegzuleiten).
+(function () {
+  var links = document.querySelectorAll('.apps .app .btn-ghost[href]');
+  function panelFor(a) {
+    var art = a.closest('.app'), next = art.nextElementSibling;
+    if (next && next.classList.contains('app-more')) return next;
+    var box = document.createElement('div');
+    box.className = 'app-more';
+    box.innerHTML = '<p class="loading">Wird geladen …</p><iframe title="Mehr über ' + art.querySelector('h2').textContent + '" loading="eager"></iframe>'
+      + '<button type="button" class="btn btn-ghost less">Weniger anzeigen</button>';
+    var frame = box.querySelector('iframe');
+    frame.src = a.getAttribute('href') + '?embed=1';
+    box.querySelector('.less').addEventListener('click', function () { toggle(a, false); art.scrollIntoView({ block: 'start', behavior: 'smooth' }); });
+    art.after(box);
+    return box;
+  }
+  function toggle(a, open) {
+    var box = panelFor(a);
+    box.hidden = !open;
+    a.setAttribute('aria-expanded', String(open));
+    a.textContent = open ? 'Weniger anzeigen' : 'Mehr erfahren';
+  }
+  links.forEach(function (a) {
+    a.setAttribute('aria-expanded', 'false');
+    a.setAttribute('role', 'button');
+    a.addEventListener('click', function (e) {
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.button) return;   // neuer Tab: ganz normal
+      e.preventDefault();
+      toggle(a, a.getAttribute('aria-expanded') !== 'true');
+    });
+  });
+  window.addEventListener('message', function (e) {
+    if (e.origin !== location.origin || !e.data || !e.data.ncEmbed) return;
+    document.querySelectorAll('.app-more iframe').forEach(function (f) {
+      if (f.contentWindow !== e.source) return;
+      if (e.data.h) {
+        f.style.height = e.data.h + 'px';
+        var l = f.previousElementSibling; if (l && l.classList.contains('loading')) l.remove();
+      }
+      if (typeof e.data.y === 'number') {
+        var top = f.getBoundingClientRect().top + window.scrollY + e.data.y - 70;
+        window.scrollTo({ top: top, behavior: 'smooth' });
+      }
+    });
+  });
+})();
+</script>
 <script>
 // Auswahl ein-/ausblenden, wenn sich die Adresse ändert (zurück-Taste führt wieder zur Auswahl)
 window.addEventListener('hashchange', function () {
