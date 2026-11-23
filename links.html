@@ -13,105 +13,98 @@
 <meta property="og:url" content="https://newxcall.github.io/links">
 <meta property="og:image" content="https://newxcall.github.io/musik/bilder/cover/2qDhqtHKGts.jpg">
 <meta name="twitter:card" content="summary">
-<meta name="theme-color" content="#ff3d6e">
+<meta name="theme-color" content="#0b0b0c">
 <link rel="icon" href="musik/bilder/icon.svg" type="image/svg+xml">
 <style>
 @font-face { font-family: "Geist"; src: url("fonts/Geist-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
-:root { color-scheme: dark; --bg: #08080b; --card: rgba(255,255,255,.06); --line: rgba(255,255,255,.1); --fg: #f5f5f7; --muted: #a1a1a6;
-  --grad: linear-gradient(120deg, #ff3d6e, #8a5cff); --font: "Geist", -apple-system, "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif; }
+/* Link-Seite – schlicht: keine Leuchteffekte, eine Akzentfarbe (Rot für Musik). */
+:root { color-scheme: dark; --bg: #0b0b0c; --card: #141416; --line: rgba(255,255,255,.09); --fg: #ededeb; --muted: #9a9a97; --accent: #ff4d6d;
+  --font: "Geist", -apple-system, "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif; }
 * { box-sizing: border-box; }
 body { margin: 0; min-height: 100svh; background: var(--bg); color: var(--fg); font-family: var(--font); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-body::before { content: ""; position: fixed; inset: -20%; z-index: -1; pointer-events: none;
-  background: radial-gradient(40% 35% at 20% 15%, rgba(255,61,110,.28), transparent 70%), radial-gradient(45% 40% at 85% 70%, rgba(138,92,255,.26), transparent 70%); filter: blur(10px); }
 a { color: inherit; text-decoration: none; }
-main { width: min(520px, 100%); margin: 0 auto; padding: 48px 16px 40px; }
+main { width: min(500px, 100%); margin: 0 auto; padding: 48px 16px 40px; }
 .head { text-align: center; }
-.avatar { width: 112px; height: 112px; border-radius: 50%; object-fit: cover; padding: 3px; background: var(--grad); box-shadow: 0 16px 50px rgba(255,61,110,.3); }
-h1 { margin: 16px 0 4px; font-size: 32px; letter-spacing: -0.03em; }
+.avatar { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; }
+h1 { margin: 14px 0 4px; font-size: 28px; font-weight: 650; letter-spacing: -0.02em; }
 .sub { margin: 0; color: var(--muted); font-size: 15px; }
-.socials { display: flex; justify-content: center; gap: 10px; margin: 18px 0 26px; }
-.socials a { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--card); border: 1px solid var(--line); transition: transform .2s, background .2s; }
-.socials a:hover { transform: translateY(-2px); background: rgba(255,255,255,.12); }
+.socials { display: flex; justify-content: center; gap: 6px; margin: 16px 0 28px; }
+.socials a { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; color: var(--muted); transition: color .2s, background .2s; }
+.socials a:hover { color: var(--fg); background: rgba(255,255,255,.06); }
 .socials svg { width: 20px; height: 20px; fill: currentColor; }
-.links { display: grid; gap: 12px; }
-.link { position: relative; display: flex; align-items: center; gap: 14px; min-height: 62px; padding: 12px 18px; border-radius: 18px;
-  background: var(--card); border: 1px solid var(--line); font-weight: 600; font-size: 16px; transition: transform .2s, background .2s, border-color .2s; }
-.link:hover { transform: translateY(-2px); background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.2); }
-.link .ic { width: 38px; height: 38px; flex: none; border-radius: 11px; display: grid; place-items: center; font-size: 18px; background: rgba(255,255,255,.08); }
-.link .ic svg { width: 20px; height: 20px; fill: currentColor; }
+.links { display: grid; gap: 8px; }
+.link { display: flex; align-items: center; gap: 14px; min-height: 58px; padding: 10px 16px; border-radius: 12px;
+  background: var(--card); border: 1px solid var(--line); font-weight: 600; font-size: 15px; transition: border-color .2s; }
+.link:hover { border-color: rgba(255,255,255,.24); }
+.link .ic { width: 34px; height: 34px; flex: none; border-radius: 8px; display: grid; place-items: center; color: var(--muted); background: rgba(255,255,255,.05); }
+.link .ic svg { width: 19px; height: 19px; fill: currentColor; }
+.link .ic svg.line { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .link small { display: block; font-weight: 400; color: var(--muted); font-size: 13px; margin-top: 2px; }
 .link .arr { margin-left: auto; color: var(--muted); }
-.link.hot { background: var(--grad); border: 0; box-shadow: 0 14px 40px -12px rgba(255,61,110,.7); }
+.link.hot { background: var(--accent); border-color: var(--accent); color: #fff; }
+.link.hot:hover { background: #ff6680; border-color: #ff6680; }
 .link.hot small, .link.hot .arr { color: rgba(255,255,255,.85); }
-.link.hot .ic { background: rgba(255,255,255,.2); }
-.live { width: 8px; height: 8px; border-radius: 50%; background: #fff; display: inline-block; margin-right: 6px; vertical-align: middle; animation: puls 1.6s infinite; }
-@keyframes puls { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,.7); } 100% { box-shadow: 0 0 0 9px rgba(255,255,255,0); } }
-.label { margin: 22px 4px 2px; font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.link.hot .ic { background: rgba(0,0,0,.14); color: #fff; }
+.live { width: 7px; height: 7px; border-radius: 50%; background: #fff; display: inline-block; margin-right: 7px; vertical-align: middle; }
+.label { margin: 22px 2px 2px; font-size: 14px; font-weight: 500; color: var(--muted); }
 /* Player: die neuesten Songs */
-.player { padding: 14px; border-radius: 20px; background: var(--card); border: 1px solid var(--line); }
+.player { padding: 14px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); }
 .player .now { display: flex; align-items: center; gap: 14px; }
-.player .now img { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; flex: none; }
+.player .now img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; flex: none; }
 .player .now .t { min-width: 0; flex: 1; }
 .player .now small { color: var(--muted); font-size: 12px; }
 .player .now b { display: block; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .seek { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .seek span { width: 34px; flex: none; } .seek span:last-child { text-align: right; }
 .player input[type=range] { -webkit-appearance: none; appearance: none; flex: 1; min-width: 0; height: 22px; background: transparent; cursor: pointer; margin: 0; }
-.player input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, #ff3d6e, #8a5cff) 0 / var(--p, 0%) 100% no-repeat, rgba(255,255,255,.15); }
-.player input[type=range]::-moz-range-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, #ff3d6e, #8a5cff) 0 / var(--p, 0%) 100% no-repeat, rgba(255,255,255,.15); }
-.player input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; margin-top: -5px; border-radius: 50%; background: #fff; border: 0; }
-.player input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 0; }
+.player input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(var(--accent), var(--accent)) 0 / var(--p, 0%) 100% no-repeat, rgba(255,255,255,.15); }
+.player input[type=range]::-moz-range-track { height: 4px; border-radius: 2px; background: linear-gradient(var(--accent), var(--accent)) 0 / var(--p, 0%) 100% no-repeat, rgba(255,255,255,.15); }
+.player input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; margin-top: -4.5px; border-radius: 50%; background: #fff; border: 0; }
+.player input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 50%; background: #fff; border: 0; }
 .ctrl { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 6px; }
-.ctrl .btns { display: flex; align-items: center; gap: 8px; }
-.ctrl button { border: 0; cursor: pointer; display: grid; place-items: center; color: var(--fg); background: rgba(255,255,255,.08); width: 40px; height: 40px; border-radius: 50%; padding: 0; }
-.ctrl button:hover { background: rgba(255,255,255,.16); }
+.ctrl .btns { display: flex; align-items: center; gap: 6px; }
+.ctrl button { border: 0; cursor: pointer; display: grid; place-items: center; color: var(--muted); background: transparent; width: 38px; height: 38px; border-radius: 50%; padding: 0; }
+.ctrl button:hover { color: var(--fg); }
 .ctrl button svg { width: 18px; height: 18px; fill: currentColor; }
-.ctrl button.play { width: 50px; height: 50px; background: #fff; color: #000; transition: transform .15s; }
-.ctrl button.play:hover { background: #fff; transform: scale(1.05); }
+.ctrl button.play { width: 46px; height: 46px; background: #fff; color: #000; }
+.ctrl button.play:hover { background: #e6e6e3; color: #000; }
 .ctrl button.play svg { width: 20px; height: 20px; }
 .vol { display: flex; align-items: center; gap: 6px; width: 130px; }
 .vol button { width: 32px; height: 32px; background: transparent; color: var(--muted); }
-.tracks { list-style: none; margin: 12px 0 0; padding: 10px 0 0; border-top: 1px solid var(--line); display: grid; gap: 4px; }
-.tracks button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 7px 8px; border: 0; border-radius: 12px; background: transparent; color: var(--fg); font: inherit; text-align: left; cursor: pointer; }
-.tracks button:hover { background: rgba(255,255,255,.06); }
-.tracks button[aria-current="true"] { background: rgba(255,61,110,.12); }
-.tracks img { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; flex: none; }
+.tracks { list-style: none; margin: 12px 0 0; padding: 10px 0 0; border-top: 1px solid var(--line); display: grid; gap: 2px; }
+.tracks button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 7px 8px; border: 0; border-radius: 8px; background: transparent; color: var(--fg); font: inherit; text-align: left; cursor: pointer; }
+.tracks button:hover { background: rgba(255,255,255,.05); }
+.tracks button[aria-current="true"] .n { color: var(--accent); }
+.tracks img { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; flex: none; }
 .tracks .n { flex: 1; min-width: 0; font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tracks .d { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .eq { display: none; gap: 2px; align-items: flex-end; height: 14px; }
-.eq i { width: 3px; background: #ff3d6e; border-radius: 1px; animation: eq .9s ease-in-out infinite alternate; }
+.eq i { width: 3px; background: var(--accent); border-radius: 1px; animation: eq .9s ease-in-out infinite alternate; }
 .eq i:nth-child(2) { animation-delay: -.3s; } .eq i:nth-child(3) { animation-delay: -.6s; }
 @keyframes eq { from { height: 3px; } to { height: 14px; } }
 .playing [aria-current="true"] .eq { display: flex; }
 .playing [aria-current="true"] .d { display: none; }
 @media (prefers-reduced-motion: reduce) { .eq i { animation: none; height: 10px; } }
 @media (max-width: 380px) { .vol { width: 96px; } }
-.big { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 4px 0 30px; }
-.tile { position: relative; isolation: isolate; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; min-height: 172px; padding: 18px;
-  border-radius: 24px; background: #0e0e14; border: 1px solid rgba(255,255,255,.16); transition: transform .25s; }
-.tile::before { content: ""; position: absolute; inset: -4px; z-index: -1; border-radius: 28px; background: var(--glow); filter: blur(18px); opacity: .3;
-  animation: atmen 4.5s ease-in-out infinite alternate; }
-.tile::after { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; border: 1.5px solid transparent;
-  background: linear-gradient(#0e0e14, #0e0e14) padding-box, var(--glow) border-box; }
-.tile:hover { transform: translateY(-3px) scale(1.01); }
-.tile:hover::before { opacity: .5; }
-.tile.music { --glow: linear-gradient(135deg, #ff3d6e, #ff8a00 45%, #8a5cff); }
-.tile.apps { --glow: linear-gradient(135deg, #63e6be, #64d2ff 45%, #bf5af2); animation-delay: -2s; }
-.tile.apps::before { animation-delay: -2.2s; }
-.tile .emoji { position: absolute; top: 16px; left: 18px; font-size: 30px; }
-.tile .imgs { position: absolute; top: 16px; left: 16px; display: flex; gap: 6px; }
+/* Die zwei großen Kacheln: Musik und Apps */
+.big { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 28px; }
+.tile { display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; min-height: 168px; padding: 18px;
+  border-radius: 14px; background: var(--card); border: 1px solid var(--line); transition: border-color .2s; }
+.tile:hover { border-color: rgba(255,255,255,.26); }
+.tile .mark { margin-bottom: auto; }
+.tile .bars { display: flex; align-items: flex-end; gap: 4px; height: 34px; }
+.tile .bars i { width: 6px; border-radius: 2px; background: var(--accent); }
+.tile .bars i:nth-child(1) { height: 40%; } .tile .bars i:nth-child(2) { height: 85%; } .tile .bars i:nth-child(3) { height: 60%; } .tile .bars i:nth-child(4) { height: 100%; } .tile .bars i:nth-child(5) { height: 50%; }
+.tile .imgs { display: flex; gap: 6px; }
 .tile .imgs img { width: 34px; height: 34px; border-radius: 9px; }
-.tile b { font-size: 22px; letter-spacing: -0.02em; line-height: 1.1; }
+.tile b { font-size: 22px; font-weight: 650; letter-spacing: -0.02em; line-height: 1.1; }
 .tile span { font-size: 13px; color: var(--muted); }
 .tile .go { color: var(--fg); font-weight: 600; margin-top: 6px; }
-@keyframes atmen { from { opacity: .2; } to { opacity: .38; } }
-@media (prefers-reduced-motion: reduce) { .tile::before { animation: none; } }
 @media (max-width: 360px) { .big { grid-template-columns: 1fr; } }
 footer { margin-top: 34px; text-align: center; font-size: 12px; color: var(--muted); }
 footer a { margin: 0 8px; }
 footer a:hover { color: var(--fg); }
-:focus-visible { outline: 2px solid #8a5cff; outline-offset: 3px; }
-@media (prefers-reduced-motion: reduce) { .live { animation: none; } .link, .socials a { transition: none; } }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 </style>
 </head>
 <body>
@@ -136,11 +129,11 @@ footer a:hover { color: var(--fg); }
 
   <div class="big">
     <a class="tile music" href="musik/">
-      <span class="emoji" aria-hidden="true">🎧</span>
+      <span class="mark bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
       <b>Musik</b><span>Songs hören & Mixing, Mastering buchen</span><span class="go">Öffnen →</span>
     </a>
     <a class="tile apps" href="./#apps">
-      <span class="imgs" aria-hidden="true"><img src="winclean/icon.png" alt=""><img src="pebble/icon.png" alt=""><img src="idock-app/icon.png" alt=""></span>
+      <span class="mark imgs" aria-hidden="true"><img src="winclean/icon.png" alt=""><img src="pebble/icon.png" alt=""><img src="idock-app/icon.png" alt=""></span>
       <b>Newcall Apps</b><span>WinClean, Pebble, iDock – gratis</span><span class="go">Öffnen →</span>
     </a>
   </div>
@@ -184,11 +177,11 @@ footer a:hover { color: var(--fg); }
       <span class="ic" style="color:#e1306c"><svg><use href="#ig"/></svg></span>
       <span>Kommissionen & Anfragen<small>Schreib mir auf Instagram</small></span><span class="arr">→</span></a>
     <a class="link" href="musik/#leistungen">
-      <span class="ic">🎛️</span><span>Producing, Mixing & Mastering buchen<small>Direkt online bezahlen</small></span><span class="arr">→</span></a>
+      <span class="ic"><svg class="line" viewBox="0 0 24 24"><path d="M5 4v16M12 4v16M19 4v16M3 15h4M10 8h4M17 13h4"/></svg></span><span>Producing, Mixing & Mastering buchen<small>Direkt online bezahlen</small></span><span class="arr">→</span></a>
 
     <p class="label">Mehr</p>
     <a class="link" href="musik/#newsletter">
-      <span class="ic">✉️</span><span>Newsletter<small>Neue Musik zuerst per E-Mail</small></span><span class="arr">→</span></a>
+      <span class="ic"><svg class="line" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg></span><span>Newsletter<small>Neue Musik zuerst per E-Mail</small></span><span class="arr">→</span></a>
   </div>
 
   <footer><a href="impressum.html">Impressum</a><a href="musik/datenschutz.html">Datenschutz</a></footer>

@@ -126,6 +126,28 @@ footer nav a:hover { color: var(--fg); }
 .btn.btn-gratis { background: #30d158; color: #04210e; }
 .plan.pro .btn-go { background: transparent; color: var(--fg); border: 1px solid rgba(255,255,255,.18); }
 </style>
+<style id="nc-calm">
+/* Schlichter Look (wie alle Newcall-Seiten): keine Leuchtflächen, keine Farbverlauf-Schrift, ruhige Beschriftungen.
+   Das nachgebaute App-Fenster bleibt unverändert. */
+:root { --bg: #0b0b0c; --surface: #141416; --surface-2: #1b1b1e; --line: rgba(255,255,255,.09); --fg: #ededeb; --muted: #9a9a97; --dim: #6f6f6c; }
+.glow { display: none !important; }
+h1, h2 { letter-spacing: -0.025em !important; font-weight: 650 !important; }
+.eyebrow, .hero .meta, .tile .k, .steps li::before, .install li::before, .plan .badge, .card .tag {
+  font-family: var(--body, "Geist", "Segoe UI", system-ui, sans-serif) !important; letter-spacing: 0 !important; text-transform: none !important; }
+.eyebrow { font-size: 15px !important; font-weight: 500 !important; }
+.grad, .grad-go, .grad-fresh, .grad-safe, .grad-warm, .grad-cool, .grad-live {
+  background: none !important; -webkit-background-clip: border-box !important; background-clip: border-box !important; color: inherit !important; }
+.nav { background: var(--bg) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+body::before { background: var(--bg) !important; }
+.btn { border-radius: 10px !important; }
+.btn:hover { transform: none !important; }
+.chip { border-radius: 8px !important; }
+.t-clean, .t-ai, .t-move, .t-music, .plan.pro, .plan.free { background: var(--surface) !important; }
+.tile, .plan { border-radius: 16px !important; }
+.plan .badge { border-radius: 6px !important; }
+.phone { box-shadow: 0 30px 80px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.06) !important; }
+.bezel { box-shadow: 0 30px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.06) !important; }
+</style>
 <style>.all-apps{font-size:13px;color:var(--muted);text-decoration:none;padding:4px 11px;border:1px solid var(--line);border-radius:999px;white-space:nowrap}.all-apps:hover{color:var(--fg)}</style>
 </head>
 <body>
