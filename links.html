@@ -2,6 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
+<script src="/nc-theme.js"></script>
 <script src="/site-edit.js"></script>
 <script src="/nc-motion.js" defer></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -105,6 +106,16 @@ footer { margin-top: 34px; text-align: center; font-size: 12px; color: var(--mut
 footer a { margin: 0 8px; }
 footer a:hover { color: var(--fg); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+/* Hell (Schalter oben rechts, siehe /nc-theme.js) */
+html[data-theme="light"] .link:hover, html[data-theme="light"] .tile:hover { border-color: rgba(0,0,0,.24); }
+html[data-theme="light"] .socials a:hover, html[data-theme="light"] .tracks button:hover { background: rgba(0,0,0,.05); }
+html[data-theme="light"] .link .ic { background: rgba(0,0,0,.05); }
+html[data-theme="light"] .player input[type=range]::-webkit-slider-runnable-track { background: linear-gradient(var(--accent), var(--accent)) 0 / var(--p, 0%) 100% no-repeat, rgba(0,0,0,.14); }
+html[data-theme="light"] .player input[type=range]::-moz-range-track { background: linear-gradient(var(--accent), var(--accent)) 0 / var(--p, 0%) 100% no-repeat, rgba(0,0,0,.14); }
+html[data-theme="light"] .player input[type=range]::-webkit-slider-thumb { background: #161617; }
+html[data-theme="light"] .player input[type=range]::-moz-range-thumb { background: #161617; }
+html[data-theme="light"] .ctrl button.play { background: #161617; color: #fff; }
+html[data-theme="light"] .ctrl button.play:hover { background: #333; color: #fff; }
 </style>
 </head>
 <body>

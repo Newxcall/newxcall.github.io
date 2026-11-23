@@ -2,6 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
+<script src="/nc-theme.js"></script>
 <script src="/site-edit.js"></script>
 <script src="/nc-motion.js" defer></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -118,7 +119,8 @@ footer nav a:hover { color: var(--fg); }
   .launcher { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .nav-links { gap: 16px; }
 }
-@media (max-width: 520px) { .nav-links a.opt { display: none; } }
+@media (max-width: 520px) { .nav-links a.opt { display: none; } .nav .wrap { gap: 12px; } .brand { white-space: nowrap; } }
+@media (max-width: 440px) { .nav-links { gap: 14px; } .nav-links a:not(:first-child) { display: none; } }
 
 /* Startauswahl: Newcall Apps oder Musik */
 .choose { display: none; }
@@ -143,6 +145,17 @@ footer nav a:hover { color: var(--fg); }
 .bars i:nth-child(1) { height: 40%; } .bars i:nth-child(2) { height: 85%; } .bars i:nth-child(3) { height: 60%; }
 .bars i:nth-child(4) { height: 100%; } .bars i:nth-child(5) { height: 50%; }
 @media (max-width: 700px) { .tiles { grid-template-columns: minmax(0, 1fr); } .tile { min-height: 200px; padding: 24px; } }
+/* Hell (Schalter oben, siehe /nc-theme.js) */
+html[data-theme="light"] .app p.desc { color: #3a3a38; }
+html[data-theme="light"] .btn-main, html[data-theme="light"] .amounts button[aria-pressed="true"] { color: #fff; }
+html[data-theme="light"] .btn-ghost, html[data-theme="light"] .amounts button, html[data-theme="light"] .amounts label { border-color: rgba(0,0,0,.18); }
+html[data-theme="light"] .btn-ghost:hover, html[data-theme="light"] .amounts button:hover { border-color: rgba(0,0,0,.45); }
+html[data-theme="light"] .btn-free { background: #28b84c; color: #fff; }
+html[data-theme="light"] .btn-free:hover { background: #22a142; }
+html[data-theme="light"] .tile:hover { border-color: rgba(0,0,0,.24); background: #fafaf8; }
+html[data-theme="light"] .support .err { color: #d12c2c; }
+.choose-theme { position: fixed; top: 14px; right: 14px; }
+.choose-theme .nc-theme { background: var(--surface); }
 </style>
 </head>
 <body>
@@ -170,6 +183,7 @@ footer nav a:hover { color: var(--fg); }
       </a>
     </div>
   </div>
+  <div class="choose-theme" data-nc-theme-slot></div>
 </div>
 
 <nav class="nav" aria-label="Hauptmenü">

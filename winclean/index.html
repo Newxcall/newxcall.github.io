@@ -2,6 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
+<script src="/nc-theme.js"></script>
 <script src="/site-edit.js"></script>
 <script src="/nc-motion.js" defer></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -322,6 +323,20 @@ body::before { background: var(--bg) !important; }
 .bezel { box-shadow: 0 30px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.06) !important; }
 </style>
 <script src="/nc-embed.js"></script>
+<style id="nc-light">
+/* Hell (Schalter oben im Menü, siehe /nc-theme.js). Nachgebaute App-Fenster, Pillen und Handys bleiben dunkel. */
+html[data-theme="light"] .btn-small, html[data-theme="light"] .btn-big, html[data-theme="light"] .chip[aria-pressed="true"] { color: #fff; }
+html[data-theme="light"] .btn-big:hover, html[data-theme="light"] .btn-small:hover { background: #3a3a3c; }
+html[data-theme="light"] { --green: #1f9e45; --mint: #12875a; --sky: #1281b3; --blue: #0a6fdc; }
+html[data-theme="light"] .btn-gratis { background: var(--green); color: #fff; }
+html[data-theme="light"] .plan.pro .btn-go { border-color: rgba(0,0,0,.18); }
+html[data-theme="light"] .phone, html[data-theme="light"] .bezel { box-shadow: 0 30px 70px rgba(0,0,0,.18), 0 0 0 1px rgba(0,0,0,.08) !important; }
+html[data-theme="light"] :is(.bezel, .phone, .deck, .card-pill, .mini-pill, .pill, .size .mini, .dark-ui) {
+  color-scheme: dark; --green: #30d158; --mint: #63e6be; --sky: #64d2ff; --blue: #0a84ff; --bg: #0b0b0c; --surface: #141416; --surface-2: #1b1b1e; --tile: #212226; --line: rgba(255,255,255,.09);
+  --fg: #ededeb; --muted: #9a9a97; --dim: #6f6f6c; }
+html[data-theme="light"] :is(.bezel, .phone, .deck, .card-pill, .mini-pill, .pill, .size .mini, .dark-ui) { color: var(--fg); }
+html[data-theme="light"] .plan.free .amount, html[data-theme="light"] .plan .badge { color: var(--green); }
+</style>
 <style>.all-apps{font-size:13px;color:var(--muted);text-decoration:none;padding:4px 11px;border:1px solid var(--line);border-radius:999px;white-space:nowrap}.all-apps:hover{color:var(--fg)}</style>
 </head>
 <body>
