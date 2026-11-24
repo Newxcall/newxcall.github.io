@@ -424,6 +424,10 @@ html[data-theme="light"] .plan.free .amount, html[data-theme="light"] .plan .bad
   <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8 5-14 15-14 0 10-6 15-14 15M5 19l7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
   <symbol id="i-list" viewBox="0 0 24 24"><path d="M4 6.5h11M4 11.5h11M4 16.5h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M19 13.5v-7l3-1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="17.3" cy="16" r="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-lyrics" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4 6.5h16M4 12h11M4 17.5h7"/></symbol>
+  <symbol id="i-tray" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 13.5 6.5 5h11l2.5 8.5V19H4zM4 13.5h4.5l1 2h5l1-2H20"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="m12 4 8.5 4.5L12 13 3.5 8.5zM3.5 12.5 12 17l8.5-4.5M3.5 16.5 12 21l8.5-4.5"/></symbol>
+  <symbol id="i-gauge" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4.5 17a8 8 0 1 1 15 0M12 14l3.5-4.5"/></symbol>
   <symbol id="i-chat" viewBox="0 0 24 24"><path fill="#fff" d="M12 3.5c-4.97 0-9 3.36-9 7.5 0 2.3 1.25 4.36 3.2 5.73L5.5 20.5l4.1-2.2c.77.15 1.57.2 2.4.2 4.97 0 9-3.36 9-7.5s-4.03-7.5-9-7.5z"/></symbol>
 </svg>
 
@@ -449,7 +453,7 @@ html[data-theme="light"] .plan.free .amount, html[data-theme="light"] .plan .bad
     <div class="wrap">
       <p class="eyebrow">Pebble für Windows</p>
       <h1 style="margin-top:14px">Alles Wichtige.<br>In einer <span class="grad-warm">Pille.</span></h1>
-      <p class="lead">Pebble sitzt oben auf deinem Bildschirm und zeigt, was gerade passiert: Musik, Lautstärke, Nachrichten, Timer und deinen Stream. Ein Blick genügt, ein Klick öffnet mehr.</p>
+      <p class="lead">Pebble sitzt oben auf deinem Bildschirm und zeigt, was gerade passiert: Musik samt Songtext, Lautstärke, Nachrichten, Termine, Timer und deinen Stream. Ein Blick genügt, ein Klick öffnet mehr.</p>
       <div class="ctas">
         <a class="btn btn-big btn-gratis" href="#laden" data-download><svg><use href="#i-down"/></svg>Gratis für Windows laden</a>
         <a class="btn-link" href="#funktionen">Funktionen ansehen ›</a>
@@ -563,7 +567,7 @@ html[data-theme="light"] .plan.free .amount, html[data-theme="light"] .plan .bad
       <div class="bento">
         <article class="tile t-music">
           <h3>Musik, immer im Blick.</h3>
-          <p>Cover, Titel, Fortschritt und Steuerung für Spotify, YouTube im Browser und jede App, die Windows ihre Musik meldet. Die Pille leuchtet sanft in der Farbe des Covers.</p>
+          <p>Cover, Titel, Fortschritt und Steuerung für Spotify, YouTube im Browser und jede App, die Windows ihre Musik meldet. Die Pille leuchtet sanft in der Farbe des Covers. Dazu Zufall und Wiederholen, ein Visualizer, ein Schlaftimer und die Wahl, welche App gerade angezeigt wird.</p>
           <div class="vis">
             <div class="card-pill" style="box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 0 60px rgba(255,94,138,.25)">
               <div class="m-top">
@@ -577,7 +581,7 @@ html[data-theme="light"] .plan.free .amount, html[data-theme="light"] .plan .bad
         </article>
         <article class="tile t-vol">
           <h3>Lautstärke. Elegant.</h3>
-          <p>Ersetzt die Windows-Anzeige. Mausrad über der Pille regelt laut und leise, der Mixer jede App einzeln.</p>
+          <p>Ersetzt die Windows-Anzeige. Mausrad über der Pille regelt laut und leise, der Mixer jede App einzeln. Ein Tipp auf den Gerätenamen wechselt zwischen Headset und Lautsprecher, <span class="kbd">Strg+Alt+M</span> schaltet das Mikrofon stumm.</p>
           <div class="vis mix">
             <div class="mix-row"><span class="ic" style="background:linear-gradient(135deg,#1ed760,#119c45)"></span><span class="tr"><i style="width:72%"></i></span><span class="num">72</span></div>
             <div class="mix-row"><span class="ic" style="background:linear-gradient(135deg,#8b9bff,#5865f2)"></span><span class="tr"><i style="width:48%"></i></span><span class="num">48</span></div>
@@ -586,7 +590,7 @@ html[data-theme="light"] .plan.free .amount, html[data-theme="light"] .plan .bad
         </article>
         <article class="tile t-note">
           <h3>Keine Nachricht verpassen.</h3>
-          <p>Neue Mitteilungen erscheinen genau da, wo du hinschaust. Die Glocke hält die letzten 50 bereit, falls du mal nicht hingesehen hast.</p>
+          <p>Neue Mitteilungen erscheinen genau da, wo du hinschaust. Die Glocke hält die letzten 50 bereit, falls du mal nicht hingesehen hast. Mit Ruhezeiten und stummen Apps bleibt es still, wenn du willst, und im Fokus sammelt Pebble alles für später.</p>
           <div class="vis notes">
             <div class="note"><div class="app-icon"><svg><use href="#i-chat"/></svg></div><div class="t"><small>CHAT · JETZT</small><b>Lena</b><p>Kommst du heute noch vorbei? Ich hab Pizza.</p></div></div>
             <div class="note"><div class="app-icon" style="background:linear-gradient(160deg,#8b9bff,#5865f2)"><svg><use href="#i-chat"/></svg></div><div class="t"><small>SERVER · VOR 5 MIN</small><b>Jonas</b><p>Heute Abend wieder zocken?</p></div></div>
@@ -602,7 +606,7 @@ html[data-theme="light"] .plan.free .amount, html[data-theme="light"] .plan .bad
         </article>
         <article class="tile t-cal">
           <h3>Dein Tag auf einen Blick.</h3>
-          <p>Nächster Termin und Wetter in der Uhr-Ansicht, eigene Erinnerungen direkt in der Pille.</p>
+          <p>Nächster Termin und Wetter in der Uhr-Ansicht, eigene Erinnerungen direkt in der Pille. Eine Minute vor Teams-, Zoom- oder Meet-Terminen erscheint „Beitreten“. Dazu Weltuhren, ein Wecker und eine Schnellnotiz.</p>
           <div class="vis cal">
             <div class="cal-row"><svg style="color:var(--orange)"><use href="#i-cal"/></svg>Training<span class="when">18:30</span></div>
             <div class="cal-row"><svg style="color:var(--orange)"><use href="#i-sun"/></svg>Leicht bewölkt<span class="when">12 °C</span></div>
@@ -610,7 +614,7 @@ html[data-theme="light"] .plan.free .amount, html[data-theme="light"] .plan .bad
         </article>
         <article class="tile t-live">
           <h3>Live dabei.</h3>
-          <p>Downloads mit geladener Menge, ein roter Punkt bei Bildschirmaufnahmen, ein farbiger Punkt, wenn Mikrofon oder Kamera an sind.</p>
+          <p>Downloads mit Menge und Tempo, ein roter Punkt bei Bildschirmaufnahmen, ein farbiger Punkt, wenn Mikrofon oder Kamera an sind. Pebble sagt auch Bescheid, wenn das Internet weg ist, das VPN wechselt, ein Update auf den Neustart wartet oder die Festplatte voll wird.</p>
           <div class="vis live-vis">
             <div class="mini-pill"><svg width="18" height="18" style="color:var(--blue)"><use href="#i-down"/></svg><span class="num" style="color:var(--blue)">418 MB</span></div>
             <div class="mini-pill"><span class="dotrow"><span class="dot" style="background:var(--orange)"></span><span class="dot" style="background:var(--green)"></span></span><span style="font-size:13px;color:var(--muted)">Mikro · Kamera</span></div>
@@ -636,6 +640,7 @@ html[data-theme="light"] .plan.free .amount, html[data-theme="light"] .plan .bad
         <p class="eyebrow" style="color:var(--red)">Neu · Für OBS Studio</p>
         <h2>Dein Stream Deck.<br><span class="grad-live">Schon eingebaut.</span></h2>
         <p>Szenen per Klick wechseln, live gehen, aufnehmen und das Mikro stumm schalten. Solange du streamst, zeigt die Pille deine Sendezeit. Live geht es erst beim zweiten Tippen, damit nichts aus Versehen passiert.</p>
+        <p>Außerdem: Quellen an- und ausschalten, einen Clip der letzten Sekunden speichern, Marker setzen, eine Warnung bei verlorenen Bildern und deinen Twitch-Chat mitlesen.</p>
         <ol class="steps">
           <li><span>In OBS <b>Werkzeuge → WebSocket-Servereinstellungen</b> öffnen.</span></li>
           <li><span><b>„WebSocket-Server aktivieren“</b> anhaken.</span></li>
@@ -683,8 +688,16 @@ html[data-theme="light"] .plan.free .amount, html[data-theme="light"] .plan .bad
         <div class="detail"><svg><use href="#i-palette"/></svg><h3>Vier Designs</h3><p>Schwarz, Graphit, Glas und Nacht. Größe, Schrift und Abstand einstellbar.</p></div>
         <div class="detail"><svg><use href="#i-leaf"/></svg><h3>Sparsam</h3><p>Reagiert auf Ereignisse statt ständig nachzufragen. Im Ruhezustand braucht Pebble praktisch keine Rechenzeit.</p></div>
         <div class="detail"><svg><use href="#i-lock"/></svg><h3>Bleibt bei dir</h3><p>Der Mitteilungsverlauf liegt nur im Arbeitsspeicher. Nachrichteninhalte werden nie gespeichert.</p></div>
-        <div class="detail"><svg><use href="#i-idle"/></svg><h3>Ein Gesicht</h3><p>In Ruhe blinzelt Pebble, schaut sich um und freut sich mit dir.</p></div>
+        <div class="detail"><svg><use href="#i-idle"/></svg><h3>Ein Gesicht</h3><p>In Ruhe blinzelt Pebble, schaut sich um und freut sich mit dir. Nach Mitternacht wird es müde, zu Weihnachten trägt es Deko, und kitzeln lässt es sich auch.</p></div>
         <div class="detail"><svg><use href="#i-bell"/></svg><h3>Ein Klingelton</h3><p>Timer und Fokus klingeln, bis du auf die Pille klickst.</p></div>
+        <div class="detail"><svg><use href="#i-lyrics"/></svg><h3>Songtext</h3><p>Der Text läuft im Takt mit, auf Wunsch als kleine Liedtext-Pille unter Pebble, die in der Coverfarbe leuchtet.</p></div>
+        <div class="detail"><svg><use href="#i-tray"/></svg><h3>Datei-Ablage</h3><p>Dateien auf die Pille ziehen, parken und später wieder herausziehen – praktisch zwischen zwei Ordnern.</p></div>
+        <div class="detail"><svg><use href="#i-layers"/></svg><h3>Profile</h3><p>Arbeit, Gaming und Stream mit eigenen Einstellungen. Auf Wunsch wechselt Pebble von selbst.</p></div>
+        <div class="detail"><svg><use href="#i-gauge"/></svg><h3>Leistung</h3><p>CPU, Arbeitsspeicher, Grafikkarte und Ping – im Spiel als kleine Leiste in der Ecke, mit FPS.</p></div>
+        <div class="detail"><svg><use href="#i-eyeoff"/></svg><h3>Weicht von selbst</h3><p>Bei Präsentationen, im Vollbild oder beim Bildschirmteilen blendet Pebble sich auf Wunsch aus.</p></div>
+        <div class="detail"><svg><use href="#i-plug"/></svg><h3>Bluetooth-Akku</h3><p>Beim Verbinden zeigt Pebble, wie voll Kopfhörer und andere Bluetooth-Geräte noch sind.</p></div>
+        <div class="detail"><svg><use href="#i-key"/></svg><h3>Mit der Tastatur</h3><p>Pebble lässt sich auch ganz ohne Maus öffnen und bedienen. Tastenkombinationen legst du selbst fest.</p></div>
+        <div class="detail"><svg><use href="#i-copy"/></svg><h3>Einstellungen mitnehmen</h3><p>Alles als Datei sichern und auf dem nächsten PC wieder laden. Passwörter bleiben auf dem alten PC.</p></div>
       </div>
     </div>
   </section>
@@ -704,7 +717,7 @@ html[data-theme="light"] .plan.free .amount, html[data-theme="light"] .plan .bad
             <li><svg><use href="#i-tick"/></svg>Für immer: Pille mit Musik, Akku, Timer und Uhr</li>
             <li><svg><use href="#i-tick"/></svg>Für immer: per eigener Tastenkombination komplett unsichtbar</li>
             <li><svg><use href="#i-tick"/></svg>7 Tage: alle Funktionen testen</li>
-            <li class="no"><svg><use href="#i-lockp"/></svg>Mac-Dock, Lautstärke und Mixer, Spotify, OBS, Wetter, Termine und Mitteilungen nur mit Abo</li>
+            <li class="no"><svg><use href="#i-lockp"/></svg>Mac-Dock, Lautstärke und Mixer, Spotify, OBS und Twitch, Wetter, Termine, Mitteilungen, Songtext, Datei-Ablage, Profile und Leistungsanzeige nur mit Abo</li>
           </ul>
           <div class="cta">
             <a class="btn btn-big btn-gratis" href="https://github.com/Newxcall/launcher/releases/latest/download/NewcallLauncher.exe" data-download><svg><use href="#i-down"/></svg>Gratis laden</a>
